@@ -365,3 +365,44 @@ main {
     }
 
 }
+
+/* ==========================
+   MENSAJES
+========================== */
+
+#contenedor-mensajes {
+    background: #fafbfd;
+}
+
+.mensaje-enviado {
+    background: var(--azul);
+    color: white;
+
+    padding: 10px 15px;
+
+    border-radius: 15px;
+
+    margin-bottom: 10px;
+
+    max-width: 75%;
+
+    margin-left: auto;
+}
+
+.mensaje-recibido {
+    background: #e9edf5;
+
+    padding: 10px 15px;
+
+    border-radius: 15px;
+
+    margin-bottom: 10px;
+
+    max-width: 75%;
+}
+
+#contenedor-mensajes {
+    background: #fafbfd;
+    height: 400px;
+    overflow-y: auto;
+}
