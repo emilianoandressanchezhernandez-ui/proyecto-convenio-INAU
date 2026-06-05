@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INAU - Panel del Tallerista</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="bi bi-mortarboard-fill"></i>
+                INAU
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <span id="nombre-usuario">
+                    Tallerista
+                </span>
+                <button id="btn-logout" class="btn btn-light btn-sm">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Salir
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+
+        <div class="hero-panel mb-5">
+            <h1 class="fw-bold mb-2">
+                Panel del Tallerista
+            </h1>
+            <p class="text-muted mb-0">
+                Bienvenido al sistema de gestión de talleres y asistencias.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- MIS TALLERES -->
+
+            <div class="col-md-6 col-xl-3">
+                <a href="mis-talleres.html" class="text-decoration-none">
+                    <div class="card taller-card h-100">
+                        <div class="card-body text-center">
+                            <div class="icono-taller">
+                                <i class="bi bi-journal-bookmark-fill"></i>
+                            </div>
+                            <h5 class="fw-bold">
+                                Mis Talleres
+                            </h5>
+                            <p class="text-muted mb-0">
+                                Consultar y administrar talleres.
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- ASISTENCIA -->
+
+            <div class="col-md-6 col-xl-3">
+                <a href="asistencia.html" class="text-decoration-none">
+                    <div class="card taller-card h-100">
+                        <div class="card-body text-center">
+                            <div class="icono-taller">
+                                <i class="bi bi-check2-square"></i>
+                            </div>
+                            <h5 class="fw-bold">
+                                Asistencia
+                            </h5>
+                            <p class="text-muted mb-0">
+                                Registrar asistencia de participantes.
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- INFORMES -->
+
+            <div class="col-md-6 col-xl-3">
+                <a href="informes.html" class="text-decoration-none">
+                    <div class="card taller-card h-100">
+                        <div class="card-body text-center">
+                            <div class="icono-taller">
+                                <i class="bi bi-bar-chart-line-fill"></i>
+                            </div>
+                            <h5 class="fw-bold">
+                                Informes
+                            </h5>
+                            <p class="text-muted mb-0">
+                                Consultar estadísticas e informes.
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- MENSAJES -->
+
+            <div class="col-md-6 col-xl-3">
+                <a href="mensajes.html" class="text-decoration-none">
+                    <div class="card taller-card h-100">
+                        <div class="card-body text-center">
+                            <div class="icono-taller">
+                                <i class="bi bi-chat-dots-fill"></i>
+                            </div>
+                            <h5 class="fw-bold">
+                                Mensajes
+                            </h5>
+                            <p class="text-muted mb-0">
+                                Comunicación con administración.
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="row mt-5 g-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-journal-text display-5"></i>
+                        <h3 class="mt-3">
+                            --
+                        </h3>
+                        <p class="text-muted mb-0">
+                            Talleres Asignados
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-people-fill display-5"></i>
+                        <h3 class="mt-3">
+                            --
+                        </h3>
+                        <p class="text-muted mb-0">
+                            Participantes
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-calendar-check-fill display-5"></i>
+                        <h3 class="mt-3">
+                            --
+                        </h3>
+                        <p class="text-muted mb-0">
+                            Asistencias del Día
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
