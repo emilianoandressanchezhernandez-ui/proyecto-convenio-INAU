@@ -1,7 +1,4 @@
-/* ==========================
-   VARIABLES
-========================== */
-
+/* VARIABLES */
 :root {
     --azul: #4f7cff;
     --azul-hover: #3d6cf5;
@@ -23,9 +20,7 @@
     --radio: 20px;
 }
 
-/* ==========================
-   GENERALES
-========================== */
+/* GENERALES */
 
 body {
     background: var(--gris-fondo);
@@ -33,33 +28,21 @@ body {
     font-family: "Segoe UI", sans-serif;
     min-height: 100vh;
 }
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
     color: var(--texto);
 }
 
 .text-muted {
     color: var(--texto-secundario) !important;
 }
-
-/* ==========================
-   LOGIN
-========================== */
+/* LOGIN */
 
 .body-login {
     min-height: 100vh;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     padding: 20px;
-
     background:
         linear-gradient(
             135deg,
@@ -77,19 +60,13 @@ h6 {
 .logo-circle {
     width: 90px;
     height: 90px;
-
     margin: auto;
-
     border-radius: 50%;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     font-size: 2rem;
-
     color: white;
-
     background:
         linear-gradient(
             135deg,
@@ -98,9 +75,7 @@ h6 {
         );
 }
 
-/* ==========================
-   NAVBAR
-========================== */
+/* NAVBAR */
 
 .navbar-custom {
     background:
@@ -122,23 +97,16 @@ h6 {
     font-weight: 600;
 }
 
-/* ==========================
-   PANEL SUPERIOR DASHBOARD
-========================== */
+/* PANEL SUPERIOR DASHBOARD  */
 
 .hero-panel {
     background: white;
-
     border-radius: var(--radio);
-
     padding: 30px;
-
     box-shadow: var(--sombra);
 }
 
-/* ==========================
-   TARJETAS
-========================== */
+/* TARJETAS */
 
 .card {
     border: none;
@@ -150,9 +118,7 @@ h6 {
     padding: 1.5rem;
 }
 
-/* ==========================
-   TARJETAS DE TALLERES
-========================== */
+/* TARJETAS DE TALLERES */
 
 .taller-card {
     transition: .3s ease;
@@ -165,25 +131,17 @@ h6 {
 .icono-taller {
     width: 70px;
     height: 70px;
-
     margin: 0 auto 20px;
-
     border-radius: 50%;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     font-size: 1.8rem;
-
     background: var(--gris-claro);
-
     color: var(--azul);
 }
 
-/* ==========================
-   FORMULARIOS
-========================== */
+/* FORMULARIOS */
 
 .form-label {
     font-weight: 600;
@@ -191,22 +149,17 @@ h6 {
 
 .form-control {
     border-radius: 12px;
-
     border: 1px solid #d8e0ea;
-
     padding: 12px 14px;
 }
 
 .form-control:focus {
     border-color: var(--azul);
-
     box-shadow:
         0 0 0 .2rem rgba(79,124,255,.15);
 }
 
-/* ==========================
-   BOTONES
-========================== */
+/* BOTONES */
 
 .btn {
     border-radius: 12px;
@@ -238,9 +191,7 @@ h6 {
     border: none;
 }
 
-/* ==========================
-   HERO ASISTENCIA
-========================== */
+/* HERO ASISTENCIA */
 
 .hero-card {
     border: none;
@@ -258,9 +209,7 @@ h6 {
     font-size: 1.05rem;
 }
 
-/* ==========================
-   TABLA
-========================== */
+/*  TABLA */
 
 .table {
     margin-bottom: 0;
@@ -276,8 +225,7 @@ h6 {
     color: var(--texto);
 }
 
-.table td,
-.table th {
+.table td, .table th {
     vertical-align: middle;
 }
 
@@ -285,18 +233,14 @@ h6 {
     background: #f8fbff;
 }
 
-/* ==========================
-   ALERTAS
-========================== */
+/* ALERTAS */
 
 .alert {
     border: none;
     border-radius: 14px;
 }
 
-/* ==========================
-   LOADING
-========================== */
+/* LOADING */
 
 .spinner-border {
     color: var(--azul);
@@ -304,71 +248,53 @@ h6 {
     height: 3rem;
 }
 
-/* ==========================
-   FOOTER ESPACIADO
-========================== */
+/* FOOTER ESPACIADO */
 
 main {
     padding-bottom: 40px;
 }
 
-/* ==========================
-   RESPONSIVE
-========================== */
+/* RESPONSIVE */
 
 @media (max-width: 992px) {
-
     .hero-panel {
         text-align: center;
     }
-
 }
 
 @media (max-width: 768px) {
-
     .card-body {
         padding: 1.25rem;
     }
-
     .hero-panel {
         padding: 24px;
     }
-
     .logo-circle {
         width: 80px;
         height: 80px;
         font-size: 1.8rem;
     }
-
     h1 {
         font-size: 2rem;
     }
-
 }
 
 @media (max-width: 576px) {
-
     .hero-panel {
         padding: 20px;
     }
-
     .navbar-brand {
         font-size: 1rem;
     }
-
     .table {
         font-size: .9rem;
     }
-
     .btn {
         font-size: .95rem;
     }
-
 }
 
-/* ==========================
-   MENSAJES
-========================== */
+/* MENSAJES */
 
 #contenedor-mensajes {
     background: #fafbfd;
@@ -377,27 +303,18 @@ main {
 .mensaje-enviado {
     background: var(--azul);
     color: white;
-
     padding: 10px 15px;
-
     border-radius: 15px;
-
     margin-bottom: 10px;
-
     max-width: 75%;
-
     margin-left: auto;
 }
 
 .mensaje-recibido {
     background: #e9edf5;
-
     padding: 10px 15px;
-
     border-radius: 15px;
-
     margin-bottom: 10px;
-
     max-width: 75%;
 }
 
