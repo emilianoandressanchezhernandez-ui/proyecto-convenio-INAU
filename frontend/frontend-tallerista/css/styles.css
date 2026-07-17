@@ -298,28 +298,74 @@ main {
 
 #contenedor-mensajes {
     background: #fafbfd;
+    height: 400px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+.conversacion-item {
+    border: 0;
+    border-bottom: 1px solid #e9ecef;
+    padding: 16px;
+    text-align: left;
+}
+
+.conversacion-item:last-child {
+    border-bottom: 0;
+}
+
+.conversacion-item.active {
+    background: var(--azul);
+    border-color: var(--azul);
+    color: white;
+}
+
+.conversacion-item.active .text-muted {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.mensaje-enviado,
+.mensaje-recibido {
+    padding: 10px 15px;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    max-width: 75%;
+    width: fit-content;
 }
 
 .mensaje-enviado {
     background: var(--azul);
     color: white;
-    padding: 10px 15px;
-    border-radius: 15px;
-    margin-bottom: 10px;
-    max-width: 75%;
     margin-left: auto;
+    border-bottom-right-radius: 4px;
 }
 
 .mensaje-recibido {
     background: #e9edf5;
-    padding: 10px 15px;
-    border-radius: 15px;
-    margin-bottom: 10px;
-    max-width: 75%;
+    color: var(--oscuro);
+    margin-right: auto;
+    border-bottom-left-radius: 4px;
 }
 
-#contenedor-mensajes {
-    background: #fafbfd;
-    height: 400px;
-    overflow-y: auto;
+.mensaje-contenido {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.mensaje-meta {
+    display: block;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    opacity: 0.75;
+}
+
+@media (max-width: 576px) {
+    #contenedor-mensajes {
+        height: 350px;
+    }
+
+    .mensaje-enviado,
+    .mensaje-recibido {
+        max-width: 90%;
+    }
 }
