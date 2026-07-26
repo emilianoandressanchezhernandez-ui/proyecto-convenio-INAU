@@ -1,10 +1,6 @@
-"use strict";
-
 /*
     MENSAJES.JS
-
     Responsabilidades:
-
     - Obtener las conversaciones del tallerista.
     - Mostrar mensajes enviados y recibidos.
     - Marcar mensajes como leídos.
@@ -12,19 +8,13 @@
     - Guardar los cambios en localStorage.
 */
 
-
-/* =========================
-   VARIABLES
-========================= */
+// VARIABLES
 
 let usuarioMensajesActual = null;
 let conversacionesMensajes = [];
 let conversacionSeleccionadaId = null;
 
-
-/* =========================
-   INICIALIZACIÓN
-========================= */
+// INICIALIZACIÓN 
 
 function inicializarMensajes() {
     try {
@@ -55,10 +45,7 @@ function inicializarMensajes() {
     }
 }
 
-
-/* =========================
-   VALIDACIÓN
-========================= */
+// VALIDACIÓN
 
 function validarDatosMensajes() {
     if (!window.DATOS_SIMULADOS) {
@@ -94,10 +81,7 @@ function validarDatosMensajes() {
     }
 }
 
-
-/* =========================
-   USUARIO
-========================= */
+// USUARIO
 
 function obtenerUsuarioMensajeria() {
     if (typeof obtenerUsuarioActual === "function") {
@@ -107,10 +91,7 @@ function obtenerUsuarioMensajeria() {
     return window.DATOS_SIMULADOS.usuarioActual;
 }
 
-
-/* =========================
-   LOCAL STORAGE
-========================= */
+// LOCAL STORAGE
 
 function cargarConversacionesMensajes() {
     const contenidoGuardado = localStorage.getItem(
@@ -140,9 +121,7 @@ function cargarConversacionesMensajes() {
 
     /*
         Creamos una copia de los datos originales.
-
-        Así evitamos modificar directamente el contenido
-        de mock-data.js.
+        Así evitamos modificar directamente el contenido de mock-data.js.
     */
 
     return JSON.parse(
@@ -152,7 +131,6 @@ function cargarConversacionesMensajes() {
     );
 }
 
-
 function guardarConversacionesMensajes() {
     localStorage.setItem(
         "conversacionesSimuladas",
@@ -160,10 +138,7 @@ function guardarConversacionesMensajes() {
     );
 }
 
-
-/* =========================
-   OBTENER CONVERSACIONES
-========================= */
+// OBTENER CONVERSACIONES
 
 function obtenerConversacionesDelUsuario() {
     return conversacionesMensajes.filter(
@@ -175,7 +150,6 @@ function obtenerConversacionesDelUsuario() {
         }
     );
 }
-
 
 function obtenerConversacionPorId(
     conversacionId
@@ -191,10 +165,7 @@ function obtenerConversacionPorId(
     );
 }
 
-
-/* =========================
-   LISTA DE CONVERSACIONES
-========================= */
+// LISTA DE CONVERSACIONES
 
 function renderizarListaConversaciones() {
     const lista = document.getElementById(
@@ -246,7 +217,6 @@ function renderizarListaConversaciones() {
 
     configurarEventosConversaciones();
 }
-
 
 function crearElementoConversacion(
     conversacion
@@ -312,7 +282,6 @@ function crearElementoConversacion(
     `;
 }
 
-
 function configurarEventosConversaciones() {
     const elementos = document.querySelectorAll(
         ".conversacion-item"
@@ -334,10 +303,7 @@ function configurarEventosConversaciones() {
     });
 }
 
-
-/* =========================
-   SELECCIONAR CONVERSACIÓN
-========================= */
+// SELECCIONAR CONVERSACIÓN
 
 function seleccionarConversacion(
     conversacionId
@@ -378,11 +344,7 @@ function seleccionarConversacion(
     inputMensaje?.focus();
 }
 
-
-/* =========================
-   MARCAR COMO LEÍDO
-========================= */
-
+// MARCAR COMO LEÍDO
 function marcarMensajesComoLeidos(
     conversacion
 ) {
@@ -403,10 +365,7 @@ function marcarMensajesComoLeidos(
     );
 }
 
-
-/* =========================
-   MOSTRAR CONVERSACIÓN
-========================= */
+// MOSTRAR CONVERSACIÓN
 
 function renderizarConversacion(
     conversacion
@@ -496,7 +455,6 @@ function renderizarConversacion(
     desplazarChatAlFinal();
 }
 
-
 function crearBurbujaMensaje(
     mensaje,
     administrador
@@ -533,10 +491,7 @@ function crearBurbujaMensaje(
     `;
 }
 
-
-/* =========================
-   FORMULARIO
-========================= */
+// FORMULARIO
 
 function configurarFormularioMensaje() {
     const formulario = document.getElementById(
@@ -552,7 +507,6 @@ function configurarFormularioMensaje() {
         enviarMensaje
     );
 }
-
 
 function enviarMensaje(event) {
     event.preventDefault();
@@ -652,10 +606,7 @@ function generarIdMensaje() {
     return Date.now();
 }
 
-
-/* =========================
-   HABILITAR Y DESHABILITAR
-========================= */
+// HABILITAR Y DESHABILITAR
 
 function habilitarChat() {
     const inputMensaje = document.getElementById(
@@ -675,7 +626,6 @@ function habilitarChat() {
     }
 }
 
-
 function deshabilitarChat() {
     const inputMensaje = document.getElementById(
         "mensaje"
@@ -694,11 +644,7 @@ function deshabilitarChat() {
     }
 }
 
-
-/* =========================
-   ADMINISTRADOR
-========================= */
-
+// ADMINISTRADOR
 function buscarAdministradorPorId(
     administradorId
 ) {
@@ -711,7 +657,6 @@ function buscarAdministradorPorId(
         }
     );
 }
-
 
 function obtenerNombreAdministrador(
     administrador
@@ -728,10 +673,7 @@ function obtenerNombreAdministrador(
         .join(" ") || "Administración";
 }
 
-
-/* =========================
-   MENSAJES NO LEÍDOS
-========================= */
+// MENSAJES NO LEÍDOS
 
 function contarMensajesNoLeidos(
     conversacion
@@ -750,7 +692,6 @@ function contarMensajesNoLeidos(
         }
     ).length;
 }
-
 
 function actualizarResumenMensajesNoLeidos() {
     const conversaciones =
@@ -780,10 +721,7 @@ function actualizarResumenMensajesNoLeidos() {
     );
 }
 
-
-/* =========================
-   FUNCIONES AUXILIARES
-========================= */
+// FUNCIONES AUXILIARES
 
 function obtenerUltimoMensaje(
     conversacion
@@ -805,7 +743,6 @@ function obtenerUltimoMensaje(
     )[0];
 }
 
-
 function obtenerVistaPreviaMensaje(
     mensaje
 ) {
@@ -825,7 +762,6 @@ function obtenerVistaPreviaMensaje(
 
     return `${contenido.slice(0, 55)}...`;
 }
-
 
 function formatearFechaHoraMensaje(
     fechaHora
@@ -850,7 +786,6 @@ function formatearFechaHoraMensaje(
     );
 }
 
-
 function desplazarChatAlFinal() {
     const contenedor = document.getElementById(
         "contenedor-mensajes"
@@ -863,7 +798,6 @@ function desplazarChatAlFinal() {
     contenedor.scrollTop =
         contenedor.scrollHeight;
 }
-
 
 function escaparHTMLMensajes(valor) {
     const caracteres = {
@@ -880,10 +814,7 @@ function escaparHTMLMensajes(valor) {
     );
 }
 
-
-/* =========================
-   ALERTAS
-========================= */
+// ALERTAS
 
 function mostrarAlertaMensajes(
     mensaje,
@@ -911,7 +842,6 @@ function mostrarAlertaMensajes(
 
     alerta.textContent = mensaje;
 }
-
 
 function ocultarAlertaMensajes() {
     const alerta = document.getElementById(

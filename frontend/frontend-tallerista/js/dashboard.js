@@ -1,20 +1,13 @@
-"use strict";
-
 /*
     DASHBOARD.JS
-
     Responsabilidades:
-
     - Mostrar un saludo personalizado.
     - Contar los talleres asignados.
     - Contar los alumnos únicos.
     - Contar los alumnos presentes durante el día.
 */
 
-
-/* =========================
-   INICIALIZACIÓN
-========================= */
+// INICIALIZACIÓN
 
 function inicializarDashboard() {
     try {
@@ -67,10 +60,7 @@ function inicializarDashboard() {
     }
 }
 
-
-/* =========================
-   VALIDACIÓN
-========================= */
+//VALIDACIÓN
 
 function validarDatosDashboard() {
     if (!window.DATOS_SIMULADOS) {
@@ -104,10 +94,7 @@ function validarDatosDashboard() {
     }
 }
 
-
-/* =========================
-   SALUDO
-========================= */
+//SALUDO
 
 function mostrarSaludo(usuario) {
     const nombre = usuario.nombre || "Tallerista";
@@ -118,10 +105,7 @@ function mostrarSaludo(usuario) {
     );
 }
 
-
-/* =========================
-   TALLERES
-========================= */
+// TALLERES
 
 function obtenerTalleresAsignados(talleristaId) {
     return window.DATOS_SIMULADOS.talleres.filter(
@@ -132,19 +116,13 @@ function obtenerTalleresAsignados(talleristaId) {
 }
 
 
-/* =========================
-   ALUMNOS ÚNICOS
-========================= */
-
+// ALUMNOS ÚNICOS 
 function obtenerAlumnosUnicos(talleres) {
     const idsTalleres = new Set(
         talleres.map((taller) => taller.id)
     );
 
-    /*
-        Buscamos las inscripciones correspondientes
-        a los talleres del usuario.
-    */
+    // Buscamos las inscripciones correspondientes a los talleres del usuario
 
     const inscripcionesDelTallerista =
         window.DATOS_SIMULADOS.inscripciones.filter(
@@ -155,11 +133,7 @@ function obtenerAlumnosUnicos(talleres) {
             }
         );
 
-    /*
-        Un alumno puede estar inscrito en más de un taller.
-
-        Usamos Set para no contarlo varias veces.
-    */
+    // Un alumno puede estar inscrito en más de un taller, usamos Set para no contarlo varias veces
 
     const idsAlumnosUnicos = new Set();
 
@@ -183,10 +157,7 @@ function obtenerAlumnosUnicos(talleres) {
     );
 }
 
-
-/* =========================
-   ASISTENCIAS DEL DÍA
-========================= */
+// ASISTENCIAS DEL DÍA
 
 function contarPresentesDelDia(talleres) {
     const asistenciasGuardadas =
@@ -199,12 +170,9 @@ function contarPresentesDelDia(talleres) {
         talleres.map((taller) => taller.id)
     );
 
-    /*
-        Filtramos únicamente los registros:
-
-        - de la fecha actual;
-        - pertenecientes a talleres del usuario.
-    */
+    // Filtramos únicamente los registros:
+    // - de la fecha actual;
+    // - pertenecientes a talleres del usuario.
 
     const asistenciasDelDia =
         asistenciasGuardadas.filter(
@@ -218,10 +186,7 @@ function contarPresentesDelDia(talleres) {
             }
         );
 
-    /*
-        Sumamos todos los alumnos marcados
-        con estado "Presente".
-    */
+    // Sumamos todos los alumnos marcados con estado "Presente"
 
     return asistenciasDelDia.reduce(
         (totalPresentes, asistencia) => {
@@ -244,7 +209,6 @@ function contarPresentesDelDia(talleres) {
         0
     );
 }
-
 
 function leerAsistenciasDashboard() {
     const contenidoGuardado =
@@ -274,7 +238,6 @@ function leerAsistenciasDashboard() {
     }
 }
 
-
 function obtenerFechaActualDashboard() {
     const fechaActual = new Date();
 
@@ -293,9 +256,7 @@ function obtenerFechaActualDashboard() {
 }
 
 
-/* =========================
-   FUNCIÓN AUXILIAR
-========================= */
+// FUNCIÓN AUXILIAR
 
 function colocarTextoDashboard(
     elementoId,
@@ -316,10 +277,7 @@ function colocarTextoDashboard(
         contenido ?? "-";
 }
 
-
-/* =========================
-   ERROR
-========================= */
+// ERROR
 
 function mostrarErrorDashboard(mensaje) {
     const alerta = document.getElementById(

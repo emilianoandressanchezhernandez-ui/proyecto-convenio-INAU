@@ -1,8 +1,6 @@
 /*
     MIS-TALLERES.JS
-
     Este archivo se encarga de:
-
     - Obtener los talleres del usuario actual.
     - Mostrar las tarjetas dinámicamente.
     - Buscar talleres.
@@ -10,24 +8,16 @@
     - Mostrar posibles errores.
 */
 
-
-/* =========================
-   VARIABLES
-========================= */
+// VARIABLES
 
 /*
     Aquí guardaremos los talleres asignados al usuario.
-
-    Esta variable permitirá buscar sobre los talleres originales
-    sin modificar los datos de mock-data.js.
+    Esta variable permitirá buscar sobre los talleres originales sin modificar los datos de mock-data.js.
 */
 
 let talleresAsignados = [];
 
-
-/* =========================
-   INICIALIZACIÓN
-========================= */
+// INICIALIZACIÓN
 
 function inicializarMisTalleres() {
 
@@ -37,9 +27,7 @@ function inicializarMisTalleres() {
 
     /*
         Si el contenedor no existe, detenemos la función.
-
-        Esto evita errores si el archivo se carga accidentalmente
-        en otra página.
+        Esto evita errores si el archivo se carga accidentalmente en otra página.
     */
 
     if (!contenedor) {
@@ -67,10 +55,7 @@ function inicializarMisTalleres() {
     }
 }
 
-
-/* =========================
-   OBTENCIÓN DE DATOS
-========================= */
+// OBTENCIÓN DE DATOS
 
 function validarDatosSimulados() {
 
@@ -93,7 +78,6 @@ function validarDatosSimulados() {
     }
 }
 
-
 function obtenerTalleresDelUsuario() {
 
     const usuarioActual =
@@ -102,20 +86,14 @@ function obtenerTalleresDelUsuario() {
     const talleres =
         window.DATOS_SIMULADOS.talleres;
 
-    /*
-        filter() devuelve solamente los talleres cuyo
-        talleristaId coincide con el ID del usuario actual.
-    */
+    // filter() devuelve solamente los talleres cuyo talleristaId coincide con el ID del usuario actual
 
     return talleres.filter((taller) => {
         return taller.talleristaId === usuarioActual.id;
     });
 }
 
-
-/* =========================
-   BUSCADOR
-========================= */
+// BUSCADOR
 
 function configurarBuscador() {
 
@@ -136,9 +114,7 @@ function configurarBuscador() {
         buscarTalleres
     );
 
-    /*
-        También permitimos buscar al presionar Enter.
-    */
+    // También permitimos buscar al presionar Enter
 
     inputBuscador.addEventListener(
         "keydown",
@@ -150,10 +126,7 @@ function configurarBuscador() {
         }
     );
 
-    /*
-        Si el usuario borra completamente el texto,
-        volvemos a mostrar todos los talleres.
-    */
+    // Si el usuario borra completamente el texto, volvemos a mostrar todos los talleres
 
     inputBuscador.addEventListener(
         "input",
@@ -165,7 +138,6 @@ function configurarBuscador() {
         }
     );
 }
-
 
 function buscarTalleres() {
 
@@ -188,7 +160,6 @@ function buscarTalleres() {
 
     /*
         Buscamos coincidencias en:
-
         - Nombre.
         - Descripción.
         - Centro.
@@ -215,10 +186,7 @@ function buscarTalleres() {
     renderizarTalleres(resultados);
 }
 
-
-/* =========================
-   RENDERIZADO
-========================= */
+// RENDERIZADO
 
 function renderizarTalleres(talleres) {
 
@@ -234,10 +202,7 @@ function renderizarTalleres(talleres) {
         return;
     }
 
-    /*
-        Limpiamos las tarjetas anteriores antes de insertar
-        los resultados nuevos.
-    */
+    // Limpiamos las tarjetas anteriores antes de insertar los resultados nuevos
 
     contenedor.innerHTML = "";
 
@@ -302,10 +267,7 @@ function crearTarjetaTaller(taller) {
     `;
 }
 
-
-/* =========================
-   FUNCIONES AUXILIARES
-========================= */
+// FUNCIONES AUXILIARES
 
 function obtenerClaseEstado(estado) {
 
@@ -319,10 +281,7 @@ function obtenerClaseEstado(estado) {
     return clases[estado] || "text-bg-secondary";
 }
 
-
-/* =========================
-   MENSAJES DE ERROR
-========================= */
+// MENSAJES DE ERROR
 
 function mostrarError(mensaje) {
 
@@ -337,7 +296,6 @@ function mostrarError(mensaje) {
     alerta.textContent = mensaje;
     alerta.classList.remove("d-none");
 }
-
 
 function ocultarError() {
 

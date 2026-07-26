@@ -1,10 +1,6 @@
-"use strict";
-
 /*
     INFORMES.JS
-
     Responsabilidades:
-
     - Obtener los informes del tallerista.
     - Filtrar opcionalmente por taller.
     - Mostrar las estadísticas generales.
@@ -13,18 +9,12 @@
     - Preparar los enlaces al detalle.
 */
 
-
-/* =========================
-   VARIABLES
-========================= */
+// VARIABLES
 
 let informesDisponibles = [];
 let tallerFiltrado = null;
 
-
-/* =========================
-   INICIALIZACIÓN
-========================= */
+// INICIALIZACIÓN
 
 function inicializarInformes() {
     try {
@@ -72,10 +62,7 @@ function inicializarInformes() {
     }
 }
 
-
-/* =========================
-   VALIDACIÓN
-========================= */
+// VALIDACIÓN 
 
 function validarDatosInformes() {
     if (!window.DATOS_SIMULADOS) {
@@ -103,10 +90,7 @@ function validarDatosInformes() {
     }
 }
 
-
-/* =========================
-   PARÁMETROS DE LA URL
-========================= */
+// PARÁMETROS DE LA URL
 
 function obtenerTallerIdOpcional() {
     const parametrosURL = new URLSearchParams(
@@ -118,10 +102,8 @@ function obtenerTallerIdOpcional() {
 
     /*
         En esta pantalla el tallerId es opcional.
-
         Sin tallerId:
         informes.html
-
         Con tallerId:
         informes.html?tallerId=1
     */
@@ -140,7 +122,6 @@ function obtenerTallerIdOpcional() {
 
     return tallerId;
 }
-
 
 function buscarTallerAsignado(
     tallerId,
@@ -164,10 +145,7 @@ function buscarTallerAsignado(
     return taller;
 }
 
-
-/* =========================
-   OBTENER INFORMES
-========================= */
+// OBTENER INFORMES
 
 function obtenerInformesDelTallerista(
     talleristaId,
@@ -188,10 +166,7 @@ function obtenerInformesDelTallerista(
         );
     }
 
-    /*
-        Ordenamos desde el informe más reciente
-        al más antiguo.
-    */
+    // Ordenamos desde el informe más reciente al más antiguo
 
     return informes.sort((informeA, informeB) => {
         return informeB.fecha.localeCompare(
@@ -200,10 +175,7 @@ function obtenerInformesDelTallerista(
     });
 }
 
-
-/* =========================
-   CONTEXTO DE LA PÁGINA
-========================= */
+// CONTEXTO DE LA PÁGINA
 
 function configurarContextoPagina() {
     const titulo = document.getElementById(
@@ -245,10 +217,7 @@ function configurarContextoPagina() {
         `INAU - Informes - ${tallerFiltrado.nombre}`;
 }
 
-
-/* =========================
-   RESUMEN
-========================= */
+// RESUMEN
 
 function actualizarResumenInformes() {
     colocarTexto(
@@ -266,7 +235,6 @@ function actualizarResumenInformes() {
         obtenerUltimaActualizacion()
     );
 }
-
 
 function contarInformesDelMesActual() {
     const fechaActual = new Date();
@@ -291,7 +259,6 @@ function contarInformesDelMesActual() {
     ).length;
 }
 
-
 function obtenerUltimaActualizacion() {
     if (informesDisponibles.length === 0) {
         return "Sin registros";
@@ -313,10 +280,7 @@ function obtenerUltimaActualizacion() {
     );
 }
 
-
-/* =========================
-   FILTROS
-========================= */
+// FILTROS
 
 function configurarFiltros() {
     const fechaDesde = document.getElementById(
@@ -346,7 +310,6 @@ function configurarFiltros() {
         aplicarFiltros
     );
 }
-
 
 function aplicarFiltros() {
     const fechaDesde =
@@ -428,10 +391,7 @@ function aplicarFiltros() {
     renderizarInformes(resultados);
 }
 
-
-/* =========================
-   TABLA
-========================= */
+// TABLA
 
 function renderizarInformes(
     informes,
@@ -522,10 +482,7 @@ function crearFilaInforme(informe) {
     `;
 }
 
-
-/* =========================
-   FUNCIONES AUXILIARES
-========================= */
+// FUNCIONES AUXILIARES
 
 function obtenerNombreTaller(tallerId) {
     const taller =
@@ -540,7 +497,6 @@ function obtenerNombreTaller(tallerId) {
         : "Taller no disponible";
 }
 
-
 function obtenerClaseEstadoInforme(estado) {
     const clases = {
         Finalizado: "text-bg-success",
@@ -551,7 +507,6 @@ function obtenerClaseEstadoInforme(estado) {
 
     return clases[estado] || "text-bg-secondary";
 }
-
 
 function formatearFecha(fechaISO) {
     const partes = fechaISO.split("-");
@@ -564,7 +519,6 @@ function formatearFecha(fechaISO) {
 
     return `${dia}/${mes}/${anio}`;
 }
-
 
 function formatearFechaHora(fechaHoraISO) {
     const fecha = new Date(fechaHoraISO);
@@ -585,7 +539,6 @@ function formatearFechaHora(fechaHoraISO) {
     );
 }
 
-
 function normalizarTexto(valor) {
     return String(valor ?? "")
         .normalize("NFD")
@@ -593,7 +546,6 @@ function normalizarTexto(valor) {
         .toLowerCase()
         .trim();
 }
-
 
 function colocarTexto(elementoId, contenido) {
     const elemento = document.getElementById(
@@ -606,7 +558,6 @@ function colocarTexto(elementoId, contenido) {
 
     elemento.textContent = contenido ?? "-";
 }
-
 
 function escaparHTML(valor) {
     const caracteres = {
@@ -623,10 +574,7 @@ function escaparHTML(valor) {
     );
 }
 
-
-/* =========================
-   ALERTAS
-========================= */
+// ALERTAS
 
 function mostrarAlertaInformes(
     mensaje,
@@ -654,7 +602,6 @@ function mostrarAlertaInformes(
 
     alerta.textContent = mensaje;
 }
-
 
 function ocultarAlertaInformes() {
     const alerta = document.getElementById(
