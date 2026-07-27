@@ -1,0 +1,284 @@
+/* VARIABLES */
+
+:root {
+    --color-principal: #4f7cff;
+    --color-principal-hover: #3d68df;
+
+    --color-exito: #28a745;
+    --color-peligro: #dc3545;
+
+    --color-fondo: #f5f7fb;
+    --color-superficie: #ffffff;
+
+    --color-texto: #2d3748;
+    --color-texto-secundario: #6c757d;
+
+    --color-borde: #e5e7eb;
+
+    --sombra-suave: 0 4px 12px rgba(0,0,0,0.05);
+    --sombra-media: 0 8px 24px rgba(0,0,0,0.08);
+
+    --radio: 16px;
+}
+
+/* RESET */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    min-height: 100vh;
+    font-family:
+        "Segoe UI",
+        Tahoma,
+        Geneva,
+        Verdana,
+        sans-serif;
+}
+
+/* NAVBAR */
+
+.navbar-custom {
+    background: var(--color-principal);
+    box-shadow: var(--sombra-suave);
+    padding-top: 0.9rem;
+    padding-bottom: 0.9rem;
+    z-index: 999;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.navbar-brand i {
+    margin-right: 0.4rem;
+}
+
+/* HERO PANEL */
+
+.hero-panel {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
+}
+
+.hero-panel h1 {
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+/* TARJETAS */
+
+.card {
+    border: none;
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
+    transition: 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-media);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* ICONOS DE ESTADÍSTICAS */
+
+.display-5 {
+    color: var(--color-principal);
+}
+
+/* LOGO CIRCLE */
+
+.logo-circle {
+    width: 110px;
+    height: 110px;
+    margin: auto;
+    border-radius: 50%;
+    background: rgba(79,124,255,0.12);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo-circle i {
+    font-size: 3rem;
+    color: var(--color-principal);
+}
+
+/* TABLAS */
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead {
+    background: #f8f9fa;
+}
+
+.table thead th {
+    border-bottom: none;
+    color: var(--color-texto);
+    font-weight: 600;
+}
+
+.table tbody tr {
+    transition: 0.2s;
+}
+
+.table tbody tr:hover {
+    background: rgba(79,124,255,0.05);
+}
+
+/* FORMULARIOS */
+
+.form-control,
+.form-select {
+    border-radius: 12px;
+    min-height: 48px;
+    border: 1px solid var(--color-borde);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-principal);
+    box-shadow:
+        0 0 0 0.2rem rgba(79,124,255,0.15);
+}
+
+textarea.form-control {
+    min-height: 150px;
+}
+
+/* BOTONES */
+
+.btn {
+    border-radius: 12px;
+    min-height: 46px;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: var(--color-principal);
+    border-color: var(--color-principal);
+}
+
+.btn-primary:hover {
+    background: var(--color-principal-hover);
+    border-color: var(--color-principal-hover);
+}
+
+.btn-success {
+    border: none;
+}
+
+.btn-danger {
+    border: none;
+}
+
+/* BADGES */
+
+.badge {
+    padding: 0.6rem 0.9rem;
+    border-radius: 50px;
+    font-weight: 500;
+}
+
+/* TITULOS */
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--color-texto);
+}
+
+.text-muted {
+    color: var(--color-texto-secundario) !important;
+}
+
+/* PERFIL */
+
+#nombre-completo,
+#alumno-nombre-completo {
+    font-weight: 700;
+}
+
+/* ESPACIADOS */
+
+main {
+    padding-bottom: 4rem;
+}
+
+/* SCROLL */
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c7d2fe;
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #9db1ff;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 992px) {
+
+    .hero-panel {
+        text-align: center;
+    }
+
+    .navbar-brand {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .hero-panel {
+        padding: 1.5rem;
+    }
+
+    .hero-panel h1 {
+        font-size: 1.7rem;
+    }
+
+    .card-body {
+        padding: 1.2rem;
+    }
+
+    .logo-circle {
+        width: 90px;
+        height: 90px;
+    }
+    .logo-circle i {
+        font-size: 2.4rem;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .hero-panel h1 {
+        font-size: 1.5rem;
+    }
+    .btn {
+        width: 100%;
+    }
+}
