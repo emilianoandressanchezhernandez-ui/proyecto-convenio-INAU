@@ -1,10 +1,6 @@
-"use strict";
-
 /*
     DETALLE-TALLER.JS
-
     Responsabilidades:
-
     - Obtener el ID del taller desde la URL.
     - Buscar el taller en los datos simulados.
     - Mostrar sus datos en el HTML.
@@ -12,10 +8,7 @@
     - Controlar posibles errores.
 */
 
-
-/* =========================
-   INICIALIZACIÓN
-========================= */
+// INICIALIZACIÓN 
 
 function inicializarDetalleTaller() {
     try {
@@ -37,10 +30,7 @@ function inicializarDetalleTaller() {
     }
 }
 
-
-/* =========================
-   VALIDACIÓN
-========================= */
+// VALIDACIÓN
 
 function validarDatosSimulados() {
     if (!window.DATOS_SIMULADOS) {
@@ -56,16 +46,11 @@ function validarDatosSimulados() {
     }
 }
 
-
-/* =========================
-   OBTENER ID DE LA URL
-========================= */
+// OBTENER ID DE LA URL
 
 function obtenerTallerIdDesdeURL() {
     /*
-        URLSearchParams permite leer los parámetros
-        que aparecen después del signo ? en la URL.
-
+        URLSearchParams permite leer los parámetros que aparecen después del signo ? en la URL.
         Ejemplo:
         detalle-taller.html?id=2
     */
@@ -86,7 +71,6 @@ function obtenerTallerIdDesdeURL() {
 
     /*
         Number.isInteger verifica que sea un número entero.
-
         También comprobamos que sea mayor que cero.
     */
 
@@ -99,10 +83,7 @@ function obtenerTallerIdDesdeURL() {
     return tallerId;
 }
 
-
-/* =========================
-   BÚSQUEDA DEL TALLER
-========================= */
+// BÚSQUEDA DEL TALLER
 
 function buscarTallerPorId(tallerId) {
     /*
@@ -124,10 +105,7 @@ function buscarTallerPorId(tallerId) {
     return tallerEncontrado;
 }
 
-
-/* =========================
-   MOSTRAR INFORMACIÓN
-========================= */
+// MOSTRAR INFORMACIÓN
 
 function mostrarDetalleTaller(taller) {
     colocarTexto(
@@ -179,10 +157,7 @@ function mostrarDetalleTaller(taller) {
     document.title = `INAU - ${taller.nombre}`;
 }
 
-
-/* =========================
-   FUNCIONES DE FORMATO
-========================= */
+// FUNCIONES DE FORMATO
 
 function formatearDias(horarios) {
     if (!Array.isArray(horarios) || horarios.length === 0) {
@@ -193,7 +168,6 @@ function formatearDias(horarios) {
         .map((horario) => horario.dia)
         .join(" - ");
 }
-
 
 function formatearHorarios(horarios) {
     if (!Array.isArray(horarios) || horarios.length === 0) {
@@ -207,7 +181,6 @@ function formatearHorarios(horarios) {
         .join(" | ");
 }
 
-
 function formatearUbicacion(ubicacion) {
     if (!ubicacion) {
         return "Ubicación no disponible";
@@ -219,20 +192,14 @@ function formatearUbicacion(ubicacion) {
         ubicacion.salon
     ];
 
-    /*
-        filter(Boolean) elimina valores vacíos,
-        null o undefined.
-    */
+    // filter(Boolean) elimina valores vacíos, null o undefined
 
     return partesUbicacion
         .filter(Boolean)
         .join(" - ");
 }
 
-
-/* =========================
-   ACCIONES
-========================= */
+// ACCIONES
 
 function configurarAccionesTaller(taller) {
     const enlaceAsistencia = document.getElementById(
@@ -249,7 +216,6 @@ function configurarAccionesTaller(taller) {
 
     /*
         Enviamos el ID del taller a las siguientes pantallas.
-
         Ejemplo:
         asistencia.html?tallerId=1
     */
@@ -264,11 +230,7 @@ function configurarAccionesTaller(taller) {
             `informes.html?tallerId=${encodeURIComponent(taller.id)}`;
     }
 
-    /*
-        La pantalla de asistencia contiene la tabla
-        de alumnos. Por eso usamos esa página también
-        para el botón "Alumnos".
-    */
+    // La pantalla de asistencia contiene la tabla de alumnos. Por eso usamos esa página también para el botón "Alumnos"
 
     if (botonVerAlumnos) {
         botonVerAlumnos.addEventListener("click", () => {
@@ -278,10 +240,7 @@ function configurarAccionesTaller(taller) {
     }
 }
 
-
-/* =========================
-   ESTILO DEL ESTADO
-========================= */
+// ESTILO DEL ESTADO
 
 function aplicarEstiloEstado(estado) {
     const elementoEstado = document.getElementById(
@@ -292,10 +251,7 @@ function aplicarEstiloEstado(estado) {
         return;
     }
 
-    /*
-        Quitamos clases que pudieran haberse agregado antes.
-    */
-
+    // Quitamos clases que pudieran haberse agregado antes
     elementoEstado.classList.remove(
         "text-success",
         "text-secondary",
@@ -318,10 +274,7 @@ function aplicarEstiloEstado(estado) {
     elementoEstado.classList.add(clase);
 }
 
-
-/* =========================
-   FUNCIÓN REUTILIZABLE
-========================= */
+// FUNCIÓN REUTILIZABLE
 
 function colocarTexto(elementoId, contenido) {
     const elemento = document.getElementById(elementoId);
@@ -334,18 +287,12 @@ function colocarTexto(elementoId, contenido) {
         return;
     }
 
-    /*
-        textContent es preferible a innerHTML cuando
-        solamente necesitamos insertar texto.
-    */
-
+    // textContent es preferible a innerHTML cuando solamente necesitamos insertar texto
     elemento.textContent = contenido ?? "-";
 }
 
 
-/* =========================
-   ERRORES
-========================= */
+// ERRORES 
 
 function mostrarErrorDetalle(mensaje) {
     const alerta = document.getElementById(

@@ -1,10 +1,6 @@
-"use strict";
-
 /*
     DETALLE-INFORME.JS
-
     Responsabilidades:
-
     - Obtener el ID del informe desde la URL.
     - Buscar el informe seleccionado.
     - Verificar que pertenezca al tallerista actual.
@@ -13,19 +9,14 @@
     - Permitir imprimir y descargar el informe.
 */
 
-
-/* =========================
-   VARIABLES
-========================= */
+// VARIABLES 
 
 let informeActual = null;
 let tallerDelInforme = null;
 let talleristaDelInforme = null;
 
 
-/* =========================
-   INICIALIZACIÓN
-========================= */
+// INICIALIZACIÓN
 
 function inicializarDetalleInforme() {
     try {
@@ -66,10 +57,7 @@ function inicializarDetalleInforme() {
     }
 }
 
-
-/* =========================
-   VALIDACIÓN DE DATOS
-========================= */
+// VALIDACIÓN DE DATOS
 
 function validarDatosDetalleInforme() {
     if (!window.DATOS_SIMULADOS) {
@@ -98,14 +86,11 @@ function validarDatosDetalleInforme() {
 }
 
 
-/* =========================
-   OBTENER ID DE LA URL
-========================= */
+// OBTENER ID DE LA URL
 
 function obtenerInformeIdDesdeURL() {
     /*
         Lee el parámetro id de una URL como:
-
         detalle-informe.html?id=2
     */
 
@@ -136,15 +121,10 @@ function obtenerInformeIdDesdeURL() {
 }
 
 
-/* =========================
-   BÚSQUEDA DE INFORMACIÓN
-========================= */
+// BÚSQUEDA DE INFORMACIÓN
 
 function buscarInformePorId(informeId) {
-    /*
-        find() devuelve el primer informe cuyo ID
-        coincide con el recibido.
-    */
+    // find() devuelve el primer informe cuyo ID coincide con el recibido 
 
     const informeEncontrado =
         window.DATOS_SIMULADOS.informes.find(
@@ -161,7 +141,6 @@ function buscarInformePorId(informeId) {
 
     return informeEncontrado;
 }
-
 
 function buscarTallerDelInforme(tallerId) {
     const tallerEncontrado =
@@ -185,16 +164,11 @@ function obtenerTalleristaActual() {
     return window.DATOS_SIMULADOS.usuarioActual;
 }
 
-
-/* =========================
-   CONTROL DE ACCESO
-========================= */
+// CONTROL DE ACCESO
 
 function validarAccesoAlInforme() {
     /*
-        El tallerista solo puede visualizar informes
-        que le pertenezcan.
-
+        El tallerista solo puede visualizar informes que le pertenezcan.
         Esta validación es únicamente visual por ahora.
         En el backend deberá repetirse obligatoriamente.
     */
@@ -218,10 +192,7 @@ function validarAccesoAlInforme() {
     }
 }
 
-
-/* =========================
-   MOSTRAR INFORMACIÓN
-========================= */
+// MOSTRAR INFORMACIÓN 
 
 function mostrarDetalleInforme() {
     colocarTextoDetalleInforme(
@@ -305,10 +276,7 @@ function mostrarDetalleInforme() {
         `INAU - ${informeActual.titulo}`;
 }
 
-
-/* =========================
-   NAVEGACIÓN
-========================= */
+// NAVEGACIÓN
 
 function configurarEnlaceVolver() {
     const enlaceVolver = document.getElementById(
@@ -319,18 +287,13 @@ function configurarEnlaceVolver() {
         return;
     }
 
-    /*
-        Regresamos al listado filtrado por el mismo taller.
-    */
+    // Regresamos al listado filtrado por el mismo taller
 
     enlaceVolver.href =
         `informes.html?tallerId=${encodeURIComponent(tallerDelInforme.id)}`;
 }
 
-
-/* =========================
-   ACCIONES
-========================= */
+// ACCIONES
 
 function configurarAccionesInforme() {
     const botonDescargar = document.getElementById(
@@ -352,27 +315,18 @@ function configurarAccionesInforme() {
     );
 }
 
-
 function imprimirInforme() {
     /*
         Abre la ventana de impresión del navegador.
-
-        Desde allí también puede guardarse como PDF,
-        dependiendo del navegador y el sistema operativo.
+        Desde allí también puede guardarse como PDF, dependiendo del navegador y el sistema operativo.
     */
-
     window.print();
 }
 
-
 function descargarInforme() {
     /*
-        Como todavía no tenemos backend ni una librería
-        para generar PDF, creamos temporalmente un archivo
-        de texto con la información del informe.
-
-        Más adelante esta función deberá solicitar el PDF
-        generado por PHP.
+        Como todavía no tenemos backend ni una librería para generar PDF, creamos temporalmente un archivo de texto con la información del informe.
+        Más adelante esta función deberá solicitar el PDF generado por PHP.
     */
 
     const contenidoInforme =
@@ -413,7 +367,6 @@ function descargarInforme() {
     );
 }
 
-
 function generarContenidoDescargable() {
     return [
         "SISTEMA DE GESTIÓN DE TALLERES INAU",
@@ -444,12 +397,8 @@ function generarContenidoDescargable() {
     ].join("\n");
 }
 
-
 function crearNombreArchivoInforme() {
-    /*
-        Reemplaza caracteres especiales y espacios para
-        obtener un nombre de archivo válido.
-    */
+    // Reemplaza caracteres especiales y espacios para obtener un nombre de archivo válido
 
     const nombreLimpio = informeActual.titulo
         .normalize("NFD")
@@ -460,7 +409,6 @@ function crearNombreArchivoInforme() {
 
     return `${nombreLimpio}.txt`;
 }
-
 
 function deshabilitarAccionesInforme() {
     const botonDescargar = document.getElementById(
@@ -480,10 +428,7 @@ function deshabilitarAccionesInforme() {
     }
 }
 
-
-/* =========================
-   ESTILOS DINÁMICOS
-========================= */
+// ESTILOS DINÁMICOS 
 
 function aplicarEstiloEstadoInforme(estado) {
     const elementoEstado = document.getElementById(
@@ -520,7 +465,6 @@ function aplicarEstiloEstadoInforme(estado) {
     );
 }
 
-
 function aplicarEstiloIndicadorGeneral(indicador) {
     const elementoIndicador = document.getElementById(
         "indicador-general"
@@ -552,10 +496,7 @@ function aplicarEstiloIndicadorGeneral(indicador) {
     );
 }
 
-
-/* =========================
-   FORMATO
-========================= */
+// FORMATO 
 
 function obtenerNombreCompletoTallerista() {
     const nombreCompleto = [
@@ -567,7 +508,6 @@ function obtenerNombreCompletoTallerista() {
 
     return nombreCompleto || "Sin información";
 }
-
 
 function formatearFechaInforme(fechaISO) {
     if (!fechaISO) {
@@ -584,7 +524,6 @@ function formatearFechaInforme(fechaISO) {
 
     return `${dia}/${mes}/${anio}`;
 }
-
 
 function formatearFechaHoraInforme(fechaHoraISO) {
     if (!fechaHoraISO) {
@@ -609,10 +548,7 @@ function formatearFechaHoraInforme(fechaHoraISO) {
     );
 }
 
-
-/* =========================
-   FUNCIÓN AUXILIAR
-========================= */
+// FUNCIÓN AUXILIAR
 
 function colocarTextoDetalleInforme(
     elementoId,
@@ -634,10 +570,7 @@ function colocarTextoDetalleInforme(
         contenido ?? "-";
 }
 
-
-/* =========================
-   ALERTAS
-========================= */
+// ALERTAS
 
 function mostrarAlertaDetalleInforme(
     mensaje,

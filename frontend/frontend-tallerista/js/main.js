@@ -15,11 +15,9 @@ function obtenerPaginaActual() {
     }
 
     /*
-        Si el HTML todavía no tiene data-page,
-        obtiene la página desde la URL.
-
+        Si el HTML todavía no tiene data-page, obtiene la página desde la URL
         Ejemplo:
-        mis-talleres.html → mis-talleres
+        mis-talleres.html -> mis-talleres
     */
 
     const archivoActual = window.location.pathname
@@ -32,14 +30,11 @@ function obtenerPaginaActual() {
     return archivoActual.replace(".html", "");
 }
 
-
 function inicializarPaginaActual() {
     const paginaActual = obtenerPaginaActual();
     /*
         Cada página tiene asociada una función de inicialización.
-
-        Las funciones se crearán dentro de los archivos
-        JavaScript específicos de cada sección.
+        Las funciones se crearán dentro de los archivos JavaScript específicos de cada sección.
     */
     const inicializadores = {
         "dashboard": "inicializarDashboard",
@@ -58,9 +53,7 @@ function inicializarPaginaActual() {
 
     /*
         Solo ejecuta la función si ya existe.
-
-        Esto evita errores mientras los demás archivos
-        JavaScript todavía están vacíos.
+        Esto evita errores mientras los demás archivos JavaScript todavía están vacíos.
     */
 
     if (typeof funcionInicializadora === "function") {
@@ -68,10 +61,7 @@ function inicializarPaginaActual() {
     }
 }
 
-
-/* =========================
-   USUARIO
-========================= */
+// USUARIO
 
 function obtenerUsuarioActual() {
     const usuarioPredeterminado =
@@ -95,11 +85,8 @@ function obtenerUsuarioActual() {
         );
 
         /*
-            Combinamos los datos originales con los
-            datos modificados en el perfil.
-
-            Así no se pierden propiedades como el ID,
-            el rol o la fecha de registro.
+            Combinamos los datos originales con los datos modificados en el perfil.
+            Así no se pierden propiedades como el ID, el rol o la fecha de registro.
         */
 
         const usuarioActual = {
@@ -107,10 +94,7 @@ function obtenerUsuarioActual() {
             ...datosGuardados
         };
 
-        /*
-            Sincronizamos mock-data.js para que los demás
-            archivos utilicen también el usuario actualizado.
-        */
+        // Sincronizamos mock-data.js para que los demás archivos utilicen también el usuario actualizado
 
         if (window.DATOS_SIMULADOS) {
             window.DATOS_SIMULADOS.usuarioActual =
@@ -151,11 +135,7 @@ function mostrarUsuarioEnNavbar() {
     const textoUsuario =
         nombreCompleto || "Tallerista";
 
-    /*
-        Algunas páginas tienen un ícono dentro del elemento
-        nombre-usuario. Lo conservamos para no eliminarlo
-        al cambiar el texto.
-    */
+    // Algunas páginas tienen un ícono dentro del elemento nombre-usuario. Lo conservamos para no eliminarlo al cambiar el texto
 
     const icono = elementoUsuario.querySelector("i");
 
@@ -173,10 +153,7 @@ function mostrarUsuarioEnNavbar() {
     elementoUsuario.textContent = textoUsuario;
 }
 
-
-/* =========================
-   CIERRE DE SESIÓN
-========================= */
+// CIERRE DE SESIÓN
 
 function configurarLogout() {
 
@@ -189,7 +166,6 @@ function configurarLogout() {
     });
 }
 
-
 function cerrarSesion() {
 
     const confirmarSalida = confirm(
@@ -201,11 +177,8 @@ function cerrarSesion() {
     }
 
     /*
-        Eliminamos solamente la información relacionada
-        con la sesión.
-
-        No utilizamos localStorage.clear(), porque eso
-        también borraría otros datos de la aplicación.
+        Eliminamos solamente la información relacionada con la sesión.
+        No utilizamos localStorage.clear(), porque eso también borraría otros datos de la aplicación.
     */
 
     localStorage.removeItem("usuarioActual");

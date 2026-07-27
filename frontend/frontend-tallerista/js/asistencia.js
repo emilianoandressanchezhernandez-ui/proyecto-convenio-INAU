@@ -1,10 +1,6 @@
-"use strict";
-
 /*
     ASISTENCIA.JS
-
     Responsabilidades:
-
     - Obtener el taller desde la URL.
     - Cargar sus alumnos.
     - Permitir registrar la asistencia.
@@ -12,19 +8,13 @@
     - Guardar temporalmente la información.
 */
 
-
-/* =========================
-   VARIABLES
-========================= */
+// VARIABLES
 
 let tallerActual = null;
 let alumnosDelTaller = [];
 let fechaAsistenciaActual = "";
 
-
-/* =========================
-   INICIALIZACIÓN
-========================= */
+// INICIALIZACIÓN
 
 function inicializarAsistencia() {
     try {
@@ -60,10 +50,7 @@ function inicializarAsistencia() {
     }
 }
 
-
-/* =========================
-   VALIDACIÓN DE DATOS
-========================= */
+// VALIDACIÓN DE DATOS
 
 function validarDatosAsistencia() {
     if (!window.DATOS_SIMULADOS) {
@@ -91,10 +78,7 @@ function validarDatosAsistencia() {
     }
 }
 
-
-/* =========================
-   OBTENER TALLER
-========================= */
+// OBTENER TALLER
 
 function obtenerTallerIdDesdeURL() {
     const parametrosURL = new URLSearchParams(
@@ -116,10 +100,8 @@ function obtenerTallerIdDesdeURL() {
             "El identificador del taller no es válido."
         );
     }
-
     return tallerId;
 }
-
 
 function buscarTallerPorId(tallerId) {
     const tallerEncontrado =
@@ -136,10 +118,7 @@ function buscarTallerPorId(tallerId) {
     return tallerEncontrado;
 }
 
-
-/* =========================
-   OBTENER ALUMNOS
-========================= */
+// OBTENER ALUMNOS
 
 function obtenerAlumnosDelTaller(tallerId) {
     const inscripcion =
@@ -155,10 +134,7 @@ function obtenerAlumnosDelTaller(tallerId) {
         inscripcion.alumnoIds
     );
 
-    /*
-        Se muestran solamente los alumnos relacionados
-        con el taller y cuyo estado sea Activo.
-    */
+    // Se muestran solamente los alumnos relacionados con el taller y cuyo estado sea Activo
 
     return window.DATOS_SIMULADOS.alumnos.filter(
         (alumno) => {
@@ -170,10 +146,7 @@ function obtenerAlumnosDelTaller(tallerId) {
     );
 }
 
-
-/* =========================
-   INFORMACIÓN GENERAL
-========================= */
+// INFORMACIÓN GENERAL
 
 function mostrarInformacionTaller() {
     colocarTexto(
@@ -199,7 +172,6 @@ function mostrarInformacionTaller() {
         `INAU - Asistencia - ${tallerActual.nombre}`;
 }
 
-
 function configurarEnlaceVolver() {
     const enlaceVolver = document.getElementById(
         "enlace-volver"
@@ -213,10 +185,7 @@ function configurarEnlaceVolver() {
         `detalle-taller.html?id=${encodeURIComponent(tallerActual.id)}`;
 }
 
-
-/* =========================
-   RENDERIZAR TABLA
-========================= */
+// RENDERIZAR TABLA
 
 function renderizarTablaAlumnos() {
     const cuerpoTabla = document.getElementById(
@@ -256,7 +225,6 @@ function renderizarTablaAlumnos() {
     configurarSelectoresAsistencia();
 }
 
-
 function crearFilaAlumno(alumno) {
     const nombreCompleto =
         `${alumno.nombre} ${alumno.apellido}`;
@@ -277,9 +245,6 @@ function crearFilaAlumno(alumno) {
                     data-alumno-id="${alumno.id}"
                     aria-label="Asistencia de ${nombreCompleto}"
                 >
-                    <option value="">
-                        Seleccionar
-                    </option>
 
                     <option value="Presente">
                         Presente
@@ -298,7 +263,6 @@ function crearFilaAlumno(alumno) {
     `;
 }
 
-
 function configurarSelectoresAsistencia() {
     const selectores = document.querySelectorAll(
         ".estado-asistencia"
@@ -312,10 +276,7 @@ function configurarSelectoresAsistencia() {
     });
 }
 
-
-/* =========================
-   CONTADOR
-========================= */
+// CONTADOR 
 
 function actualizarContadorPresentes() {
     const selectores = document.querySelectorAll(
@@ -332,10 +293,7 @@ function actualizarContadorPresentes() {
     );
 }
 
-
-/* =========================
-   GUARDAR ASISTENCIA
-========================= */
+// GUARDAR ASISTENCIA
 
 function configurarBotonGuardar() {
     const botonGuardar = document.getElementById(
@@ -351,7 +309,6 @@ function configurarBotonGuardar() {
         guardarAsistencia
     );
 }
-
 
 function guardarAsistencia() {
     const selectores = Array.from(
@@ -407,10 +364,7 @@ function guardarAsistencia() {
     );
 }
 
-
-/* =========================
-   LOCAL STORAGE
-========================= */
+// LOCAL STORAGE 
 
 function leerAsistenciasGuardadas() {
     const contenidoGuardado = localStorage.getItem(
@@ -440,14 +394,10 @@ function leerAsistenciasGuardadas() {
     }
 }
 
-
 function guardarEnLocalStorage(nuevaAsistencia) {
     const asistencias = leerAsistenciasGuardadas();
 
-    /*
-        Eliminamos un posible registro anterior del mismo
-        taller y la misma fecha para evitar duplicados.
-    */
+    // Eliminamos un posible registro anterior del mismo taller y la misma fecha para evitar duplicados 
 
     const asistenciasActualizadas =
         asistencias.filter((asistencia) => {
@@ -466,7 +416,6 @@ function guardarEnLocalStorage(nuevaAsistencia) {
         JSON.stringify(asistenciasActualizadas)
     );
 }
-
 
 function cargarAsistenciaGuardada() {
     const asistencias = leerAsistenciasGuardadas();
@@ -501,10 +450,7 @@ function cargarAsistenciaGuardada() {
     );
 }
 
-
-/* =========================
-   FECHAS Y HORARIOS
-========================= */
+// FECHAS Y HORARIOS
 
 function obtenerFechaISO() {
     const fechaActual = new Date();
@@ -522,7 +468,6 @@ function obtenerFechaISO() {
     return `${anio}-${mes}-${dia}`;
 }
 
-
 function formatearFechaParaMostrar(fechaISO) {
     const partes = fechaISO.split("-");
 
@@ -534,7 +479,6 @@ function formatearFechaParaMostrar(fechaISO) {
 
     return `${dia}/${mes}/${anio}`;
 }
-
 
 function formatearHorarios(horarios) {
     if (!Array.isArray(horarios) || horarios.length === 0) {
@@ -548,10 +492,7 @@ function formatearHorarios(horarios) {
         .join(" | ");
 }
 
-
-/* =========================
-   ALERTAS
-========================= */
+// ALERTAS
 
 function mostrarAlertaAsistencia(
     mensaje,
@@ -580,7 +521,6 @@ function mostrarAlertaAsistencia(
     alerta.textContent = mensaje;
 }
 
-
 function deshabilitarGuardado() {
     const botonGuardar = document.getElementById(
         "btn-guardar-asistencia"
@@ -591,10 +531,7 @@ function deshabilitarGuardado() {
     }
 }
 
-
-/* =========================
-   FUNCIÓN AUXILIAR
-========================= */
+// FUNCIÓN AUXILIAR
 
 function colocarTexto(elementoId, contenido) {
     const elemento = document.getElementById(

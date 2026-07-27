@@ -1,10 +1,6 @@
-"use strict";
-
 /*
     PERFIL.JS
-
     Responsabilidades:
-
     - Cargar los datos del usuario actual.
     - Mostrar la información en el formulario.
     - Validar los cambios.
@@ -12,17 +8,11 @@
     - Actualizar la tarjeta y la navbar.
 */
 
-
-/* =========================
-   VARIABLE PRINCIPAL
-========================= */
+// VARIABLE PRINCIPAL
 
 let usuarioPerfilActual = null;
 
-
-/* =========================
-   INICIALIZACIÓN
-========================= */
+// INICIALIZACIÓN
 
 function inicializarPerfil() {
     try {
@@ -52,10 +42,7 @@ function inicializarPerfil() {
     }
 }
 
-
-/* =========================
-   VALIDACIÓN INICIAL
-========================= */
+// VALIDACIÓN INICIAL
 
 function validarDatosPerfil() {
     if (!window.DATOS_SIMULADOS) {
@@ -71,10 +58,7 @@ function validarDatosPerfil() {
     }
 }
 
-
-/* =========================
-   OBTENER USUARIO
-========================= */
+// OBTENER USUARIO
 
 function obtenerUsuarioParaPerfil() {
     /*
@@ -89,10 +73,7 @@ function obtenerUsuarioParaPerfil() {
     return window.DATOS_SIMULADOS.usuarioActual;
 }
 
-
-/* =========================
-   MOSTRAR DATOS
-========================= */
+// MOSTRAR DATOS
 
 function mostrarDatosPerfil(usuario) {
     colocarValorInput(
@@ -150,10 +131,7 @@ function mostrarDatosPerfil(usuario) {
     );
 }
 
-
-/* =========================
-   FORMULARIO
-========================= */
+// FORMULARIO
 
 function configurarFormularioPerfil() {
     const formulario = document.getElementById(
@@ -172,11 +150,8 @@ function configurarFormularioPerfil() {
     );
 }
 
-
 function guardarCambiosPerfil(event) {
-    /*
-        Evita que el formulario recargue la página.
-    */
+    // Evita que el formulario recargue la página
 
     event.preventDefault();
 
@@ -199,10 +174,7 @@ function guardarCambiosPerfil(event) {
         return;
     }
 
-    /*
-        Conservamos las propiedades que el usuario
-        no puede modificar, como ID, rol y fechas.
-    */
+    // Conservamos las propiedades que el usuario no puede modificar, como ID, rol y fechas
 
     const usuarioActualizado = {
         ...usuarioPerfilActual,
@@ -219,10 +191,7 @@ function guardarCambiosPerfil(event) {
         JSON.stringify(usuarioActualizado)
     );
 
-    /*
-        Sincronizamos los datos actuales para que los cambios
-        se vean sin tener que recargar la página.
-    */
+    // Sincronizamos los datos actuales para que los cambios se vean sin tener que recargar la página
 
     usuarioPerfilActual =
         usuarioActualizado;
@@ -244,10 +213,7 @@ function guardarCambiosPerfil(event) {
     );
 }
 
-
-/* =========================
-   LEER FORMULARIO
-========================= */
+// LEER FORMULARIO
 
 function obtenerDatosFormularioPerfil() {
     return {
@@ -259,10 +225,7 @@ function obtenerDatosFormularioPerfil() {
     };
 }
 
-
-/* =========================
-   VALIDACIONES
-========================= */
+// VALIDACIONES
 
 function validarFormularioPerfil(datos) {
     if (
@@ -318,7 +281,6 @@ function validarCorreoPerfil(correo) {
     );
 }
 
-
 function validarTelefonoPerfil(telefono) {
     /*
         Elimina espacios, guiones, paréntesis y el signo +.
@@ -334,10 +296,7 @@ function validarTelefonoPerfil(telefono) {
     );
 }
 
-
-/* =========================
-   ACTUALIZACIÓN VISUAL
-========================= */
+// ACTUALIZACIÓN VISUAL
 
 function actualizarDatosVisibles(usuario) {
     colocarTextoPerfil(
@@ -350,10 +309,7 @@ function actualizarDatosVisibles(usuario) {
         usuario.rol || "Tallerista"
     );
 
-    /*
-        Actualizamos también el nombre que aparece
-        en la navbar.
-    */
+    // Actualizamos también el nombre que aparece en la navbar
 
     const elementoNavbar = document.getElementById(
         "nombre-usuario"
@@ -381,10 +337,7 @@ function actualizarDatosVisibles(usuario) {
     }
 }
 
-
-/* =========================
-   CONTRASEÑA
-========================= */
+// CONTRASEÑA
 
 function limpiarCamposContrasena() {
     colocarValorInput(
@@ -398,15 +351,11 @@ function limpiarCamposContrasena() {
     );
 }
 
-
 function obtenerMensajeGuardado(password) {
     if (password) {
         /*
             No guardamos contraseñas en localStorage.
-
-            En la etapa del backend, PHP se encargará
-            de enviarla de forma segura y almacenarla
-            mediante hash.
+            En la etapa del backend, PHP se encargará de enviarla de forma segura y almacenarla mediante hash.
         */
 
         return "Los datos se guardaron correctamente. El cambio de contraseña quedó simulado para la futura conexión con el backend.";
@@ -415,10 +364,7 @@ function obtenerMensajeGuardado(password) {
     return "Los datos del perfil se guardaron correctamente.";
 }
 
-
-/* =========================
-   FORMATO
-========================= */
+// FORMATO
 
 function obtenerNombreCompletoPerfil(usuario) {
     return [
@@ -428,7 +374,6 @@ function obtenerNombreCompletoPerfil(usuario) {
         .filter(Boolean)
         .join(" ") || "Tallerista";
 }
-
 
 function formatearFechaPerfil(fechaISO) {
     if (!fechaISO) {
@@ -446,16 +391,13 @@ function formatearFechaPerfil(fechaISO) {
     return `${dia}/${mes}/${anio}`;
 }
 
-
 function formatearFechaHoraPerfil(valorFecha) {
     if (!valorFecha) {
         return "Sin información";
     }
 
     /*
-        También permite mostrar el formato utilizado
-        inicialmente en mock-data.js:
-
+        También permite mostrar el formato utilizado inicialmente en mock-data.js:
         2026-07-17 14:30
     */
 
@@ -483,10 +425,7 @@ function formatearFechaHoraPerfil(valorFecha) {
     );
 }
 
-
-/* =========================
-   FUNCIONES AUXILIARES
-========================= */
+// FUNCIONES AUXILIARES
 
 function obtenerValorInput(elementoId) {
     const elemento = document.getElementById(
@@ -497,7 +436,6 @@ function obtenerValorInput(elementoId) {
         ? elemento.value.trim()
         : "";
 }
-
 
 function colocarValorInput(
     elementoId,
@@ -513,7 +451,6 @@ function colocarValorInput(
 
     elemento.value = contenido ?? "";
 }
-
 
 function colocarTextoPerfil(
     elementoId,
@@ -531,10 +468,7 @@ function colocarTextoPerfil(
         contenido ?? "--";
 }
 
-
-/* =========================
-   ALERTAS
-========================= */
+// ALERTAS
 
 function mostrarAlertaPerfil(
     mensaje,
@@ -563,7 +497,6 @@ function mostrarAlertaPerfil(
     alerta.textContent = mensaje;
 }
 
-
 function ocultarAlertaPerfil() {
     const alerta = document.getElementById(
         "alerta-perfil"
@@ -584,7 +517,6 @@ function ocultarAlertaPerfil() {
         "alert-info"
     );
 }
-
 
 function deshabilitarFormularioPerfil() {
     const formulario = document.getElementById(

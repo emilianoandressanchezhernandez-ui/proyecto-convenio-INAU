@@ -1,13 +1,7 @@
-"use strict";
-
 /*
     MOCK-DATA.JS - FRONTEND TALLERISTA
-
     Este archivo contiene datos simulados.
-
-    Por ahora no existe conexión con PHP ni MySQL, por lo
-    que estos objetos representan temporalmente la información
-    que más adelante llegará desde el backend.
+    Por ahora no existe conexión con PHP ni MySQL, por lo que estos objetos representan temporalmente la información que más adelante llegará desde el backend.
 
     Este archivo no debe manipular el HTML.
     Solamente almacena datos.
@@ -15,9 +9,7 @@
 
 window.DATOS_SIMULADOS = {
 
-    /* =========================
-       USUARIO ACTUAL
-    ========================= */
+    // USUARIO ACTUAL
 
     usuarioActual: {
         id: 1,
@@ -31,10 +23,7 @@ window.DATOS_SIMULADOS = {
         ultimoAcceso: "2026-07-17 14:30"
     },
 
-
-    /* =========================
-       TALLERES ASIGNADOS
-    ========================= */
+    // TALLERES ASIGNADOS
 
     talleres: [
         {
@@ -239,9 +228,7 @@ window.DATOS_SIMULADOS = {
 
     /*
         Relaciona cada taller con sus alumnos.
-
-        Más adelante esta información vendrá de una tabla
-        de inscripciones en MySQL.
+        Más adelante esta información vendrá de una tabla de inscripciones en MySQL.
     */
 
     inscripciones: [
