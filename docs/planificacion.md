@@ -1,901 +1,271 @@
-# Documentación general del proyecto
+# Sistema de Gestión de Talleres en Convenio con INAU - GestorTaller
 
-## Sistema de Gestión de Talleres en Convenio con INAU
+<br>
 
-**Proyecto de egreso – 3.º EMT Informática 2026**
-**Estado documentado:** 17 de julio de 2026
+## 1. Situación inicial del cliente.
 
-### Integrantes registrados en el repositorio
-
-* Emiliano Sánchez – Coordinador.
-* Gabriel Rendon – Subcoordinador - Base de datos.
-* Ignacio Viera – Frontend.
-* Maximiliano Leal – Fronted.
-* Thiago Ferragut – Backend.
+**Organismo público vinculado a actividades socioeducativas (INAU) que gestiona talleres mediante convenio. Actualmente, la gestión de talleres, participantes y asistencias requiere una herramienta digital que centralice la información y mejore la coordinación entre talleristas y la administración.**
 
 ---
 
-## 1. Resumen ejecutivo
+<br>
 
-El proyecto consiste en desarrollar una aplicación web para organizar y controlar los talleres realizados en convenio con INAU. El sistema busca centralizar información que actualmente resulta difícil de consultar, actualizar y seguir, como los talleres, los alumnos asignados, las asistencias, los informes y la comunicación entre talleristas y administración.
+## 2. Necesidad presentada por el cliente
 
-La solución se plantea como un sistema compuesto por dos interfaces diferenciadas:
-
-* un panel para talleristas;
-* un panel para administradores.
-
-Ambas interfaces compartirán un backend centralizado, encargado de la autenticación, la lógica del negocio, los permisos, la persistencia de datos y la comunicación con una base de datos MySQL.
-
-Actualmente, el desarrollo se encuentra concentrado en el frontend. El panel del tallerista ya pasó de ser un conjunto de páginas estáticas a una interfaz dinámica que trabaja con datos simulados, parámetros de URL y almacenamiento local.
-
-El panel administrador conserva sus pantallas HTML y CSS, pero su JavaScript y sus operaciones de gestión todavía están pendientes. El backend, la base de datos y la API REST se desarrollarán en etapas posteriores.
-
----
-
-## 2. Origen y necesidad del proyecto
-
-El proyecto surge a partir de una necesidad real detectada mediante una entrevista al cliente. El problema principal identificado fue la falta de una plataforma que facilite el acceso, la disponibilidad, la privacidad y la organización de las actividades realizadas en los talleres.
-
-Entre las dificultades del proceso actual se destacan:
-
-* información distribuida o poco centralizada;
-* dificultad para consultar talleres, alumnos y asistencias;
-* falta de una herramienta única para registrar y modificar información;
-* comunicación limitada entre los diferentes responsables;
-* dificultad para generar informes y realizar un seguimiento preciso;
-* necesidad de acceder desde diferentes dispositivos y ubicaciones.
-
-La entrevista planteó inicialmente una plataforma similar a un entorno educativo, con acceso para alumnos, talleristas y administradores. Sin embargo, la especificación técnica posterior redujo el alcance de la primera versión a dos tipos de usuario autenticado: administrador y tallerista.
-
-Los alumnos quedan registrados como personas vinculadas a los talleres, pero no acceden directamente al sistema en el alcance actual.
-
-Esta evolución permite concentrar la primera versión en los procesos más importantes para la organización interna:
-
-* gestión de talleres;
-* asignación de alumnos;
-* control de asistencia;
-* generación y consulta de informes;
-* mensajería administrativa.
+>**El problema principal a resolver es la falta de organización y accesibilidad en la plataforma actual. Se requiere un espacio unificado donde estudiantes, talleristas y administradores dispongan de funciones específicas que permitan optimizar, asegurar y promover la accesibilidad, disponibilidad y estructuración de la información.**
+>
+>**-Se busca implementar una plataforma integral con las facultades mencionadas, mediante la cual:**
+>
+>**-Los alumnos puedan acceder a sus talleres, tareas, información académica y foros de discusión.**
+>
+>**-Los talleristas puedan publicar material didáctico e información, evaluar entregas y llevar el control de asistencias.**
+>
+>**-Los administradores cuenten con la capacidad de supervisar y gestionar de manera global la actividad dentro del sistema.**
+>
 
 ---
 
-## 3. Problema que se busca resolver
+<br>
 
-La institución necesita una herramienta digital que permita registrar, consultar y mantener información confiable sobre los talleres y sus actividades. Sin un sistema centralizado, el seguimiento puede depender de registros separados, comunicaciones informales o procesos manuales.
+## 3. Anotaciones de la entrevista con el cliente
 
-El sistema busca resolver principalmente los siguientes problemas:
 
-1. Falta de centralización de la información.
-2. Dificultad para conocer qué alumnos pertenecen a cada taller.
-3. Falta de un registro ordenado de asistencias por alumno, fecha y taller.
-4. Dificultad para consultar el historial y generar informes.
-5. Falta de una vía interna y trazable de comunicación entre talleristas y administración.
-6. Riesgo de que los usuarios accedan o modifiquen información que no corresponde a su rol.
-7. Necesidad de utilizar la plataforma desde computadoras, tablets y teléfonos.
+### 1. Definición del Problema y Necesidad Principal
+
+El problema principal a resolver es la falta de una plataforma web centralizada que otorgue acceso a estudiantes, talleristas y administradores a funciones específicas que faciliten, mejoren, aseguren la privacidad y avancen en términos de accesibilidad, disponibilidad y organización.
+
+Actualmente, el proceso presenta fallas en la accesibilidad y facilidad al momento de ejecutar las tareas operativas. Se busca optimizar su funcionalidad integral.
+
+
+### 2. Visión del Sistema
+
+Se proyecta alcanzar una plataforma con características similares a la plataforma Crea, estructurada para que:
+
+- *Alumnos:* Accedan a sus talleres, tareas, información académica y foros.
+- *Talleristas:* Publiquen material, compartan información, evalúen, gestionen entregas y lleven el control de asistencia.
+- *Administradores:* Tengan visibilidad y control global de las actividades y eventos dentro del sistema.
+
+(Nota: En el proceso actual no se especificó la metodología exacta con la que se realizan estas tareas hoy en día).
+
+
+### 3. Definición de Roles y Permisos de Usuario
+
+#### 3.1. Alumno
+
+- *Visualización:* Materiales, tareas e información de sus respectivos talleres; sus notas asignadas por el tallerista y su información personal.
+- *Acciones/Carga:* Consultas y envío de archivos requeridos para la entrega de tareas.
+- *Modificación:* Cambio de contraseña y edición limitada de ciertos elementos del perfil. Sin acceso a modificar los archivos de entregas una vez enviados.
+- *Eliminación:* Edición/eliminación de ciertos datos de su perfil (ej. foto de perfil, biografía).
+
+#### 3.2. Tallerista
+
+- *Visualización:* Únicamente la información correspondiente a su taller (materiales, tareas, listado de alumnos inscritos, asistencias y ciertos datos del estudiante).
+- *Acciones/Carga:* Publicar material didáctico, asignar y corregir tareas, comunicarse con los alumnos, registrar asistencia de su taller e ingresar notas e informes para la administración.
+- *Modificación:* Ajuste de materiales de su taller, registros de asistencia y calificaciones asignadas a los alumnos.
+- *Eliminación:* Borrado de materiales, calificaciones e historial de asistencias de su taller.
+
+#### 3.3. Administrador
+
+- *Visualización:* Acceso integral a toda la información del sistema, observando y supervisando el orden y el uso adecuado de la plataforma.
+- *Acciones/Carga:* Gestión completa para subir, modificar, eliminar y consultar cualquier información (con excepción de la modificación directa de datos personales de los usuarios como el número de cédula).
+
+
+### 4. Alcance del Proyecto
+
+#### 4.1. Alcance de la Primera Versión (MVP)
+
+- Operatividad general y funcional de la plataforma.
+- Capacidades para que los talleristas suban material y asignen tareas (sin especificar inicialmente restricciones de imágenes, datos o archivos extra).
+- Módulo para el pase de lista / control de asistencias por parte de los talleristas.
+- Interfaz para que los alumnos visualicen los contenidos y envíen sus entregas.
+- Panel de administración con acceso y supervisión global del sistema.
+
+#### 4.2. Funcionalidades Deseables (Fases Futuras)
+
+- *Foros por Taller:* Espacios interactivos donde se puedan publicar imágenes y novedades para ser visualizados por los usuarios y sus familiares.
+- *Soporte Multiformato:* Compatibilidad para la subida de archivos tipo PDF, PNG, MP4 y JPG.
+- *Módulo Avanzado de Asistencia:* Control detallado e historial de asistencia con métricas semanales, mensuales, anuales, etc.
+- *Canal de Comunicación Interna:* Envío de informes directos de los talleristas hacia la administración.
+
+
+### 5. Requerimientos de Información y Auditoría
+
+#### 5.1. Registros Obligatorios
+
+El sistema deberá registrar:
+
+- Usuarios y contraseñas.
+- Asistencias.
+- Elementos enviados y subidos.
+- Informes generados.
+- Traza de archivos subidos, modificados o eliminados.
+- Datos de contacto de los talleristas e información personal de cada usuario.
+
+#### 5.2. Consultas y Protección de Datos
+
+- Consulta de datos sensibles utilizados.
+
+
+### 6. Generación de Reportes
+
+El sistema debe permitir la emisión de los siguientes reportes:
+
+- Listas de alumnos.
+- Mapeo de talleres y sus respectivos talleristas asignados.
+- Histórico de calificaciones de alumnos.
+- Información detallada de alumnos y talleristas.
+- Reportes emitidos por los talleristas.
+- Registros de asistencias.
+- Listado e historial de tareas entregadas.
+
+
+### 7. Requerimientos No Funcionales
+
+- *Notificaciones:* El sistema deberá emitir notificaciones automáticas ante eventos relevantes (correcciones de tareas, faltas de asistencia, nuevas entregas, etc.).
+- *Integración / Módulos no especificados:* (No especificado en la entrevista).
+- *Seguridad y Protección de Datos:* Aunque no se definió un nivel de seguridad específico, se exige el cumplimiento obligatorio de medidas para la protección de los datos de los usuarios.
+- *Rendimiento:* Se requiere un tiempo de respuesta rápido en la ejecución de tareas habituales.
+- *Multiplataforma y Accesibilidad:* Diseño adaptable a todos los dispositivos, permitiendo el acceso remoto desde cualquier ubicación.
+- *Disponibilidad:* Sistema disponible en modalidad 24/7.
+- *Marco Legal y Reglas de Negocio:*
+  - Las reglas de negocio no fueron especificadas en la entrevista.
+  - Las restricciones legales no fueron detalladas en la entrevista.
+
+
+### 8. Criterios de Aceptación y Plazos
+
+- *Criterio de Aceptación:* El cliente validará el sistema cuando este sea plenamente funcional en la operativa del día a día, cumpliendo con las características requeridas.
+- *Plazo de Entrega:* Finales del año en curso.
+
 
 ---
 
-## 4. Objetivos
+<br>
 
-### 4.1 Objetivo general
+## 4. Información obtenida en la entrevista
 
-Desarrollar una aplicación web responsive, organizada y escalable que permita gestionar talleres en convenio con INAU, controlar la asistencia de los alumnos, consultar informes y mantener una comunicación interna entre talleristas y administradores.
-
-### 4.2 Objetivos específicos
-
-* Centralizar la información de usuarios, talleristas, alumnos y talleres.
-* Diferenciar las funciones y permisos según el rol del usuario.
-* Permitir al tallerista consultar únicamente los talleres que tiene asignados.
-* Registrar la asistencia de los alumnos por taller y fecha.
-* Evitar registros duplicados de asistencia para un mismo alumno, taller y fecha.
-* Permitir la consulta de informes y estadísticas básicas.
-* Implementar una mensajería interna entre talleristas y administración.
-* Preparar el frontend para conectarse posteriormente a una API REST.
-* Mantener una estructura de archivos clara y modular.
-* Aplicar control de versiones, documentación y pruebas durante el desarrollo.
-* Proteger los datos personales y limitar la modificación de información sensible.
+| Categoría           | Información relevada                                                                    |
+| ------------------- | --------------------------------------------------------------------------------------- |
+| Problema principal  |  Falta sistema digital de organización y accesibilidad, al que alumnos, talleristas y   | 
+|                     |  administradores puedan usar.                                                           |
+| Objetivo de negocio |  Se espera alcanzar una plataforma con las funciones mencionadas, mejorando el control, |
+|                     |  accesibilidad y monitoreo, para alumnos, talleristas y administradores.                |
+| Plazo esperado      | Aproximadamente Finales de año.                                                         |
+| Usuarios            |  Administradores, Talleristas, Alumnos                                                  |
+| Seguridad           | Acceso por roles, protección de datos sensibles de los usuarios.                        |
 
 ---
 
-## 5. Público objetivo y actores del sistema
+<br>
 
-### 5.1 Administrador
+## 5. Nombre propuesto del producto
 
-El administrador tendrá acceso a la gestión general del sistema. Entre sus responsabilidades previstas se encuentran:
+**GestorTalleres - Convenio con INAU**
 
-* administrar cuentas de usuarios;
-* registrar, consultar, modificar y dar de baja lógica a talleristas;
-* registrar, consultar, modificar y dar de baja lógica a alumnos;
-* crear y administrar talleres;
-* asignar alumnos y talleristas a los talleres;
-* consultar y corregir registros de asistencia;
-* consultar informes generales;
-* enviar y recibir mensajes internos;
-* revisar modificaciones y conservar trazabilidad.
-
-### 5.2 Tallerista
-
-El tallerista tendrá acceso limitado a la información relacionada con su trabajo. Podrá:
-
-* consultar su perfil;
-* visualizar sus talleres asignados;
-* consultar los datos de cada taller;
-* ver los alumnos vinculados a sus talleres;
-* registrar asistencias;
-* consultar informes relacionados;
-* comunicarse con la administración.
-
-Los datos de identificación del tallerista, como nombre, apellido y cédula, deben mostrarse como información de solo lectura en su perfil.
-
-El tallerista puede modificar datos de contacto, como correo y teléfono, y solicitar un cambio de contraseña. La autorización definitiva deberá aplicarse también en el backend.
-
-### 5.3 Alumnos
-
-En el alcance técnico actual, los alumnos no tienen cuenta de acceso. Son entidades administradas dentro del sistema y pueden estar relacionados con uno o varios talleres.
-
-La entrevista original contemplaba un posible acceso futuro para que los alumnos consultaran materiales y entregaran tareas. Esta funcionalidad queda fuera de la primera versión y puede considerarse una ampliación posterior.
+**Sistema de Gestión de Talleres en Convenio con INAU**
 
 ---
 
-## 6. Alcance funcional
+<br>
 
-### 6.1 Autenticación
+## 6. Visión del producto
 
-Se prevé un único inicio de sesión ubicado en la raíz del proyecto. Una vez validadas las credenciales, el sistema deberá redirigir al usuario según su rol:
+**Desarrollar una solución web con diseño adaptativo (responsive) que centralice la gestión operativa de los talleres ejecutados en convenio con el INAU.**
 
-* administrador: panel administrador;
-* tallerista: panel tallerista.
+**El sistema otorgará a administradores y talleristas las capacidades necesarias para la administración integral de talleres, participantes, controles de asistencia, generación de informes y comunicación interna. Asimismo, proporcionará a los alumnos acceso directo a sus talleres, tareas, información académica y foros de consulta, garantizando un entorno organizado, seguro y accesible desde diversos dispositivos.**
 
-La autenticación real todavía no está implementada. La pantalla de acceso existe, pero necesita:
-
-* conectarse a un archivo de autenticación;
-* corregir sus rutas después de la reorganización de carpetas;
-* validar las credenciales;
-* crear una sesión segura;
-* redirigir al panel correspondiente.
-
-### 6.2 Gestión de talleres
-
-El sistema deberá registrar, como mínimo:
-
-* nombre;
-* descripción;
-* temática;
-* ubicación;
-* horarios;
-* fecha de inicio y finalización;
-* estado;
-* talleristas asignados;
-* alumnos asignados;
-* documentos adjuntos.
-
-En el frontend del tallerista ya existe un listado dinámico de talleres y una pantalla de detalle.
-
-El listado muestra únicamente información resumida:
-
-* nombre;
-* estado;
-* acceso al detalle.
-
-La pantalla de detalle concentra:
-
-* descripción;
-* días y horarios;
-* ubicación;
-* cantidad de alumnos;
-* asistencia promedio;
-* estado;
-* accesos a asistencia e informes.
-
-### 6.3 Gestión de alumnos
-
-Los alumnos deberán contener datos personales y de referencia. La especificación propone campos como:
-
-* nombre y apellido;
-* cédula;
-* fecha de nacimiento;
-* teléfono;
-* dirección;
-* correo;
-* referente adulto;
-* centro o programa de referencia;
-* observaciones;
-* situación de derivación;
-* fecha de ingreso.
-
-La asignación de alumnos a talleres será responsabilidad del administrador. Un alumno podrá participar en más de un taller.
-
-### 6.4 Control de asistencia
-
-El registro de asistencia debe relacionar:
-
-* taller;
-* alumno;
-* fecha;
-* estado;
-* observaciones opcionales;
-* usuario que creó o modificó el registro.
-
-Los estados definidos en la especificación son:
-
-* presente;
-* ausente;
-* justificado;
-* tardanza.
-
-La versión simulada actual implementa:
-
-* presente;
-* ausente;
-* justificado.
-
-La opción tardanza y las observaciones por alumno quedan pendientes.
-
-El frontend actual permite:
-
-* recibir el taller seleccionado mediante la URL;
-* cargar los alumnos inscritos;
-* elegir el estado de cada alumno;
-* actualizar el contador de presentes;
-* impedir el guardado si faltan estados;
-* guardar temporalmente la asistencia;
-* recuperar una asistencia previamente guardada para la misma fecha y taller.
-
-### 6.5 Informes
-
-La especificación contempla informes:
-
-* por alumno;
-* por rango de fechas;
-* por taller;
-* por tallerista;
-* por relación entre talleristas y alumnos.
-
-La versión actual incluye:
-
-* listado de informes simulados;
-* filtros por fecha;
-* búsqueda por título, taller, tipo o estado;
-* cantidad total de informes;
-* informes del mes;
-* última actualización;
-* pantalla de detalle;
-* impresión desde el navegador;
-* descarga provisional como archivo de texto.
-
-La generación real de archivos PDF o Excel deberá implementarse posteriormente desde el backend o mediante una herramienta específica.
-
-### 6.6 Mensajería interna
-
-La plataforma debe permitir mensajes entre talleristas y administradores.
-
-Los mensajes incluyen:
-
-* conversación;
-* remitente;
-* destinatario;
-* contenido;
-* fecha y hora;
-* estado leído o no leído.
-
-El módulo actual permite:
-
-* mostrar conversaciones disponibles;
-* seleccionar una conversación;
-* visualizar el historial;
-* distinguir mensajes enviados y recibidos;
-* marcar automáticamente como leídos los mensajes recibidos;
-* mostrar mensajes pendientes;
-* impedir mensajes vacíos;
-* limitar la extensión;
-* enviar nuevas respuestas;
-* conservar temporalmente la conversación en el navegador.
-
-### 6.7 Perfil
-
-El perfil del tallerista muestra:
-
-* nombre;
-* apellido;
-* cédula;
-* correo;
-* teléfono;
-* rol;
-* identificador;
-* fecha de registro;
-* último acceso.
-
-Nombre, apellido y cédula se muestran como campos de solo lectura. Correo y teléfono pueden editarse.
-
-El cambio de contraseña se encuentra simulado y no almacena la contraseña en el navegador.
+**Estas capacidades se incorporarán de forma incremental: la primera versión del sistema comprende las funcionalidades definidas en el alcance inicial (autenticación, gestión de usuarios y talleres, asistencia, material y tareas, informes y perfiles), mientras que la comunicación interna y los foros de consulta se desarrollarán en etapas posteriores.**
 
 ---
 
-## 7. Requisitos no funcionales
+<br>
 
-El sistema deberá cumplir con los siguientes criterios:
+## 7. Alcance incluido (primera versión):
 
-* diseño responsive para computadora, tablet y teléfono;
-* disponibilidad prevista las 24 horas una vez desplegado;
-* rapidez en las operaciones habituales;
-* navegación clara y consistente;
-* validación de formularios tanto en frontend como en backend;
-* separación entre frontend y backend;
-* control de acceso por roles;
-* protección de datos personales;
-* persistencia confiable en MySQL;
-* trazabilidad de acciones importantes;
-* restricción de formatos y tamaños de archivos adjuntos;
-* código organizado, reutilizable y mantenible;
-* documentación técnica dentro del repositorio;
-* uso de Git para registrar y revisar cambios.
+1. Sistema de autenticación con acceso diferenciado para administradores, alumnos y talleristas.
+2. Gestión de usuarios, talleristas, alumnos y talleres.
+3. Asignación de alumnos y talleristas a los talleres.
+4. Registro, consulta y modificación de asistencias por taller y fecha.
+5. Carga de material y tareas por parte del tallerista (sin especificar tipos de archivo extra, imágenes o datos adicionales).
+6. Visualización de material y tareas por parte del alumno, y envío/carga de los archivos correspondientes a la tarea asignada.
+7. Corrección de tareas y asignación de notas por parte del tallerista.
+8. Consulta y generación de informes de asistencia y talleres.
+9. Exportación de informes en formatos PDF y Excel.
+10. Gestión de perfiles de usuario según el rol.
+11. Plataforma web responsive accesible desde distintos dispositivos.
 
 ---
 
-## 8. Tecnologías y herramientas utilizadas
+<br>
 
-### 8.1 Tecnologías actuales
+## 8. Alcance excluido (queda para etapas futuras):
 
-* **HTML5:** estructura de las páginas.
-* **CSS3:** personalizaciones visuales.
-* **Bootstrap 5.3:** diseño responsive y componentes.
-* **Bootstrap Icons:** iconografía.
-* **JavaScript Vanilla:** comportamiento dinámico del frontend.
-* **localStorage:** persistencia temporal en el navegador.
-* **Mock data:** arrays y objetos para simular la futura base de datos.
-* **Git:** control de versiones.
-* **GitHub:** almacenamiento y seguimiento del repositorio.
-* **Visual Studio Code:** entorno de desarrollo.
-* **XAMPP o servidor local:** ejecución del proyecto durante el desarrollo.
-
-### 8.2 Tecnologías previstas
-
-* PHP para el backend.
-* MySQL para la base de datos.
-* API REST para la comunicación entre frontend y backend.
-* Fetch API para las solicitudes desde JavaScript.
-* Filesystem del servidor para archivos adjuntos.
+1. Foros de comunicación y publicación de contenido para talleres.
+2. Compatibilidad para la subida de archivos tipo PNG y MP4 (más allá del tipo básico soportado en v1).
+3. Control detallado e historial de asistencia con métricas semanales, mensuales, anuales, etc.
+4. Listado e historial ampliado de tareas entregadas (más allá del envío/corrección básica ya incluida en v1).
+5. Sistema de notificaciones automáticas ante eventos relevantes (correcciones de tareas, faltas de asistencia, nuevas entregas).
+6. Mensajería interna entre administradores y talleristas (No en tiempo real).
 
 ---
 
-## 9. Arquitectura y organización del repositorio
+<br>
 
-La estructura actual principal es:
+## 9. Requerimientos funcionales:
 
-```text
-proyecto-convenio-INAU/
-│
-├── backend/
-│   └── .gitkeep
-│
-├── docs/
-│   ├── api.md
-│   ├── modelado.md
-│   ├── planificacion.md
-│   ├── requerimientos.md
-│   ├── seguridad.md
-│   └── testing.md
-│
-├── frontend/
-│   ├── frontend-admin/
-│   │   ├── css/
-│   │   ├── js/
-│   │   └── páginas HTML del administrador
-│   │
-│   └── frontend-tallerista/
-│       ├── css/
-│       ├── js/
-│       └── páginas HTML del tallerista
-│
-├── index.html
-└── README.md
-```
-
-### 9.1 Frontend del tallerista
-
-Incluye ocho páginas principales:
-
-* `dashboard.html`;
-* `perfil.html`;
-* `mis-talleres.html`;
-* `detalle-taller.html`;
-* `asistencia.html`;
-* `informes.html`;
-* `detalle-informe.html`;
-* `mensajes.html`.
-
-La carpeta JavaScript contiene módulos específicos para cada pantalla, además de `main.js` y `mock-data.js`.
-
-### 9.2 Frontend administrador
-
-Incluye doce páginas HTML para:
-
-* dashboard;
-* talleristas;
-* detalle de tallerista;
-* alumnos;
-* detalle de alumno;
-* talleres;
-* detalle de taller;
-* asistencias;
-* reportes;
-* detalle de reporte;
-* mensajes;
-* perfil.
-
-Estas pantallas constituyen la base visual, pero sus archivos JavaScript continúan vacíos y todavía no existe lógica dinámica ni operaciones CRUD.
-
-### 9.3 Backend
-
-La carpeta backend existe como espacio reservado, pero todavía no contiene implementación.
-
-### 9.4 Documentación técnica
-
-La carpeta `docs` ya contiene los archivos esperados para:
-
-* requerimientos;
-* modelado;
-* API;
-* seguridad;
-* planificación;
-* testing.
-
-En el estado actual del repositorio, estos archivos están creados pero vacíos. Esta documentación general puede utilizarse como base para comenzar a completarlos.
+|Codigo | Requerimiento funcional
+|-------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| RF01  | El sistema debe permitir iniciar sesión con usuario y contraseña, diferenciando el acceso según el rol (alumno, tallerista, administrador).  |
+| RF02  | El sistema debe permitir al administrador gestionar usuarios (alumnos y talleristas) y talleres: crear, modificar, eliminar y consultar.     |
+| RF03  | El sistema debe permitir al administrador asignar alumnos y talleristas a los talleres correspondientes.                                     |
+| RF04  | El sistema debe permitir al tallerista registrar la asistencia de los alumnos de su taller, indicando fecha.                                 |
+| RF05  | El sistema debe permitir consultar y modificar la asistencia registrada por taller y fecha.                                                  |
+| RF06 	| El sistema debe permitir al tallerista subir material y tareas asociados a su taller.                                                        |
+| RF07  | El sistema debe permitir al alumno visualizar el material y las tareas de su taller.                                                         |
+| RF08  | El sistema debe permitir al alumno enviar/subir los archivos correspondientes a una tarea asignada.                                          |
+| RF09  | El sistema debe permitir al tallerista corregir las tareas enviadas por los alumnos.                                                         |
+| RF10  | El sistema debe permitir al tallerista asignar una nota a cada alumno por tarea.                                                             |
+| RF11  | El sistema debe permitir generar informes de asistencia por taller.                                                                          |
+| RF12  | El sistema debe permitir generar informes de talleres con sus talleristas asignados.                                                         |
+| RF13  | El sistema debe permitir exportar los informes generados en formato PDF o Excel.                                                             |
+| RF14  | El sistema debe permitir a cada usuario gestionar su perfil según su rol (modificar contraseña y datos personales).                          |
+| RF15  | El sistema debe permitir al alumno eliminar ciertos datos de su perfil (foto, biografía).                                                    |
 
 ---
 
-## 10. Organización del JavaScript del tallerista
+<br>
 
-La reorganización del JavaScript tuvo como objetivo evitar que toda la lógica quedara acumulada en un único archivo.
+## 10. Requerimientos no funcionales:
 
-### 10.1 `main.js`
-
-Funciona como punto de entrada común. Sus responsabilidades son:
-
-* esperar la carga del DOM;
-* mostrar el usuario en la barra de navegación;
-* configurar el cierre de sesión;
-* detectar la página actual mediante `data-page`;
-* ejecutar el inicializador del módulo correspondiente.
-
-### 10.2 `mock-data.js`
-
-Contiene la base de datos simulada del frontend. Incluye:
-
-* usuario actual;
-* talleres;
-* alumnos;
-* inscripciones;
-* informes;
-* administradores;
-* conversaciones;
-* mensajes.
-
-Este archivo no manipula el HTML. Su función es ofrecer datos temporales hasta que exista una API.
-
-### 10.3 Módulos por pantalla
-
-* `dashboard.js`: calcula métricas y muestra el saludo.
-* `perfil.js`: carga y valida el perfil.
-* `mis-talleres.js`: lista y busca talleres.
-* `detalle-taller.js`: obtiene el taller mediante un parámetro de URL.
-* `asistencia.js`: registra y recupera asistencias.
-* `informes.js`: lista, filtra y resume informes.
-* `detalle-informe.js`: muestra, imprime y descarga un informe.
-* `mensajes.js`: administra conversaciones, lectura y envío de mensajes.
+|Codigo | Requerimiento funcional
+|-------|--------------------------------------------------------------------------------------------------------------------------|
+| NRF01 | El sistema debe presentar un diseño responsive, adaptándose a computadora, tablet y teléfono.                            |
+| NRF02 | El sistema debe estar disponible las 24 horas del día una vez desplegado.                                                |
+| NRF03 | El sistema debe responder con rapidez en las operaciones habituales.                                                     |
+| NRF04 | El sistema debe presentar una navegación clara y consistente para el usuario.                                            |
+| NRF05 | El sistema debe validar los formularios tanto en el frontend como en el backend.                                         |
+| NRF06 | El sistema debe mantener una arquitectura separada entre frontend y backend.                                             |
+| NRF07 | El sistema debe controlar el acceso a las funcionalidades según el rol del usuario.                                      |
+| NRF08 | El sistema debe proteger los datos personales de los usuarios.                                                           |
+| NRF09 | El sistema debe garantizar la persistencia confiable de los datos en una base de datos relacional.                       |
+| NRF10 | El sistema debe registrar la trazabilidad de las acciones importantes realizadas por los usuarios.                       |
+| NRF11 | El sistema debe restringir los formatos de archivos adjuntos a PDF e imágenes JPG, acorde a los tipos soportados en v1.  |
+| NRF12 | El sistema debe restringir el tamaño de los archivos adjuntos permitidos.                                                |
+| NRF13 | El código del sistema debe estar organizado, ser reutilizable y mantenible.	                                             |
+| NRF14 | El sistema debe contar con documentación técnica dentro del repositorio.                                                 |
+| NRF15 | El equipo debe utilizar Git para registrar y revisar los cambios del código.                                             |
 
 ---
 
-## 11. Proceso de desarrollo realizado
-
-### Etapa 1: análisis del problema
-
-Se realizó una entrevista al cliente para identificar:
-
-* problemas actuales;
-* usuarios involucrados;
-* información que debe registrarse;
-* funciones necesarias;
-* expectativas de disponibilidad, seguridad y rendimiento.
-
-### Etapa 2: definición del alcance
-
-Se compararon las necesidades iniciales con la consigna técnica. Se definió que la primera versión tendrá dos roles autenticados:
-
-* administrador;
-* tallerista.
-
-También se acordó utilizar el término “alumnos” en la interfaz actual, en lugar de “participantes”.
-
-### Etapa 3: estructura del repositorio
-
-Se crearon carpetas separadas para:
-
-* backend;
-* documentación;
-* frontend administrador;
-* frontend tallerista.
-
-Posteriormente, ambos frontends se agruparon dentro de una carpeta general `frontend`.
-
-### Etapa 4: diseño estático
-
-Se construyeron las páginas HTML de ambos roles utilizando Bootstrap 5.3 y un diseño institucional, limpio y responsive.
-
-Se incluyeron:
-
-* barras de navegación;
-* tarjetas;
-* tablas;
-* formularios;
-* perfiles;
-* paneles;
-* enlaces entre páginas.
-
-### Etapa 5: preparación para datos dinámicos
-
-Los elementos importantes recibieron IDs y los contenedores quedaron preparados para ser completados desde JavaScript.
-
-Se evitó depender exclusivamente de información escrita directamente en el HTML.
-
-### Etapa 6: modularización de JavaScript
-
-El archivo principal se redujo a tareas comunes y se crearon archivos separados por pantalla. Cada módulo recibió una responsabilidad concreta.
-
-### Etapa 7: creación de datos simulados
-
-Se creó `mock-data.js` con objetos relacionados mediante identificadores. Esta decisión permite probar la aplicación como si ya existiera una base de datos.
-
-### Etapa 8: navegación mediante parámetros
-
-Se implementaron rutas como:
-
-```text
-detalle-taller.html?id=1
-asistencia.html?tallerId=1
-informes.html?tallerId=1
-detalle-informe.html?id=1
-```
-
-Los módulos leen estos parámetros con `URLSearchParams`, validan los identificadores y buscan los registros correspondientes.
-
-### Etapa 9: persistencia temporal
-
-Se utilizó `localStorage` para conservar:
-
-* datos editables del perfil;
-* asistencias simuladas;
-* conversaciones y mensajes;
-* contador de mensajes no leídos;
-* información temporal de sesión.
-
-### Etapa 10: pruebas funcionales
-
-Se comprobaron manualmente:
-
-* carga de talleres;
-* búsqueda de talleres;
-* navegación al detalle;
-* IDs inexistentes o faltantes;
-* registro y recuperación de asistencias;
-* filtros de informes;
-* detalle e impresión de informes;
-* validación del perfil;
-* mensajes vacíos;
-* lectura y envío de mensajes;
-* persistencia después de recargar;
-* cierre de sesión;
-* rutas relativas.
-
----
-
-## 12. Avance actual
-
-### 12.1 Completado o funcional en el frontend tallerista
-
-| Módulo             | Estado                    | Funciones implementadas                                                             |
-| ------------------ | ------------------------- | ----------------------------------------------------------------------------------- |
-| Dashboard          | Funcional                 | Saludo, talleres asignados, alumnos únicos y presentes del día.                     |
-| Perfil             | Funcional con observación | Carga de datos, edición de contacto, validaciones e identificación de solo lectura. |
-| Mis Talleres       | Funcional                 | Listado dinámico, búsqueda y acceso a detalles.                                     |
-| Detalle del taller | Funcional                 | Lectura del ID, datos completos y enlaces contextualizados.                         |
-| Asistencia         | Funcional como simulación | Lista de alumnos, estados, contador, guardado y recuperación local.                 |
-| Informes           | Funcional como simulación | Listado, filtros, estadísticas y navegación.                                        |
-| Detalle de informe | Funcional como simulación | Información completa, impresión y descarga TXT.                                     |
-| Mensajes           | Funcional como simulación | Conversación, leído/no leído, envío y persistencia local.                           |
-| Cierre de sesión   | Funcional                 | Eliminación de información de sesión y regreso al `index.html`.                     |
-
-### 12.2 Parcialmente desarrollado
-
-* Interfaz administrador: HTML y CSS creados; JavaScript pendiente.
-* Login: interfaz creada; autenticación y rutas pendientes.
-* Documentos técnicos: archivos creados; contenido pendiente.
-* CSS: existen hojas separadas para cada rol; se debe decidir qué estilos serán compartidos.
-
-### 12.3 No iniciado
-
-* Backend PHP.
-* Base de datos MySQL.
-* API REST.
-* Fetch API.
-* Sesiones reales.
-* Control de acceso del servidor.
-* CRUD del administrador.
-* Gestión real de archivos adjuntos.
-* Historial de actividad.
-* Testing automatizado.
-* Despliegue final.
-
----
-
-## 13. Modelo de datos preliminar
-
-A partir de la entrevista, la especificación técnica y los datos simulados, se identifican las siguientes entidades principales:
-
-* usuarios;
-* roles;
-* talleristas;
-* alumnos;
-* talleres;
-* asignaciones de talleristas;
-* inscripciones de alumnos;
-* asistencias;
-* informes;
-* mensajes internos;
-* adjuntos;
-* historial de actividad.
-
-### Relaciones principales
-
-* Un usuario posee un rol.
-* Un tallerista se relaciona con una cuenta de usuario.
-* Un alumno puede estar en varios talleres.
-* Un taller puede tener varios alumnos y uno o varios talleristas.
-* Una asistencia pertenece a un alumno, un taller y una fecha.
-* Un informe pertenece a un taller y un tallerista.
-* Un mensaje relaciona a un administrador con un tallerista.
-* Un adjunto puede pertenecer a un taller o a otro registro permitido.
-
----
-
-## 14. Decisiones técnicas adoptadas
-
-### 14.1 Un único login
-
-No se crearán páginas de acceso separadas por rol. El backend identificará al usuario y lo redirigirá al panel correspondiente.
-
-### 14.2 Separación por roles
-
-Los paneles administrador y tallerista permanecen separados para simplificar permisos, navegación y mantenimiento.
-
-### 14.3 Bootstrap como base
-
-El CSS personaliza Bootstrap, pero no intenta reemplazarlo. Esto facilita el diseño responsive y mantiene consistencia visual.
-
-### 14.4 Datos simulados antes del backend
-
-El frontend se está completando con mock data antes de iniciar PHP. Esto permite validar flujos y componentes sin depender todavía de una base de datos.
-
-### 14.5 Parámetros de URL
-
-Los detalles y módulos dependientes de un taller reciben identificadores en la URL. Esto imita el comportamiento de una aplicación conectada a endpoints.
-
-### 14.6 Persistencia local provisional
-
-`localStorage` se usa únicamente para demostración y pruebas. No reemplaza a MySQL, no ofrece seguridad real y no debe almacenar contraseñas.
-
-### 14.7 Restricción de datos personales
-
-El tallerista no debe modificar nombre, apellido o cédula. La interfaz los muestra como solo lectura.
-
-El backend deberá reforzar esta regla ignorando cualquier intento de modificación no autorizado.
-
----
-
-## 15. Seguridad y privacidad
-
-El sistema manejará información personal y posiblemente sensible. Por lo tanto, se deberán aplicar medidas como:
-
-* contraseñas almacenadas mediante hash seguro;
-* sesiones controladas desde el servidor;
-* validación y sanitización de entradas;
-* consultas preparadas para evitar inyección SQL;
-* verificación de permisos en cada endpoint;
-* protección de rutas según rol;
-* restricción de archivos permitidos;
-* nombres de archivo generados de forma segura;
-* límites de tamaño de adjuntos;
-* registro de modificaciones relevantes;
-* baja lógica cuando corresponda;
-* protección de datos personales en reportes y pantallas;
-* cierre de sesión seguro.
-
-Las validaciones realizadas actualmente en JavaScript mejoran la experiencia del usuario, pero no son suficientes para garantizar seguridad. Todas deben repetirse en PHP.
-
----
-
-## 16. Observaciones técnicas y puntos a corregir
-
-### 16.1 Rutas del login
-
-Después de mover los dos paneles dentro de la carpeta `frontend`, el `index.html` todavía referencia rutas anteriores para el CSS y para `js/auth.js`.
-
-Deben actualizarse para apuntar a la ubicación real o debe crearse una carpeta común para los recursos del login.
-
-### 16.2 Restricción del perfil
-
-El HTML del perfil ya utiliza `readonly` para nombre, apellido y cédula.
-
-Sin embargo, la versión actual de `perfil.js` todavía incluye esos valores dentro del objeto guardado. Aunque el usuario común no puede cambiarlos desde la interfaz, se recomienda eliminar esas propiedades de la operación de actualización para reforzar la regla también en la lógica del frontend.
-
-### 16.3 Estados de talleres
-
-Los datos simulados usan el estado “Activo”, mientras que la especificación propone:
-
-* planificado;
-* en curso;
-* finalizado;
-* suspendido.
-
-Debe definirse una lista oficial antes de crear la base de datos.
-
-### 16.4 Estados de asistencia
-
-Falta agregar:
-
-* tardanza;
-* observaciones por registro.
-
-### 16.5 Terminología
-
-La consigna técnica utiliza “participantes”, mientras que el equipo decidió utilizar “alumnos” en la interfaz.
-
-Esta decisión debe documentarse y aplicarse de forma consistente en:
-
-* base de datos;
-* API;
-* documentación;
-* código;
-* textos visibles.
-
-### 16.6 Permisos sobre datos personales
-
-La entrevista presenta respuestas que pueden interpretarse de manera contradictoria sobre quién puede modificar cédulas y datos personales.
-
-El equipo decidió que el tallerista no puede hacerlo y que la administración tendrá mayor control. Esta regla debe confirmarse expresamente con el cliente antes de implementarla en el backend.
-
-### 16.7 Funciones repetidas
-
-Varios módulos repiten funciones para:
-
-* mostrar alertas;
-* colocar texto;
-* formatear fechas;
-* escapar HTML;
-* obtener parámetros de URL.
-
-Estas funciones deberían trasladarse gradualmente a `utils.js` y `dom.js`.
-
-### 16.8 Archivos vacíos
-
-Los siguientes archivos están creados, pero vacíos:
-
-* `constants.js`;
-* `dom.js`;
-* `utils.js`;
-* `talleres.js`.
-
-Debe decidirse si se utilizarán durante la refactorización o si conviene eliminarlos para evitar archivos sin propósito.
-
-### 16.9 Documentación pendiente
-
-Los seis archivos de la carpeta `docs` están vacíos.
-
-Es necesario distribuir la información de esta documentación general entre:
-
-* requerimientos;
-* modelado;
-* API;
-* seguridad;
-* planificación;
-* testing.
-
----
-
-## 17. Próximos pasos recomendados
-
-### Fase 1: cierre del frontend tallerista
-
-1. Revisar rutas y enlaces de todas las páginas.
-2. Corregir la restricción lógica del perfil.
-3. Agregar tardanza y observaciones a asistencia.
-4. Refactorizar funciones comunes hacia `utils.js` y `dom.js`.
-5. Normalizar estados y nombres de propiedades.
-6. Probar responsive y accesibilidad.
-7. Documentar casos de prueba.
-
-### Fase 2: frontend administrador dinámico
-
-1. Crear una estrategia común de datos simulados.
-2. Implementar dashboard administrativo.
-3. Implementar CRUD simulado de talleristas.
-4. Implementar CRUD simulado de alumnos.
-5. Implementar gestión de talleres y asignaciones.
-6. Implementar consulta y corrección de asistencias.
-7. Implementar reportes.
-8. Integrar la mensajería con el panel del tallerista.
-
-### Fase 3: modelado y base de datos
-
-1. Confirmar reglas de negocio con el cliente.
-2. Crear diagrama entidad-relación.
-3. Definir claves primarias y foráneas.
-4. Definir estados, restricciones e índices.
-5. Preparar scripts SQL o migraciones.
-
-### Fase 4: backend y API
-
-1. Implementar configuración de PHP y MySQL.
-2. Crear autenticación y sesiones.
-3. Crear verificaciones por rol.
-4. Implementar endpoints REST.
-5. Implementar operaciones CRUD.
-6. Implementar carga segura de archivos.
-7. Registrar historial de actividad.
-
-### Fase 5: integración
-
-1. Sustituir mock data por Fetch API.
-2. Sustituir `localStorage` por persistencia del servidor.
-3. Manejar errores HTTP y estados de carga.
-4. Probar permisos reales.
-5. Verificar todos los flujos de extremo a extremo.
-
-### Fase 6: testing y entrega
-
-1. Crear plan de pruebas.
-2. Ejecutar pruebas funcionales y de permisos.
-3. Revisar seguridad básica.
-4. Completar documentación.
-5. Preparar demo y defensa técnica.
-6. Preparar despliegue y datos de demostración.
-
----
-
-## 18. Criterios de aceptación generales
-
-El sistema podrá considerarse funcional cuando:
-
-* un usuario pueda iniciar sesión y ser dirigido según su rol;
-* el tallerista vea únicamente sus talleres;
-* el administrador pueda gestionar los datos autorizados;
-* los alumnos puedan asignarse a uno o varios talleres;
-* se registre una única asistencia por alumno, fecha y taller;
-* los informes reflejen datos persistentes;
-* la mensajería funcione entre administrador y tallerista;
-* los permisos se validen en el backend;
-* los datos continúen disponibles después de cerrar el navegador;
-* la plataforma sea usable desde distintos dispositivos;
-* las acciones importantes queden registradas;
-* la documentación y las pruebas estén completas.
-
----
-
-## 19. Conclusión
-
-El proyecto cuenta con una base visual amplia y una arquitectura que permite continuar creciendo. El principal avance técnico se encuentra en el frontend del tallerista, que ya utiliza módulos JavaScript, datos relacionados, navegación mediante identificadores y persistencia temporal.
-
-El trabajo realizado permitió comprobar los flujos principales antes de comenzar el backend. Esta estrategia reduce riesgos porque permite detectar problemas de navegación, permisos, estructura de datos y experiencia de usuario durante una etapa en la que todavía es sencillo realizar cambios.
-
-La prioridad siguiente debe ser cerrar técnicamente el frontend del tallerista, completar el panel administrador con el mismo criterio modular y definir de manera formal el modelo de datos y las reglas de negocio.
-
-Una vez realizadas esas tareas, el equipo podrá comenzar PHP y MySQL con una estructura más clara y con menos necesidad de modificar las interfaces ya construidas.
-
----
-
-## 20. Fuentes utilizadas
-
-* Entrevista realizada al cliente.
-* Documento `proyecto_convenio_inau(1).md`.
-* Repositorio actualizado `proyecto-convenio-INAU(1).zip`.
-* Decisiones y avances realizados durante la implementación del frontend del tallerista.
+<br>
+
+## 11. Epicas
+
+| Código | Épica                             | Descripcióm                                                                            |
+| ------ | --------------------------------- | -------------------------------------------------------------------------------------- |
+| EP1    | Autenticación y control de acceso | Permitir el ingreso seguro y diferenciado a la plataforma según el rol del usuario.    |
+| EP2    | Gestión de usuarios y talleres    | Administrar los usuarios (alumnos, talleristas) y su relación con los talleres.        |
+| EP3    | Gestión de asistencia             | Registrar y controlar la asistencia de los alumnos a los talleres.                     |
+| EP4    | Gestión de material y tareas      | Permitir la carga, entrega y corrección de material y tareas de cada taller.           |
+| EP5    | Reportes e informes               | Generar y exportar información consolidada de asistencia, talleres y trazabilidad.     |
+| EP6    | Gestión de perfil de usuario      | Permitir a cada usuario administrar su propia información personal.                    |
