@@ -362,41 +362,4 @@ administradores: [
         area: "Administración INAU"
     }
 ],
-
-conversaciones: [
-    {
-        id: 1,
-        talleristaId: 1,
-        administradorId: 101,
-        asunto: "Comunicación con Administración",
-        ultimaActualizacion: "2026-07-17T16:45:00-03:00",
-
-        mensajes: [
-            {
-                id: 1,
-                remitenteId: 101,
-                remitenteRol: "Administrador",
-                contenido: "Bienvenido al sistema. Puedes utilizar esta conversación para comunicarte con la administración.",
-                fechaHora: "2026-07-15T10:00:00-03:00",
-                leido: true
-            },
-            {
-                id: 2,
-                remitenteId: 1,
-                remitenteRol: "Tallerista",
-                contenido: "Muchas gracias. Utilizaré este medio para enviar consultas y solicitudes.",
-                fechaHora: "2026-07-15T10:12:00-03:00",
-                leido: true
-            },
-            {
-                id: 3,
-                remitenteId: 101,
-                remitenteRol: "Administrador",
-                contenido: "Recuerda completar los registros de asistencia después de cada taller.",
-                fechaHora: "2026-07-17T16:45:00-03:00",
-                leido: false
-            }
-        ]
-    }
-]
 };
