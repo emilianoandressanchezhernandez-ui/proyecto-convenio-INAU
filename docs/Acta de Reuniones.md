@@ -1,5 +1,5 @@
 
-# Acta de Reuniones.
+# Acta de Reuniones del Equipo.
 
 <br>
 
