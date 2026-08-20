@@ -3,6 +3,8 @@
     Este archivo contiene datos simulados.
     Por ahora no existe conexión con PHP ni MySQL, por lo que estos objetos representan temporalmente la información que más adelante llegará desde el backend.
 
+    Este archivo no debe manipular el HTML.
+    Solamente almacena datos.
 */
 
 window.DATOS_SIMULADOS = {
@@ -53,7 +55,8 @@ window.DATOS_SIMULADOS = {
             asistenciaPromedio: 87,
             estado: "Activo",
             fechaInicio: "2026-03-16",
-            fechaFin: "2026-11-30"
+            fechaFin: "2026-11-30",
+            observaciones: ""
         },
 
         {
@@ -85,7 +88,8 @@ window.DATOS_SIMULADOS = {
             asistenciaPromedio: 91,
             estado: "Activo",
             fechaInicio: "2026-03-17",
-            fechaFin: "2026-11-28"
+            fechaFin: "2026-11-28",
+            observaciones: ""
         },
 
         {
@@ -112,7 +116,8 @@ window.DATOS_SIMULADOS = {
             asistenciaPromedio: 84,
             estado: "Activo",
             fechaInicio: "2026-04-10",
-            fechaFin: "2026-11-27"
+            fechaFin: "2026-11-27",
+            observaciones: ""
         }
     ],
 
@@ -129,7 +134,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2008-05-12",
             estado: "Activo",
             fechaRegistro: "2026-03-10",
-            ultimaAsistencia: "2026-08-14"
+            ultimaAsistencia: "2026-08-14",
+            observaciones: ""
         },
         {
             id: 2,
@@ -141,7 +147,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2009-03-25",
             estado: "Activo",
             fechaRegistro: "2026-03-10",
-            ultimaAsistencia: "2026-08-15"
+            ultimaAsistencia: "2026-08-15",
+            observaciones: ""
         },
         {
             id: 3,
@@ -153,7 +160,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2008-11-18",
             estado: "Activo",
             fechaRegistro: "2026-03-15",
-            ultimaAsistencia: null
+            ultimaAsistencia: null,
+            observaciones: ""
         },
         {
             id: 4,
@@ -165,7 +173,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2009-07-30",
             estado: "Activo",
             fechaRegistro: "2026-03-20",
-            ultimaAsistencia: "2026-08-13"
+            ultimaAsistencia: "2026-08-13",
+            observaciones: ""
         },
         {
             id: 5,
@@ -177,7 +186,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2008-02-14",
             estado: "Activo",
             fechaRegistro: "2026-03-10",
-            ultimaAsistencia: "2026-08-14"
+            ultimaAsistencia: "2026-08-14",
+            observaciones: ""
         },
         {
             id: 6,
@@ -189,7 +199,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2009-09-22",
             estado: "Activo",
             fechaRegistro: "2026-03-12",
-            ultimaAsistencia: "2026-08-15"
+            ultimaAsistencia: "2026-08-15",
+            observaciones: ""
         },
         {
             id: 7,
@@ -201,7 +212,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2008-12-05",
             estado: "Activo",
             fechaRegistro: "2026-03-15",
-            ultimaAsistencia: "2026-08-12"
+            ultimaAsistencia: "2026-08-12",
+            observaciones: ""
         },
         {
             id: 8,
@@ -213,7 +225,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2009-01-19",
             estado: "Activo",
             fechaRegistro: "2026-03-18",
-            ultimaAsistencia: "2026-08-14"
+            ultimaAsistencia: "2026-08-14",
+            observaciones: ""
         },
         {
             id: 9,
@@ -225,7 +238,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2008-06-11",
             estado: "Activo",
             fechaRegistro: "2026-03-10",
-            ultimaAsistencia: null
+            ultimaAsistencia: null,
+            observaciones: ""
         },
         {
             id: 10,
@@ -237,7 +251,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2009-04-28",
             estado: "Activo",
             fechaRegistro: "2026-03-14",
-            ultimaAsistencia: "2026-08-15"
+            ultimaAsistencia: "2026-08-15",
+            observaciones: ""
         },
         {
             id: 11,
@@ -249,7 +264,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2008-08-17",
             estado: "Inactivo",
             fechaRegistro: "2026-03-10",
-            ultimaAsistencia: "2026-07-20"
+            ultimaAsistencia: "2026-07-20",
+            observaciones: ""
         },
         {
             id: 12,
@@ -261,7 +277,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2009-10-09",
             estado: "Activo",
             fechaRegistro: "2026-03-16",
-            ultimaAsistencia: "2026-08-13"
+            ultimaAsistencia: "2026-08-13",
+            observaciones: ""
         },
         {
             id: 13,
@@ -273,7 +290,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2008-01-03",
             estado: "Activo",
             fechaRegistro: "2026-03-12",
-            ultimaAsistencia: "2026-08-14"
+            ultimaAsistencia: "2026-08-14",
+            observaciones: ""
         },
         {
             id: 14,
@@ -285,7 +303,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2009-05-26",
             estado: "Activo",
             fechaRegistro: "2026-03-19",
-            ultimaAsistencia: "2026-08-15"
+            ultimaAsistencia: "2026-08-15",
+            observaciones: ""
         },
         {
             id: 15,
@@ -297,7 +316,8 @@ window.DATOS_SIMULADOS = {
             fechaNacimiento: "2008-09-08",
             estado: "Activo",
             fechaRegistro: "2026-03-10",
-            ultimaAsistencia: "2026-08-13"
+            ultimaAsistencia: "2026-08-13",
+            observaciones: ""
         }
     ],
 
@@ -471,7 +491,8 @@ window.DATOS_SIMULADOS = {
                 justificados: 0
             },
             formato: "PDF",
-            generadoPor: 1
+            generadoPor: 1,
+            estado: "Generado"
         },
         {
             id: 2,
@@ -488,7 +509,8 @@ window.DATOS_SIMULADOS = {
                 suspendidos: 0
             },
             formato: "Excel",
-            generadoPor: 1
+            generadoPor: 1,
+            estado: "Generado"
         },
         {
             id: 3,
@@ -506,7 +528,8 @@ window.DATOS_SIMULADOS = {
                 justificados: 1
             },
             formato: "PDF",
-            generadoPor: 1
+            generadoPor: 1,
+            estado: "Generado"
         },
         {
             id: 4,
@@ -522,7 +545,8 @@ window.DATOS_SIMULADOS = {
                 inactivos: 1
             },
             formato: "Excel",
-            generadoPor: 1
+            generadoPor: 1,
+            estado: "Generado"
         },
         {
             id: 5,
@@ -538,7 +562,8 @@ window.DATOS_SIMULADOS = {
                 inactivos: 1
             },
             formato: "PDF",
-            generadoPor: 1
+            generadoPor: 1,
+            estado: "Generado"
         }
     ],
 
