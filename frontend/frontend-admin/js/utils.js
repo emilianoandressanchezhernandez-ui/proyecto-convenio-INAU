@@ -131,7 +131,6 @@ function generarId(arreglo) {
     return maximo + 1;
 }
 
-<<<<<<< HEAD
 // Convierte el arreglo de horarios de un taller en un texto legible.
 // [{dia: "Lunes", horaInicio: "14:00", horaFin: "16:00"}] -> "Lunes 14:00-16:00"
 // Se usa en cualquier pantalla que liste talleres (detalle de tallerista,
@@ -307,47 +306,3 @@ function obtenerListado(clave, listaOriginal) {
     const listaGuardada = obtenerDato(clave);
     return listaGuardada || listaOriginal;
 }
-=======
-
-// ==============================
-// DATOS DEL FRONTEND ADMIN
-// ==============================
-
-function cargarColeccionAdmin(clave, respaldo) {
-    const guardado = obtenerDato(`admin_${clave}`);
-    return Array.isArray(guardado) ? guardado : structuredClone(respaldo || []);
-}
-
-function guardarColeccionAdmin(clave, datos) {
-    guardarDato(`admin_${clave}`, datos);
-    if (window.DATOS_SIMULADOS && clave in window.DATOS_SIMULADOS) {
-        window.DATOS_SIMULADOS[clave] = datos;
-    }
-}
-
-function filaVacia(colspan, mensaje) {
-    return `<tr><td colspan="${colspan}" class="text-center text-muted py-5">${escaparHTML(mensaje)}</td></tr>`;
-}
-
-function actualizarEstadisticasPagina(valores) {
-    const bloques = document.querySelectorAll("main > .row.g-4.mb-4 .card h3, main > .row.mt-5.g-4 .card h3");
-    bloques.forEach((bloque, indice) => {
-        if (valores[indice] !== undefined) bloque.textContent = valores[indice];
-    });
-}
-
-function mostrarAlertaTemporal(mensaje, tipo = "info") {
-    const alerta = document.createElement("div");
-    alerta.className = `alert alert-${tipo} position-fixed top-0 start-50 translate-middle-x mt-3 shadow`;
-    alerta.style.zIndex = "1080";
-    alerta.textContent = mensaje;
-    document.body.appendChild(alerta);
-    setTimeout(() => alerta.remove(), 2500);
-}
-
-function mostrarRecursoNoEncontrado(nombre) {
-    const main = document.querySelector("main");
-    if (!main) return;
-    main.innerHTML = `<div class="alert alert-warning mt-4"><strong>${escaparHTML(nombre)} no encontrado.</strong><br>Verifique el identificador utilizado en la URL.</div>`;
-}
->>>>>>> c6e8eca1d4807b7378ed01f8fbdac06d3f9fc044
