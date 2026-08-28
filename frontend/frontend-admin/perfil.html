@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,7 +36,7 @@
     <main class="container py-5">
 
         <!-- CABECERA -->
-        
+
         <div class="hero-panel mb-4">
             <h1 class="fw-bold mb-2">
                 Mi Perfil
@@ -45,6 +46,8 @@
                 Información personal y configuración de la cuenta.
             </p>
         </div>
+
+        <div id="alerta-perfil" class="alert alert-danger d-none" role="alert"></div>
 
         <!-- PERFIL -->
 
@@ -132,14 +135,16 @@
 
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <input type="password" id="password-actual" class="form-control" placeholder="Contraseña actual">
+                        <input type="password" id="password-actual" class="form-control"
+                            placeholder="Contraseña actual">
                     </div>
 
                     <div class="col-md-4">
                         <input type="password" id="password-nueva" class="form-control" placeholder="Nueva contraseña">
                     </div>
                     <div class="col-md-4">
-                        <input type="password" id="password-confirmar" class="form-control" placeholder="Confirmar contraseña">
+                        <input type="password" id="password-confirmar" class="form-control"
+                            placeholder="Confirmar contraseña">
                     </div>
                 </div>
             </div>
@@ -179,6 +184,11 @@
         </div>
 
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/mock-data.js"></script>
+    <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/perfil.js"></script>
 </body>
+
 </html>

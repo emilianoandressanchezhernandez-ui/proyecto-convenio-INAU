@@ -227,13 +227,20 @@ El sistema debe permitir la emisión de los siguientes reportes:
 2. Gestión de usuarios, talleristas, alumnos y talleres.
 3. Asignación de alumnos y talleristas a los talleres.
 4. Registro, consulta y modificación de asistencias por taller y fecha.
-5. Carga de material y tareas por parte del tallerista (sin especificar tipos de archivo extra, imágenes o datos adicionales).
+5. Carga y modificación de material y tareas por parte del tallerista (sin especificar tipos de archivo extra, imágenes o datos adicionales).
 6. Visualización de material y tareas por parte del alumno, y envío/carga de los archivos correspondientes a la tarea asignada.
-7. Corrección de tareas y asignación de notas por parte del tallerista.
-8. Consulta y generación de informes de asistencia y talleres.
-9. Exportación de informes en formatos PDF y Excel.
-10. Gestión de perfiles de usuario según el rol.
-11. Plataforma web responsive accesible desde distintos dispositivos.
+7. Eliminación de material, calificaciones y registros de asistencia del taller por parte del tallerista.
+8. Corrección de tareas y asignación de notas por parte del tallerista.
+9. Consulta y generación de informes de asistencia y talleres.
+10. Generación de listados e informes de alumnos y talleristas, incluyendo el histórico de calificaciones.
+11. Exportación de informes en formatos PDF y Excel.
+12. Gestión de perfiles de usuario según el rol.
+13. Plataforma web responsive accesible desde distintos dispositivos.
+14. Comunicación asincrónica del tallerista con los alumnos de su taller.
+15. Visualización de las notas asignadas al alumno.
+16. Consulta de datos sensibles utilizados en la plataforma por parte del administrador.
+17. Consulta del listado de alumnos inscritos en el taller por parte del tallerista.
+
 
 ---
 

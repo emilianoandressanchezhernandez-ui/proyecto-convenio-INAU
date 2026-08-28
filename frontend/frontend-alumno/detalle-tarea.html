@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INAU - Detalle de Tarea</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body data-page="detalle-tarea">
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+        <div class="container">
+            <a href="tareas.html" class="navbar-brand">
+                <i class="bi bi-arrow-left-circle-fill"></i>
+                Volver
+            </a>
+
+            <div class="d-flex align-items-center gap-3">
+                <a href="perfil.html" id="nombre-usuario" class="text-white text-decoration-none fw-semibold">
+                    <i class="bi bi-person-circle"></i>
+                    Alumno
+                </a>
+                <button id="btn-logout" class="btn btn-light btn-sm">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Salir
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+
+        <div id="alerta-detalle-tarea" class="alert alert-danger d-none" role="alert"></div>
+
+        <div class="hero-panel mb-4">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <div>
+                    <h1 id="titulo-tarea" class="fw-bold mb-2">
+                        Título de la tarea
+                    </h1>
+                    <p id="taller-tarea" class="text-muted mb-0">
+                        Taller
+                    </p>
+                </div>
+                <span id="badge-estado-tarea" class="badge fs-6">
+                    -
+                </span>
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- ENUNCIADO -->
+
+            <div class="col-lg-7">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">
+                            <i class="bi bi-card-text me-1"></i>
+                            Consigna
+                        </h5>
+                        <p id="descripcion-tarea" class="mb-0">
+                            -
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ENTREGA -->
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">
+                            <i class="bi bi-upload me-1"></i>
+                            Mi entrega
+                        </h5>
+
+                        <div id="alerta-entrega" class="alert d-none" role="alert"></div>
+
+                        <div id="entrega-actual" class="mb-3 d-none">
+                            <div class="archivo-actual">
+                                <i class="bi bi-paperclip"></i>
+                                <span id="nombre-archivo-entregado">-</span>
+                            </div>
+                            <p class="text-muted mt-2 mb-0">
+                                Entregado el <span id="fecha-entrega-realizada">-</span>
+                            </p>
+                        </div>
+
+                        <form id="form-entrega">
+                            <div class="mb-3">
+                                <label for="archivo-tarea" class="form-label">
+                                    Archivo de la entrega (PDF o JPG)
+                                </label>
+                                <div class="zona-archivo mb-2">
+                                    <i class="bi bi-cloud-arrow-up-fill d-block mb-2"></i>
+                                    <input
+                                        type="file"
+                                        id="archivo-tarea"
+                                        class="form-control"
+                                        accept=".pdf,.jpg,.jpeg,.html,.css,.js"
+                                    >
+                                </div>
+                                <div class="form-text">
+                                    Tamaño máximo permitido: 10 MB.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="comentario-entrega" class="form-label">
+                                    Comentario (opcional)
+                                </label>
+                                <textarea
+                                    id="comentario-entrega"
+                                    class="form-control"
+                                    rows="3"
+                                    placeholder="Agregá un comentario para el tallerista..."
+                                ></textarea>
+                            </div>
+
+                            <button type="submit" id="btn-entregar" class="btn btn-primary">
+                                <i class="bi bi-send-fill me-1"></i>
+                                Enviar entrega
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INFORMACIÓN Y NOTA -->
+
+            <div class="col-lg-5">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            Fechas
+                        </h5>
+                        <p class="mb-1">
+                            <strong>Publicada:</strong>
+                            <span id="fecha-publicacion-tarea">-</span>
+                        </p>
+                        <p class="mb-0">
+                            <strong>Fecha límite de entrega:</strong>
+                            <span id="fecha-limite-tarea">-</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">
+                            <i class="bi bi-award me-1"></i>
+                            Corrección
+                        </h5>
+
+                        <div id="sin-nota" class="text-muted">
+                            Todavía no fue corregida por el tallerista.
+                        </div>
+
+                        <div id="con-nota" class="d-none">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <span id="valor-nota" class="nota-destacada">-</span>
+                                <span class="text-muted">
+                                    Corregida el <span id="fecha-correccion">-</span>
+                                </span>
+                            </div>
+                            <p class="mb-0">
+                                <strong>Comentario del tallerista:</strong>
+                            </p>
+                            <p id="comentario-nota" class="mb-0">
+                                -
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/detalle-tarea.js"></script>
+</body>
+</html>
