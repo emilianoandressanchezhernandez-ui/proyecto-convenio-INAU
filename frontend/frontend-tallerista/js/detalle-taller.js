@@ -210,6 +210,10 @@ function configurarAccionesTaller(taller) {
         "enlace-informes"
     );
 
+    const enlaceMaterial = document.getElementById(
+        "enlace-material"
+    );
+
     const botonVerAlumnos = document.getElementById(
         "btn-ver-alumnos"
     );
@@ -228,6 +232,11 @@ function configurarAccionesTaller(taller) {
     if (enlaceInformes) {
         enlaceInformes.href =
             `informes.html?tallerId=${encodeURIComponent(taller.id)}`;
+    }
+
+    if (enlaceMaterial) {
+        enlaceMaterial.href =
+            `material.html?tallerId=${encodeURIComponent(taller.id)}`;
     }
 
     // La pantalla de asistencia contiene la tabla de alumnos. Por eso usamos esa página también para el botón "Alumnos"

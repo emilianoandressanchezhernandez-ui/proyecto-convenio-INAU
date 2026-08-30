@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,11 +33,7 @@
     </nav>
     <main class="container py-5">
 
-        <div
-            id="alerta-detalle-taller"
-            class="alert alert-danger d-none"
-            role="alert"
-        ></div>
+        <div id="alerta-detalle-taller" class="alert alert-danger d-none" role="alert"></div>
 
         <!-- INFORMACIÓN GENERAL -->
 
@@ -138,19 +135,25 @@
                     Acciones
                 </h4>
                 <div class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <a href="asistencia.html" id="enlace-asistencia" class="btn btn-primary w-100">
                             <i class="bi bi-check2-square"></i>
                             Tomar Asistencia
                         </a>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <a href="informes.html" id="enlace-informes" class="btn btn-primary w-100">
                             <i class="bi bi-bar-chart-fill"></i>
                             Ver Informes
                         </a>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <a href="material.html" id="enlace-material" class="btn btn-primary w-100">
+                            <i class="bi bi-file-earmark-richtext"></i>
+                            Material y Tareas
+                        </a>
+                    </div>
+                    <div class="col-md-3">
                         <button id="btn-ver-alumnos" class="btn btn-primary w-100">
                             <i class="bi bi-people-fill"></i>
                             Alumnos
@@ -166,4 +169,5 @@
     <script src="js/main.js"></script>
     <script src="js/detalle-taller.js"></script>
 </body>
+
 </html>
