@@ -1,4 +1,4 @@
-# Nombre del Proyecto: GestorTalleres – Plataforma de gestión de talleres en convenio con INAU
+# Nombre del Proyecto:  TheNewfutures – Plataforma de gestión de talleres en convenio con INAU
 
 ---
 
@@ -26,24 +26,17 @@
 ---
 
 ### Situación inicial del cliente: 
-    Organismo público vinculado a actividades socioeducativas (INAU) que gestiona talleres mediante convenio. 
-    Actualmente, la gestión de talleres, participantes y asistencias requiere una herramienta digital que centralice 
-    la información y mejore la coordinación entre talleristas y la administración. 
+   **Organismo público vinculado a actividades socioeducativas (INAU) que gestiona talleres mediante convenio. Actualmente, la gestión de talleres, participantes y asistencias requiere una herramienta digital que centralice la información y mejore la coordinación entre talleristas y la administración.**
 
 ---
 
 ### Necesidad planteada por el cliente:
-    Desarrollar una plataforma web que centralice la gestión de talleres, participantes, asistencias, tareas y 
-    comunicación brindando acceso diferenciado a alumnos, talleristas y administradores para mejorar la organización, 
-    accesibilidad y el control de la información. 
+   **Desarrollar una plataforma web que centralice la gestión de talleres, participantes, asistencias, tareas y comunicación brindando acceso diferenciado a alumnos, talleristas y administradores para mejorar la organización, accesibilidad y el control de la información.**
 
 ---
 
 ### Justificación del proyecto:
-    Actualmente no existe una plataforma que centralice la gestión de talleres, participantes, asistencias, tareas y 
-    comunicación. Esto dificulta la organización, el acceso a la información y el seguimiento de las actividades. 
-    El desarrollo de este sistema permitirá optimizar estos procesos, mejorar la comunicación entre alumnos, talleristas 
-    y administradores, y ofrecer una herramienta accesible, organizada y disponible para el uso diario.
+   **Actualmente no existe una plataforma que centralice la gestión de talleres, participantes, asistencias, tareas y comunicación. Esto dificulta la organización, el acceso a la información y el seguimiento de las actividades. El desarrollo de este sistema permitirá optimizar estos procesos, mejorar la comunicación entre alumnos, talleristas y administradores, y ofrecer una herramienta accesible, organizada y disponible para el uso diario.**
 
 ---
 

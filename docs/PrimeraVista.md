@@ -7,11 +7,11 @@
 
 ### Integrantes registrados en el repositorio
 
-* Emiliano Sánchez – Coordinador.
-* Gabriel Rendon – Subcoordinador - Base de datos.
-* Ignacio Viera – Frontend.
-* Maximiliano Leal – Fronted.
-* Thiago Ferragut – Backend.
+* Emiliano Sánchez – Líder/Scrum Master.
+* Gabriel Rendon – Subcoordinador.
+* Ignacio Viera – Frontend y Backend.
+* Maximiliano Leal – Frontend y Backend.
+* Thiago Ferragut – Frontend y Backend.
 
 ---
 
@@ -19,10 +19,7 @@
 
 El proyecto consiste en desarrollar una aplicación web para organizar y controlar los talleres realizados en convenio con INAU. El sistema busca centralizar información que actualmente resulta difícil de consultar, actualizar y seguir, como los talleres, los alumnos asignados, las asistencias, los informes y la comunicación entre talleristas y administración.
 
-La solución se plantea como un sistema compuesto por dos interfaces diferenciadas:
-
-* un panel para talleristas;
-* un panel para administradores.
+La solución se plantea como un sistema compuesto por tres tipos de acceso diferenciados, conforme al alcance definido: un panel para talleristas; un panel para administradores; y acceso para alumnos a sus talleres, tareas y entregas. Actualmente, el desarrollo se concentra en los paneles de tallerista y administrador; el acceso de los alumnos está pendiente de implementación.
 
 Ambas interfaces compartirán un backend centralizado, encargado de la autenticación, la lógica del negocio, los permisos, la persistencia de datos y la comunicación con una base de datos MySQL.
 
@@ -45,17 +42,15 @@ Entre las dificultades del proceso actual se destacan:
 * dificultad para generar informes y realizar un seguimiento preciso;
 * necesidad de acceder desde diferentes dispositivos y ubicaciones.
 
-La entrevista planteó inicialmente una plataforma similar a un entorno educativo, con acceso para alumnos, talleristas y administradores. Sin embargo, la especificación técnica posterior redujo el alcance de la primera versión a dos tipos de usuario autenticado: administrador y tallerista.
+La entrevista planteó una plataforma con acceso para alumnos, talleristas y administradores, y así quedó definido en el alcance de la primera versión (autenticación con acceso diferenciado para los tres roles). El desarrollo actual se encuentra concentrado en los paneles de administrador y tallerista; el acceso de los alumnos al sistema (visualización de material y tareas, y envío de entregas) forma parte del alcance definido y está pendiente de implementación.
 
-Los alumnos quedan registrados como personas vinculadas a los talleres, pero no acceden directamente al sistema en el alcance actual.
-
-Esta evolución permite concentrar la primera versión en los procesos más importantes para la organización interna:
+La primera versión se concentra en los siguientes procesos, definidos como parte del alcance inicial:
 
 * gestión de talleres;
 * asignación de alumnos;
 * control de asistencia;
-* generación y consulta de informes;
-* mensajería administrativa.
+* gestión de material y tareas, incluyendo la entrega por parte de los alumnos;
+* generación y consulta de informes.
 
 ---
 
@@ -89,11 +84,12 @@ Desarrollar una aplicación web responsive, organizada y escalable que permita g
 * Registrar la asistencia de los alumnos por taller y fecha.
 * Evitar registros duplicados de asistencia para un mismo alumno, taller y fecha.
 * Permitir la consulta de informes y estadísticas básicas.
-* Implementar una mensajería interna entre talleristas y administración.
+* Permitir a los alumnos visualizar el material y las tareas de su taller, y enviar sus entregas.
 * Preparar el frontend para conectarse posteriormente a una API REST.
 * Mantener una estructura de archivos clara y modular.
 * Aplicar control de versiones, documentación y pruebas durante el desarrollo.
 * Proteger los datos personales y limitar la modificación de información sensible.
+* (Fase futura) Implementar una mensajería interna entre talleristas y administración, conforme al alcance definido.
 
 ---
 
@@ -122,6 +118,8 @@ El tallerista tendrá acceso limitado a la información relacionada con su traba
 * consultar los datos de cada taller;
 * ver los alumnos vinculados a sus talleres;
 * registrar asistencias;
+* cargar material y tareas para sus talleres;
+* corregir las tareas entregadas por los alumnos y asignar una nota;
 * consultar informes relacionados;
 * comunicarse con la administración.
 
@@ -131,9 +129,9 @@ El tallerista puede modificar datos de contacto, como correo y teléfono, y soli
 
 ### 5.3 Alumnos
 
-En el alcance técnico actual, los alumnos no tienen cuenta de acceso. Son entidades administradas dentro del sistema y pueden estar relacionados con uno o varios talleres.
+Los alumnos forman parte del alcance definido para la primera versión: podrán visualizar el material y las tareas de su taller, y enviar sus entregas correspondientes, además de contar con acceso a su información personal y a las notas asignadas por el tallerista. También son entidades administradas dentro del sistema y pueden estar relacionados con uno o varios talleres.
 
-La entrevista original contemplaba un posible acceso futuro para que los alumnos consultaran materiales y entregaran tareas. Esta funcionalidad queda fuera de la primera versión y puede considerarse una ampliación posterior.
+El acceso de los alumnos al sistema aún no se implementó en el frontend actual; queda pendiente para una próxima etapa de desarrollo.
 
 ---
 
@@ -144,7 +142,8 @@ La entrevista original contemplaba un posible acceso futuro para que los alumnos
 Se prevé un único inicio de sesión ubicado en la raíz del proyecto. Una vez validadas las credenciales, el sistema deberá redirigir al usuario según su rol:
 
 * administrador: panel administrador;
-* tallerista: panel tallerista.
+* tallerista: panel tallerista;
+* alumno: panel alumno (pendiente de implementación).
 
 La autenticación real todavía no está implementada. La pantalla de acceso existe, pero necesita:
 
@@ -263,11 +262,17 @@ La versión actual incluye:
 * impresión desde el navegador;
 * descarga provisional como archivo de texto.
 
-La generación real de archivos PDF o Excel deberá implementarse posteriormente desde el backend o mediante una herramienta específica.
+La generación real de archivos PDF o Excel forma parte del alcance de la primera versión y deberá implementarse desde el backend o mediante una herramienta específica.
 
-### 6.6 Mensajería interna
+### 6.6 Gestión de material y tareas
 
-La plataforma debe permitir mensajes entre talleristas y administradores.
+El tallerista podrá cargar material y tareas asociados a su taller. El alumno podrá visualizar ese material y esas tareas, y enviar los archivos correspondientes a su entrega. El tallerista podrá corregir las tareas entregadas y asignar una nota a cada alumno.
+
+Esta funcionalidad forma parte del alcance definido para la primera versión y se encuentra pendiente de implementación en el frontend actual.
+
+### 6.7 Mensajería interna
+
+Conforme al alcance definido, la mensajería interna entre talleristas y administradores es una funcionalidad deseable prevista para una fase futura, no para la primera versión. El equipo desarrolló, de forma anticipada, un prototipo simulado de este módulo.
 
 Los mensajes incluyen:
 
@@ -291,7 +296,7 @@ El módulo actual permite:
 * enviar nuevas respuestas;
 * conservar temporalmente la conversación en el navegador.
 
-### 6.7 Perfil
+### 6.8 Perfil
 
 El perfil del tallerista muestra:
 
@@ -325,7 +330,7 @@ El sistema deberá cumplir con los siguientes criterios:
 * protección de datos personales;
 * persistencia confiable en MySQL;
 * trazabilidad de acciones importantes;
-* restricción de formatos y tamaños de archivos adjuntos;
+* restricción de formatos (PDF e imágenes JPG, acorde a los tipos soportados en v1) y tamaños de archivos adjuntos;
 * código organizado, reutilizable y mantenible;
 * documentación técnica dentro del repositorio;
 * uso de Git para registrar y revisar cambios.
@@ -500,10 +505,7 @@ Se realizó una entrevista al cliente para identificar:
 
 ### Etapa 2: definición del alcance
 
-Se compararon las necesidades iniciales con la consigna técnica. Se definió que la primera versión tendrá dos roles autenticados:
-
-* administrador;
-* tallerista.
+Se compararon las necesidades iniciales relevadas en la entrevista con la documentación técnica del equipo. Se confirmó que la primera versión contempla tres roles: administrador, tallerista y alumno, conforme al alcance definido.
 
 También se acordó utilizar el término “alumnos” en la interfaz actual, en lugar de “participantes”.
 
@@ -602,7 +604,7 @@ Se comprobaron manualmente:
 | Asistencia         | Funcional como simulación | Lista de alumnos, estados, contador, guardado y recuperación local.                 |
 | Informes           | Funcional como simulación | Listado, filtros, estadísticas y navegación.                                        |
 | Detalle de informe | Funcional como simulación | Información completa, impresión y descarga TXT.                                     |
-| Mensajes           | Funcional como simulación | Conversación, leído/no leído, envío y persistencia local.                           |
+| Mensajes           | Funcional como simulación (prototipo de fase futura) | Conversación, leído/no leído, envío y persistencia local.            |
 | Cierre de sesión   | Funcional                 | Eliminación de información de sesión y regreso al `index.html`.                     |
 
 ### 12.2 Parcialmente desarrollado
@@ -614,6 +616,9 @@ Se comprobaron manualmente:
 
 ### 12.3 No iniciado
 
+* Acceso y panel de alumnos (visualización de material y tareas, entrega de tareas).
+* Gestión de material y tareas (carga, corrección y calificación).
+* Eliminación de datos de perfil del alumno (foto, biografía).
 * Backend PHP.
 * Base de datos MySQL.
 * API REST.
@@ -686,9 +691,9 @@ Los detalles y módulos dependientes de un taller reciben identificadores en la 
 
 ### 14.7 Restricción de datos personales
 
-El tallerista no debe modificar nombre, apellido o cédula. La interfaz los muestra como solo lectura.
+Ni el tallerista ni el administrador deben modificar directamente datos personales como el nombre, apellido o cédula del alumno o del tallerista. La interfaz los muestra como solo lectura.
 
-El backend deberá reforzar esta regla ignorando cualquier intento de modificación no autorizado.
+El backend deberá reforzar esta regla ignorando cualquier intento de modificación no autorizado, sin excepción de rol.
 
 ---
 
@@ -760,9 +765,7 @@ Esta decisión debe documentarse y aplicarse de forma consistente en:
 
 ### 16.6 Permisos sobre datos personales
 
-La entrevista presenta respuestas que pueden interpretarse de manera contradictoria sobre quién puede modificar cédulas y datos personales.
-
-El equipo decidió que el tallerista no puede hacerlo y que la administración tendrá mayor control. Esta regla debe confirmarse expresamente con el cliente antes de implementarla en el backend.
+Conforme a la entrevista y el alcance definido, ni el tallerista ni el administrador pueden modificar directamente datos personales como el número de cédula; esta restricción aplica a ambos roles. Esta regla debe confirmarse expresamente con el cliente antes de implementarla en el backend.
 
 ### 16.7 Funciones repetidas
 
@@ -869,15 +872,17 @@ El sistema podrá considerarse funcional cuando:
 * un usuario pueda iniciar sesión y ser dirigido según su rol;
 * el tallerista vea únicamente sus talleres;
 * el administrador pueda gestionar los datos autorizados;
+* los alumnos puedan visualizar el material y las tareas de su taller, y enviar sus entregas;
 * los alumnos puedan asignarse a uno o varios talleres;
 * se registre una única asistencia por alumno, fecha y taller;
 * los informes reflejen datos persistentes;
-* la mensajería funcione entre administrador y tallerista;
 * los permisos se validen en el backend;
 * los datos continúen disponibles después de cerrar el navegador;
 * la plataforma sea usable desde distintos dispositivos;
 * las acciones importantes queden registradas;
 * la documentación y las pruebas estén completas.
+
+**Nota:** la mensajería interna corresponde a una funcionalidad deseable de fase futura, según el alcance definido, y no constituye un criterio de aceptación de la primera versión.
 
 ---
 
@@ -887,7 +892,7 @@ El proyecto cuenta con una base visual amplia y una arquitectura que permite con
 
 El trabajo realizado permitió comprobar los flujos principales antes de comenzar el backend. Esta estrategia reduce riesgos porque permite detectar problemas de navegación, permisos, estructura de datos y experiencia de usuario durante una etapa en la que todavía es sencillo realizar cambios.
 
-La prioridad siguiente debe ser cerrar técnicamente el frontend del tallerista, completar el panel administrador con el mismo criterio modular y definir de manera formal el modelo de datos y las reglas de negocio.
+La prioridad siguiente debe ser cerrar técnicamente el frontend del tallerista, completar el panel administrador con el mismo criterio modular, iniciar el acceso de los alumnos conforme al alcance definido, y definir de manera formal el modelo de datos y las reglas de negocio.
 
 Una vez realizadas esas tareas, el equipo podrá comenzar PHP y MySQL con una estructura más clara y con menos necesidad de modificar las interfaces ya construidas.
 

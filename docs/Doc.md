@@ -1,4 +1,4 @@
-# Sistema de Gestión de Talleres en Convenio con INAU - GestorTaller
+# Proyecto Sistema de Gestión de Talleres en Convenio con INAU
 
 <br>
 
@@ -27,7 +27,41 @@
 
 <br>
 
-## 3. Anotaciones de la entrevista con el cliente
+## 3. Primer análisis del equipo de desarrollo
+
+
+| Área a aclarar     | Preguntas iniciales del equipo                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Roles y usuarios   | ¿Qué roles existen dentro de la plataforma? ¿Qué puede ver, cargar, modificar y eliminar cada uno?                                         |
+| Talleres           | ¿Cómo se organiza un taller? ¿Un tallerista puede tener varios talleres o un taller varios talleristas?                                    |
+| Participantes      | ¿Cómo se identifica a cada alumno dentro del sistema? ¿Se inscriben a un taller o a varios?                                                |
+| Asistencia         | ¿Cómo se registra actualmente la asistencia? ¿Por clase, por día, por taller?                                                              |
+| Material y tareas  | ¿Qué tipo de contenido suben los talleristas (documentos, imágenes, videos)? ¿Cómo entregan los alumnos sus tareas?                        |
+| Foros              | ¿Qué se espera que contenga un foro? ¿Es por taller, general, o incluye a las familias?                                                    |
+| Usuarios técnicos  | ¿Quiénes van a usar el sistema en el día a día: solo talleristas y administración, o también otro personal?                                |
+| Infraestructura    | ¿Desde qué dispositivos se accederá (celular, tablet, computadora)? ¿Hay conectividad estable en los lugares donde se dictan los talleres? |
+| Seguridad y datos  | ¿Qué datos personales de alumnos y talleristas se manejan? ¿Cuáles se consideran sensibles?                                                |
+| Plazo              | ¿Cuándo necesitan tener una primera versión funcionando?                                                                                   |
+
+
+
+<br>
+
+
+## 4. Participantes de la entrevista
+
+| Rol                   | Participante                       |  Responsabilidad                                              |
+| --------------------- | ---------------------------------  | ------------------------------------------------------------- |
+| Usuario experto	      | Lemuel Szwec González, tallerista	 | Explica el proceso operativo actual y las necesidades del rol |
+|                       |                                    | tallerista dentro de la plataforma.                           |
+| Equipo de desarrollo  | Emiliano Sánchez, líder de equipo  | Relevar necesidades y transformar la información en backlog.  |
+| Equipo de desarrollo  | Maximiliano Leal, desarrollador FE | Relevar necesidades y transformar la información en backlog.  |
+
+
+
+<br>
+
+## 5. Anotaciones de la entrevista con el cliente
 
 
 ### 1. Definición del Problema y Necesidad Principal
@@ -128,8 +162,8 @@ El sistema debe permitir la emisión de los siguientes reportes:
 - *Multiplataforma y Accesibilidad:* Diseño adaptable a todos los dispositivos, permitiendo el acceso remoto desde cualquier ubicación.
 - *Disponibilidad:* Sistema disponible en modalidad 24/7.
 - *Marco Legal y Reglas de Negocio:*
-  - Las reglas de negocio no fueron especificadas en la entrevista.
-  - Las restricciones legales no fueron detalladas en la entrevista.
+ - Las reglas de negocio no fueron especificadas en la entrevista.
+ - Las restricciones legales no fueron detalladas en la entrevista.
 
 
 ### 8. Criterios de Aceptación y Plazos
@@ -137,30 +171,36 @@ El sistema debe permitir la emisión de los siguientes reportes:
 - *Criterio de Aceptación:* El cliente validará el sistema cuando este sea plenamente funcional en la operativa del día a día, cumpliendo con las características requeridas.
 - *Plazo de Entrega:* Finales del año en curso.
 
-
 ---
+
 
 <br>
 
-## 4. Información obtenida en la entrevista
 
-| Categoría           | Información relevada                                                                    |
-| ------------------- | --------------------------------------------------------------------------------------- |
-| Problema principal  |  Falta sistema digital de organización y accesibilidad, al que alumnos, talleristas y   | 
-|                     |  administradores puedan usar.                                                           |
-| Objetivo de negocio |  Se espera alcanzar una plataforma con las funciones mencionadas, mejorando el control, |
-|                     |  accesibilidad y monitoreo, para alumnos, talleristas y administradores.                |
-| Plazo esperado      | Aproximadamente Finales de año.                                                         |
-| Usuarios            |  Administradores, Talleristas, Alumnos                                                  |
-| Seguridad           | Acceso por roles, protección de datos sensibles de los usuarios.                        |
+## 6. Información obtenida en la entrevista
 
----
+| Categoría                          | Información relevada                                                                                      |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Problema principal                 | Falta de una plataforma digital que otorgue acceso a alumnos, talleristas y administradores, dificultando |
+|                                    | la accesibilidad, disponibilidad y organización de los talleres.                                          |
+| Objetivo de negocio                | Alcanzar una plataforma con las funciones mencionadas, mejorando el control, accesibilidad y              |
+|                                    | organización, para alumnos, talleristas y administradores.                                                |
+| Alcance inicial                    | Que los talleristas puedan subir material y tareas, pasar asistencia; que los alumnos puedan ver y enviar |
+|                                    | lo que hicieron; y que el administrador tenga acceso a ver todo lo que sucede.                            |
+| Plazo esperado                     | Finales de año.                                                                                           |
+| Usuarios                           | Administradores, Talleristas, Alumnos.                                                                    |
+| Infraestructura                    | No se especificó.                                                                                         |
+| Seguridad                          | Acceso por roles, protección de datos sensibles de los usuarios.                                          |
+| Riesgo operativo                   | No se especificó.                                                                                         |
+| Restricción técnica                | No se especificó.                                                                                         |
+
+
 
 <br>
 
-## 5. Nombre propuesto del producto
+## 7. Nombre propuesto del producto
 
-**GestorTalleres - Convenio con INAU**
+**TheNewfutures - Convenio con INAU**
 
 **Sistema de Gestión de Talleres en Convenio con INAU**
 
@@ -168,7 +208,7 @@ El sistema debe permitir la emisión de los siguientes reportes:
 
 <br>
 
-## 6. Visión del producto
+## 8. Visión del producto
 
 **Desarrollar una solución web con diseño adaptativo (responsive) que centralice la gestión operativa de los talleres ejecutados en convenio con el INAU.**
 
@@ -180,25 +220,33 @@ El sistema debe permitir la emisión de los siguientes reportes:
 
 <br>
 
-## 7. Alcance incluido (primera versión):
+
+## 9. Alcance incluido (primera versión):
 
 1. Sistema de autenticación con acceso diferenciado para administradores, alumnos y talleristas.
 2. Gestión de usuarios, talleristas, alumnos y talleres.
 3. Asignación de alumnos y talleristas a los talleres.
 4. Registro, consulta y modificación de asistencias por taller y fecha.
-5. Carga de material y tareas por parte del tallerista (sin especificar tipos de archivo extra, imágenes o datos adicionales).
+5. Carga y modificación de material y tareas por parte del tallerista (sin especificar tipos de archivo extra, imágenes o datos adicionales).
 6. Visualización de material y tareas por parte del alumno, y envío/carga de los archivos correspondientes a la tarea asignada.
-7. Corrección de tareas y asignación de notas por parte del tallerista.
-8. Consulta y generación de informes de asistencia y talleres.
-9. Exportación de informes en formatos PDF y Excel.
-10. Gestión de perfiles de usuario según el rol.
-11. Plataforma web responsive accesible desde distintos dispositivos.
+7. Eliminación de material, calificaciones y registros de asistencia del taller por parte del tallerista.
+8. Corrección de tareas y asignación de notas por parte del tallerista.
+9. Consulta y generación de informes de asistencia y talleres.
+10. Generación de listados e informes de alumnos y talleristas, incluyendo el histórico de calificaciones.
+11. Exportación de informes en formatos PDF y Excel.
+12. Gestión de perfiles de usuario según el rol.
+13. Plataforma web responsive accesible desde distintos dispositivos.
+14. Comunicación asincrónica del tallerista con los alumnos de su taller.
+15. Visualización de las notas asignadas al alumno.
+16. Consulta de datos sensibles utilizados en la plataforma por parte del administrador.
+17. Consulta del listado de alumnos inscritos en el taller por parte del tallerista.
+
 
 ---
 
 <br>
 
-## 8. Alcance excluido (queda para etapas futuras):
+## 10. Alcance excluido (queda para etapas futuras):
 
 1. Foros de comunicación y publicación de contenido para talleres.
 2. Compatibilidad para la subida de archivos tipo PNG y MP4 (más allá del tipo básico soportado en v1).
@@ -211,7 +259,7 @@ El sistema debe permitir la emisión de los siguientes reportes:
 
 <br>
 
-## 9. Requerimientos funcionales:
+## 11. Requerimientos funcionales:
 
 |Codigo | Requerimiento funcional
 |-------|----------------------------------------------------------------------------------------------------------------------------------------------|
@@ -231,11 +279,11 @@ El sistema debe permitir la emisión de los siguientes reportes:
 | RF14  | El sistema debe permitir a cada usuario gestionar su perfil según su rol (modificar contraseña y datos personales).                          |
 | RF15  | El sistema debe permitir al alumno eliminar ciertos datos de su perfil (foto, biografía).                                                    |
 
----
+
 
 <br>
 
-## 10. Requerimientos no funcionales:
+## 12. Requerimientos no funcionales:
 
 |Codigo | Requerimiento funcional
 |-------|--------------------------------------------------------------------------------------------------------------------------|
@@ -251,15 +299,15 @@ El sistema debe permitir la emisión de los siguientes reportes:
 | NRF10 | El sistema debe registrar la trazabilidad de las acciones importantes realizadas por los usuarios.                       |
 | NRF11 | El sistema debe restringir los formatos de archivos adjuntos a PDF e imágenes JPG, acorde a los tipos soportados en v1.  |
 | NRF12 | El sistema debe restringir el tamaño de los archivos adjuntos permitidos.                                                |
-| NRF13 | El código del sistema debe estar organizado, ser reutilizable y mantenible.	                                             |
+| NRF13 | El código del sistema debe estar organizado, ser reutilizable y mantenible.	                                           |
 | NRF14 | El sistema debe contar con documentación técnica dentro del repositorio.                                                 |
 | NRF15 | El equipo debe utilizar Git para registrar y revisar los cambios del código.                                             |
 
----
+
 
 <br>
 
-## 11. Epicas
+## 13. Epicas
 
 | Código | Épica                             | Descripcióm                                                                            |
 | ------ | --------------------------------- | -------------------------------------------------------------------------------------- |
@@ -269,3 +317,20 @@ El sistema debe permitir la emisión de los siguientes reportes:
 | EP4    | Gestión de material y tareas      | Permitir la carga, entrega y corrección de material y tareas de cada taller.           |
 | EP5    | Reportes e informes               | Generar y exportar información consolidada de asistencia, talleres y trazabilidad.     |
 | EP6    | Gestión de perfil de usuario      | Permitir a cada usuario administrar su propia información personal.                    |
+
+
+<br>
+
+
+## 14. Estimacion por Epica
+
+
+| Código | Épica | Estimación en puntos |
+| --- | --- | --- |
+| EP1 | Autenticación y control de acceso | 8 |
+| EP2 | Gestión de usuarios y talleres | 13 |
+| EP3 | Gestión de asistencia | 8 |
+| EP4 | Gestión de material y tareas | 20 |
+| EP5 | Reportes e informes | 13 |
+| EP6 | Gestión de perfil de usuario | 3 |
+| EP-Totales | Estimacion de puntos de todas las EP | 65 |
