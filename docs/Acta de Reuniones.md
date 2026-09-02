@@ -13,6 +13,7 @@
 | **R-06** | Segunda parte del proyecto (Primera semana) | Presencial | Equipo no completo: Gabriel Rendon, Ignacio Viera, Maximiliano Leal, Thiago Ferragut | Avances en la documentación (Historias de usuario y Product Backlog inicial) y comienzo del backend. | Retrasos en el frontend. | Completar las Historias de Usuario antes de comenzar con el backend. | Ninguno. |
 | **R-07** | Segunda semana | Virtual | Equipo completo: Emiliano Sánchez, Gabriel Rendon, Ignacio Viera, Maximiliano Leal, Thiago Ferragut | Retrasos en el frontend y ajuste en el alcance. | Backend y distribución de tareas secundarias. | Reducir el alcance de la primera versión y reorganizar la lógica del frontend. | Ninguno. |
 | **R-08** | Tercera semana | Presencial | Equipo no completo: Gabriel Rendon, Ignacio Viera, Maximiliano Leal, Thiago Ferragut | Distribución de tareas (documentación para la rama de ciberseguridad y ajustes menores en el frontend). | Comenzar con el backend y base de datos. | Thiago Ferragut: ajustes del frontend. Ignacio Viera y Maximiliano Leal: documentación para ciberseguridad. | Ninguno. |
+| **R-09** | Semana pre-segunda entrega | Presencial | Equipo completo: Emiliano Sánchez, Gabriel Rendon, Ignacio Viera, Maximiliano Leal, Thiago Ferragut | Tareas pendientes para la segunda entrega (base de datos, backend y documentación). | Ninguno. | Se asignaron las últimas tareas pendientes entre los integrantes del equipo: Thiago Ferragut, base de datos. Ignacio Viera y Maximiliano Leal, documentación para la rama de ciberseguridad, control de cambios, estructura, actualización del acta de uso ético de IA y documentación de infraestructura. Gabriel Rendon, diagramas UML y MER, y backend. Emiliano Sánchez, apoyo en backend y base de datos. | Ninguno. |
 
 
 <br>
@@ -25,6 +26,6 @@
 
 <br>
 
-> **Nota 2 (R-06 a R-08):** Emiliano Sánchez se encuentra de reposo desde la R-06; a la fecha 29/08/26 no se ha reintegrado. Durante este período participa únicamente en las reuniones digitales (R-07), no en las presenciales (R-06 y R-08).
+> **Nota 2 (R-06 a R-09):** Emiliano Sánchez estuvo de reposo entre la R-06 y la R-08, participando únicamente en las reuniones digitales (R-07) y no en las presenciales (R-06 y R-08). Se reintegró a partir de la R-09, 2/09/2026 fecha de reintegracion.
 > Maximiliano Leal e Ignacio Viera están actualmente bajo observación; se espera que mejoren su participación y realización de tareas.
 > Thiago Ferragut ha mostrado mejoría en la participación y realización de tareas.

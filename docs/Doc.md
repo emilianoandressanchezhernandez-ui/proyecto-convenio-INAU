@@ -10,7 +10,7 @@
 
 <br>
 
-## 2. Necesidad presentada por el cliente
+## 2. Necesidad presentada por el cliente.
 
 >**El problema principal a resolver es la falta de organización y accesibilidad en la plataforma actual. Se requiere un espacio unificado donde estudiantes, talleristas y administradores dispongan de funciones específicas que permitan optimizar, asegurar y promover la accesibilidad, disponibilidad y estructuración de la información.**
 >
@@ -27,8 +27,7 @@
 
 <br>
 
-## 3. Primer análisis del equipo de desarrollo
-
+## 3. Primer análisis del equipo de desarrollo.
 
 | Área a aclarar | Preguntas iniciales del equipo |
 | --- | --- |
@@ -61,7 +60,6 @@
 <br>
 
 ## 5. Anotaciones de la entrevista con el cliente
-
 
 ### 1. Definición del Problema y Necesidad Principal
 
@@ -387,8 +385,8 @@ El sistema debe permitir la emisión de los siguientes reportes:
 | Elemento | Propuesta |
 | --- | --- |
 | Producto | TheNewfutures – Plataforma de gestión de talleres en convenio con INAU |
-| Duración | 12 semanas (4 sprints de 3 semanas cada uno). |
-| Metodología | Scrum, con 4 sprints de 3 semanas. |
+| Duración | 12 semanas (6 sprints de 2 semanas cada uno). |
+| Metodología | Scrum, con 6 sprints de 2 semanas. |
 | Entregas | Incremento funcional al final de cada sprint. |
 | Forma de trabajo | Equipo de 5 integrantes (Emiliano Sánchez — Líder/Scrum Master, Gabriel Rendon — Subcoordinador, Ignacio Viera, Maximiliano Leal, Thiago Ferragut), con reuniones periódicas de seguimiento y reparto de tareas por sprint. |
 | Primera versión | Autenticación por rol, gestión de usuarios y talleres (incluyendo consulta de datos sensibles y del listado de alumnos por taller), registro y consulta de asistencia, carga/entrega/corrección/eliminación de material y tareas, reportes de asistencia/talleres/alumnos/talleristas, gestión de perfil. |
@@ -398,27 +396,52 @@ El sistema debe permitir la emisión de los siguientes reportes:
 <br>
 
 
-## 18. Aprobación ficticia del cliente
+## 18. Estimación de costos
 
->!!!!!
+> **Nota:** El costo está estimado en forma simplificada, como estimación didáctica. En un proyecto real, el presupuesto dependería de tarifas, tecnología, infraestructura, contratos, licencias, soporte y mantenimiento.
+
+| Concepto | Detalle | Costo |
+| --- | --- | --- |
+| **Recursos humanos** | 5 integrantes × 6 h semanales × 12 semanas = 360 h, a USD 12/h (perfil junior) | USD 4.320 |
+| **Hosting** | Plan compartido con soporte PHP y MySQL, USD 5 mensuales | USD 60 / año |
+| **Dominio** | Registro anual `.uy` o `.com` | USD 15 / año |
+| **Certificado SSL** | Incluido en el hosting (Let's Encrypt) | USD 0 |
+| **Herramientas y licencias** | Git/GitHub, VS Code, XAMPP, Bootstrap, PHP y MySQL: todas libres o gratuitas | USD 0 |
+| **Total primer año** | | **USD 4.395** |
+| **Mantenimiento anual posterior** | Hosting + dominio | **USD 75 / año** |
+
+**Costo por punto de esfuerzo:** USD 4.320 ÷ 63 puntos ≈ **USD 68,6 por punto**. Este indicador permite estimar funcionalidades futuras: una historia de 3 puntos equivale aproximadamente a USD 206, y una de 5 puntos, a USD 343.
 
 ---
 
+## 19. Aprobación ficticia del cliente
+
+Luego de revisar la propuesta, el cliente responde:
+
+> "La propuesta está dentro del presupuesto máximo que habíamos previsto. Nos parece correcto empezar por una versión inicial.
+>
+> Lo más importante para nosotros es que los talleristas puedan registrar la asistencia y subir el material sin complicaciones, y que la administración pueda ver en todo momento qué está pasando en cada taller. 
+>
+>Entendemos que algunas funciones, como los foros y las notificaciones automáticas, queden para más adelante.
+
+Aprobamos el proyecto con 6 ciclos de trabajo de 2 semanas. Queremos participar en las revisiones al final de cada ciclo para validar que el sistema se ajuste al trabajo real de los talleres."
+
+
 <br>
 
-## 19. Formato de historia de usuario
+## 20. Formato de historia de usuario
 
 Se utilizará el siguiente formato:
 
 > Como **[tipo de usuario]**, quiero **[acción o necesidad]**, para **[beneficio o resultado esperado]**.
->
+
 Cada historia incluirá criterios de aceptación para saber cuándo puede considerarse terminada.
 
 ---
 
 <br>
 
-## 20. Historias de Usuario iniciales.
+## 21. Historias de Usuario iniciales.
 
 | Código | Épica | RF | Historia de Usuario | Puntos | Prioridad |
 | --- | --- | --- | --- | --- | --- |
@@ -448,7 +471,7 @@ Cada historia incluirá criterios de aceptación para saber cuándo puede consid
 
 <br>
 
-## 21. Backlog priorizado
+## 22. Backlog priorizado
 
 ### Sprint 1 (Semanas 1-2)
 
@@ -519,7 +542,7 @@ Cada historia incluirá criterios de aceptación para saber cuándo puede consid
 
 ---
 
-### 21.2 Backlog priorizado: Resumen de puntos por sprint
+### 22.2 Backlog priorizado: Resumen de puntos por sprint
 
 | Sprint | Semanas | Puntos | Estado | Reporte quincenal |
 | --- | --- | --- | --- | --- |
