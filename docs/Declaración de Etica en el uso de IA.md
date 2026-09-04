@@ -46,6 +46,8 @@
 | Claude Sonnet 5 | Redacción (Electiva Ciberseguridad) | Redacción: se realizó una transcripción a formato Markdown para agregarlo a la documentación; la información no recibió ningún tipo de alteración. Coherencia: verificó la coherencia del documento, luego de que el alcanse inicial fuera modificado, todo fue supervisado por el Subcoordinador y Líder. | Gabriel Rendon |
 | Claude Sonnet 5 | Redacción y Revision de Coherencia(Primera vista) | Redacción: se realizó una transcripción a formato Markdown para agregarlo a la documentación; la información no recibió ningún tipo de alteración.  | Gabriel Rendon |
 | ChatGPT: GPT-5.5 Instant | Frontend (HTML y CSS) | Código: se utilizó la IA para la revisión del código y como ayuda en la estructura; fue revisado por el Subcoordinador. | Emiliano Sánchez |
+Claude Sonnet 5 | Documentación de infraestructura (scripts, Dockerfiles, etc.) | Redacción: se documentó la infraestructura del proyecto (scripts, archivos Docker, configuración de despliegue) en formato Markdown, a partir del código y la configuración existentes. Revisión: se verificó la coherencia y precisión técnica de la documentación generada, supervisada por [nombre del responsable]. | [Maximiliano Leal, Ignacio viera] |
+Claude Sonnet 5 | frontend-alumno (HTML y CSS) | Código: se utilizó la IA para la revisión del código y como ayuda en la estructura; fue revisado por el Subcoordinador. | Maximiliano leal|
 
 ---
 
