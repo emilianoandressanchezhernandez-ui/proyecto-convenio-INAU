@@ -353,6 +353,116 @@ window.DATOS_SIMULADOS = {
             ultimaActualizacion: "2026-06-01T12:30:00"
         }
     ],
+
+    // CONTENIDOS (material y tareas subidos por el tallerista)
+    // tipo "Material": solo lectura para el alumno, fechaLimite siempre null.
+    // tipo "Tarea": el alumno debe entregar algo, fechaLimite indica el plazo.
+
+    contenidos: [
+        {
+            id: 1,
+            tallerId: 1,
+            tipo: "Material",
+            titulo: "Guía de HTML básico",
+            descripcion: "Introducción a etiquetas HTML y estructura de una página web.",
+            fechaPublicacion: "2026-08-01",
+            fechaLimite: null
+        },
+        {
+            id: 2,
+            tallerId: 1,
+            tipo: "Tarea",
+            titulo: "Primera página web",
+            descripcion: "Crear una página HTML simple con título, párrafo e imagen.",
+            fechaPublicacion: "2026-08-03",
+            fechaLimite: "2026-08-17"
+        },
+        {
+            id: 3,
+            tallerId: 2,
+            tipo: "Material",
+            titulo: "Introducción a sensores",
+            descripcion: "Material sobre sensores básicos utilizados en robótica educativa.",
+            fechaPublicacion: "2026-08-05",
+            fechaLimite: null
+        },
+        {
+            id: 4,
+            tallerId: 2,
+            tipo: "Tarea",
+            titulo: "Armado de circuito simple",
+            descripcion: "Fotografiar el circuito armado en clase y describir su funcionamiento.",
+            fechaPublicacion: "2026-08-06",
+            fechaLimite: "2026-08-20"
+        },
+        {
+            id: 5,
+            tallerId: 3,
+            tipo: "Tarea",
+            titulo: "Boceto de logo personal",
+            descripcion: "Diseñar un boceto a mano de un logo que los represente.",
+            fechaPublicacion: "2026-08-08",
+            fechaLimite: "2026-08-15"
+        }
+    ],
+
+    // ENTREGAS (lo que cada alumno sube para una tarea puntual)
+    // contenidoId siempre debe apuntar a un "contenido" con tipo "Tarea".
+    // El ciclo de estados es: Pendiente -> Entregada -> Corregida.
+
+    entregas: [
+        {
+            id: 1,
+            contenidoId: 2,
+            alumnoId: 1,
+            fechaEntrega: "2026-08-15",
+            archivoNombre: "pagina-sofia.html",
+            estado: "Corregida",
+            nota: 9,
+            comentario: "Muy prolijo el orden de las etiquetas, buen trabajo."
+        },
+        {
+            id: 2,
+            contenidoId: 2,
+            alumnoId: 2,
+            fechaEntrega: "2026-08-16",
+            archivoNombre: "pagina-mateo.html",
+            estado: "Entregada",
+            nota: null,
+            comentario: null
+        },
+        {
+            id: 3,
+            contenidoId: 2,
+            alumnoId: 3,
+            fechaEntrega: null,
+            archivoNombre: null,
+            estado: "Pendiente",
+            nota: null,
+            comentario: null
+        },
+        {
+            id: 4,
+            contenidoId: 4,
+            alumnoId: 1,
+            fechaEntrega: "2026-08-18",
+            archivoNombre: "circuito-sofia.jpg",
+            estado: "Corregida",
+            nota: 7,
+            comentario: "Funciona bien, pero faltó explicar el rol de la resistencia."
+        },
+        {
+            id: 5,
+            contenidoId: 5,
+            alumnoId: 1,
+            fechaEntrega: "2026-08-14",
+            archivoNombre: "boceto-sofia.jpg",
+            estado: "Entregada",
+            nota: null,
+            comentario: null
+        }
+    ],
+
     administradores: [
         {
             id: 1,

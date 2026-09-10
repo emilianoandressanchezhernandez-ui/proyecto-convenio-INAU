@@ -257,6 +257,10 @@ function crearFilaAlumno(alumno) {
                     <option value="Justificado">
                         Justificado
                     </option>
+                    
+                    <option value="Tardanza">
+                        Tardanza
+                    </option>
                 </select>
             </td>
         </tr>

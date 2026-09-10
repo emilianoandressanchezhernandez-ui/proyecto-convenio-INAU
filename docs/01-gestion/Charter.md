@@ -1,6 +1,5 @@
-# Nombre del Proyecto:  TheNewfutures – Plataforma de gestión de talleres en convenio con INAU
+# Nombre del Proyecto: TheNewfutures – Plataforma de gestión de talleres en convenio con INAU
 
----
 
 ### Cliente / patrocinador: INAU
 
@@ -11,17 +10,17 @@
 ---
 
 ### Equipo: 
-> -Emiliano Sánchez: Lider / Scrum Master <br>
-> -Gabriel Rendon: Sublíder <br>
-> -Ignacio Viera: desarrolladores Frontend y Backend <br>
-> -Maximiliano Leal: desarrolladores Frontend y Backend <br>
-> -Thiago Ferragut: desarrolladores Frontend y Backend 
+> -Emiliano Sánchez: Líder / Scrum Master <br>
+> -Gabriel Rendon: Subcoordinador <br>
+> -Ignacio Viera: desarrollador Frontend y Backend <br>
+> -Maximiliano Leal: desarrollador Frontend y Backend <br>
+> -Thiago Ferragut: desarrollador Frontend y Backend 
 
 ---
 
 ### Fecha de inicio: 17 de julio de 2026
 
-### Duración estimada: 16 semanas
+### Duración estimada: 12 semanas
 
 ---
 
@@ -41,7 +40,9 @@
 ---
 
 ### Visión del producto: 
-   **Desarrollar una plataforma web responsive que centralice la gestión de talleres en convenio con INAU, permitiendo a administradores y talleristas gestionar talleres, participantes, asistencias, informes y comunicación interna de forma organizada, segura y accesible desde distintos dispositivos.**
+   **Desarrollar una plataforma web responsive que centralice la gestión de talleres en convenio con INAU, permitiendo a administradores y talleristas gestionar talleres, participantes, asistencias e informes de forma organizada, segura y accesible desde distintos dispositivos.**
+
+   **La comunicación interna entre administradores y talleristas está prevista como funcionalidad deseable para una etapa futura, conforme al alcance excluido de la primera versión.**
 
 ---
 
@@ -51,14 +52,23 @@
 2. Gestión de usuarios, talleristas, alumnos y talleres.
 3. Asignación de alumnos y talleristas a los talleres.
 4. Registro, consulta y modificación de asistencias por taller y fecha.
-5. Carga de material y tareas por parte del tallerista (sin especificar tipos de archivo extra, imágenes o datos adicionales).
+5. Carga y modificación de material y tareas por parte del tallerista (sin especificar tipos de archivo extra, imágenes o datos adicionales).
 6. Visualización de material y tareas por parte del alumno, y envío/carga de los archivos correspondientes a la tarea asignada.
-7. Corrección de tareas y asignación de notas por parte del tallerista.
-8. Consulta y generación de informes de asistencia y talleres.
-9. Exportación de informes en formatos PDF y Excel.
-10. Gestión de perfiles de usuario según el rol.
-11. Plataforma web responsive accesible desde distintos dispositivos.
+7. Eliminación de material, calificaciones y registros de asistencia del taller por parte del tallerista.
+8. Corrección de tareas y asignación de notas por parte del tallerista.
+9. Consulta y generación de informes de asistencia y talleres.
+10. Generación de listados e informes de alumnos y talleristas, incluyendo el histórico de calificaciones.
+11. Exportación de informes en formatos PDF y Excel.
+12. Gestión de perfiles de usuario según el rol.
+13. Plataforma web responsive accesible desde distintos dispositivos.
+14. Visualización de las notas asignadas al alumno.
+15. Consulta de datos sensibles utilizados en la plataforma por parte del administrador.
+16. Consulta del listado de alumnos inscritos en el taller por parte del tallerista.
 
+
+---
+
+<br>
 
 ## Alcance excluido (queda para etapas futuras):
 
@@ -68,29 +78,29 @@
 4. Listado e historial ampliado de tareas entregadas (más allá del envío/corrección básica ya incluida en v1).
 5. Sistema de notificaciones automáticas ante eventos relevantes (correcciones de tareas, faltas de asistencia, nuevas entregas).
 6. Mensajería interna entre administradores y talleristas (No en tiempo real).
+7. Comunicación asincrónica del tallerista con los alumnos de su taller.
 
 ---
 
+<br>
 
-| **Rol**              | **Persona / referente**          | **Responsabilidad**                                                |
-| -------------------- | -------------------------------- | ------------------------------------------------------------------ |
-| Cliente / Sponsor    | Referente del convenio con INAU  | Define las necesidades del sistema, valida el alcance y aprueba la |
-|                      |                                  |  solución final.                                                   |
-|----------------------|----------------------------------|--------------------------------------------------------------------|
-| Administrador        | Responsable de la administración | Gestiona usuarios, talleres, alumnos y supervisa el funcionamiento |
-|                      |                                  | general de la plataforma.                                          |
-|----------------------|----------------------------------|--------------------------------------------------------------------|
-| Tallerista           | Talleristas del convenio         | Registran asistencias, gestionan la información de sus talleres y  |
-|                      |                                  | se comunican con la administración.                                |
-|----------------------|----------------------------------|--------------------------------------------------------------------|
-| Equipo de desarrollo | Equipo de 3.º BT Informática     | Analiza los requerimientos, diseña, desarrolla, prueba y documenta |
-|                      |                                  | el sistema.                                                        |
+## Stakeholders principales:
 
+| **Rol** | **Persona / referente** | **Responsabilidad** |
+| --- | --- | --- |
+| Cliente / Sponsor | Referente del convenio con INAU | Define las necesidades del sistema, valida el alcance y aprueba la solución final. |
+| Administrador | Responsable de la administración | Gestiona usuarios, talleres, alumnos y supervisa el funcionamiento general de la plataforma. |
+| Tallerista | Talleristas del convenio | Registran asistencias, gestionan la información de sus talleres y se comunican con la administración. |
+| Equipo de desarrollo | Equipo de 3.º BT Informática | Analiza los requerimientos, diseña, desarrolla, prueba y documenta el sistema. |
 
 ---
+
+<br>
+
+## Riesgos iniciales:
 
 | **Riesgo**                                                  | **Impacto**                                               |
-|-------------------------------------------------------------|-----------------------------------------------------------|
+| --- | --- |
 | Tiempo insuficiente para completar el proyecto.             | Reducción del alcance o funcionalidades pendientes.       |
 | Dificultades al integrar frontend, backend y base de datos. | Retrasos y errores en el funcionamiento.                  |
 | Cambios en los requerimientos del cliente.                  | Replanificación y modificaciones del desarrollo.          |
@@ -100,12 +110,17 @@
 ---
 
 ### Plazo y metodología: 
-**Desarrollo mediante Scrum, organizado en sprints quincenales, con entrega final prevista para finales de 2026.**
+**Desarrollo mediante Scrum, organizado en 6 sprints quincenales (12 semanas), con reporte de avance al cierre de cada sprint.**
 
 ---
 
 ### Esfuerzo estimado: 
-**55 Puntos, distribuidos en cuatro épicas principales de desarrollo.**
+**76 Puntos, distribuidos en seis épicas principales de desarrollo, correspondientes al alcance ajustado de la primera versión.**
+
+---
+
+### Costos estimados:
+**USD 4.395 el primer año (recursos humanos e infraestructura), con un costo de mantenimiento posterior de USD 75 anuales correspondiente a hosting y dominio.**
 
 ---
 

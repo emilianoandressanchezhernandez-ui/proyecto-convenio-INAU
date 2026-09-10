@@ -44,6 +44,8 @@ function inicializarPaginaActual() {
         "asistencia": "inicializarAsistencia",
         "informes": "inicializarInformes",
         "detalle-informe": "inicializarDetalleInforme",
+        "material": "inicializarMaterial",
+        "correccion-tarea": "inicializarCorreccionTarea",
     };
 
     const nombreFuncion = inicializadores[paginaActual];
