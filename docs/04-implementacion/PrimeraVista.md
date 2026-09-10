@@ -1,5 +1,11 @@
 # Documentación general del proyecto
 
+> **Nota de vigencia:** este documento registra el estado del proyecto al 17 de julio de 2026 y se conserva como referencia histórica del proceso de análisis. 
+>Varias de sus definiciones fueron modificadas posteriormente: el alcance de la mensajería, los estados de taller, el modelo de datos y la estructura del
+>repositorio. Para el estado vigente, consultar `docs/03-diseño/Justificacion Tecnologica.md`, `docs/03-diseño/Modelado/` y `docs/02-analisis/Doc.md`.
+
+<br>
+
 ## Sistema de Gestión de Talleres en Convenio con INAU
 
 **Proyecto de egreso – 3.º EMT Informática 2026**
@@ -15,6 +21,8 @@
 
 ---
 
+<br>
+
 ## 1. Resumen ejecutivo
 
 El proyecto consiste en desarrollar una aplicación web para organizar y controlar los talleres realizados en convenio con INAU. El sistema busca centralizar información que actualmente resulta difícil de consultar, actualizar y seguir, como los talleres, los alumnos asignados, las asistencias, los informes y la comunicación entre talleristas y administración.
@@ -28,6 +36,8 @@ Actualmente, el desarrollo se encuentra concentrado en el frontend. El panel del
 El panel administrador conserva sus pantallas HTML y CSS, pero su JavaScript y sus operaciones de gestión todavía están pendientes. El backend, la base de datos y la API REST se desarrollarán en etapas posteriores.
 
 ---
+
+<br>
 
 ## 2. Origen y necesidad del proyecto
 
@@ -54,6 +64,8 @@ La primera versión se concentra en los siguientes procesos, definidos como part
 
 ---
 
+<br>
+
 ## 3. Problema que se busca resolver
 
 La institución necesita una herramienta digital que permita registrar, consultar y mantener información confiable sobre los talleres y sus actividades. Sin un sistema centralizado, el seguimiento puede depender de registros separados, comunicaciones informales o procesos manuales.
@@ -69,6 +81,8 @@ El sistema busca resolver principalmente los siguientes problemas:
 7. Necesidad de utilizar la plataforma desde computadoras, tablets y teléfonos.
 
 ---
+
+<br>
 
 ## 4. Objetivos
 
@@ -92,6 +106,8 @@ Desarrollar una aplicación web responsive, organizada y escalable que permita g
 * (Fase futura) Implementar una mensajería interna entre talleristas y administración, conforme al alcance definido.
 
 ---
+
+<br>
 
 ## 5. Público objetivo y actores del sistema
 
@@ -134,6 +150,8 @@ Los alumnos forman parte del alcance definido para la primera versión: podrán 
 El acceso de los alumnos al sistema aún no se implementó en el frontend actual; queda pendiente para una próxima etapa de desarrollo.
 
 ---
+
+<br>
 
 ## 6. Alcance funcional
 
@@ -316,6 +334,8 @@ El cambio de contraseña se encuentra simulado y no almacena la contraseña en e
 
 ---
 
+<br>
+
 ## 7. Requisitos no funcionales
 
 El sistema deberá cumplir con los siguientes criterios:
@@ -336,6 +356,8 @@ El sistema deberá cumplir con los siguientes criterios:
 * uso de Git para registrar y revisar cambios.
 
 ---
+
+<br>
 
 ## 8. Tecnologías y herramientas utilizadas
 
@@ -362,6 +384,8 @@ El sistema deberá cumplir con los siguientes criterios:
 * Filesystem del servidor para archivos adjuntos.
 
 ---
+
+<br>
 
 ## 9. Arquitectura y organización del repositorio
 
@@ -449,6 +473,8 @@ En el estado actual del repositorio, estos archivos están creados pero vacíos.
 
 ---
 
+<br>
+
 ## 10. Organización del JavaScript del tallerista
 
 La reorganización del JavaScript tuvo como objetivo evitar que toda la lógica quedara acumulada en un único archivo.
@@ -490,6 +516,8 @@ Este archivo no manipula el HTML. Su función es ofrecer datos temporales hasta 
 * `mensajes.js`: administra conversaciones, lectura y envío de mensajes.
 
 ---
+
+<br>
 
 ## 11. Proceso de desarrollo realizado
 
@@ -591,6 +619,8 @@ Se comprobaron manualmente:
 
 ---
 
+<br>
+
 ## 12. Avance actual
 
 ### 12.1 Completado o funcional en el frontend tallerista
@@ -633,6 +663,8 @@ Se comprobaron manualmente:
 
 ---
 
+<br>
+
 ## 13. Modelo de datos preliminar
 
 A partir de la entrevista, la especificación técnica y los datos simulados, se identifican las siguientes entidades principales:
@@ -662,6 +694,8 @@ A partir de la entrevista, la especificación técnica y los datos simulados, se
 * Un adjunto puede pertenecer a un taller o a otro registro permitido.
 
 ---
+
+<br>
 
 ## 14. Decisiones técnicas adoptadas
 
@@ -697,6 +731,8 @@ El backend deberá reforzar esta regla ignorando cualquier intento de modificaci
 
 ---
 
+<br>
+
 ## 15. Seguridad y privacidad
 
 El sistema manejará información personal y posiblemente sensible. Por lo tanto, se deberán aplicar medidas como:
@@ -718,6 +754,8 @@ El sistema manejará información personal y posiblemente sensible. Por lo tanto
 Las validaciones realizadas actualmente en JavaScript mejoran la experiencia del usuario, pero no son suficientes para garantizar seguridad. Todas deben repetirse en PHP.
 
 ---
+
+<br>
 
 ## 16. Observaciones técnicas y puntos a corregir
 
@@ -805,6 +843,8 @@ Es necesario distribuir la información de esta documentación general entre:
 
 ---
 
+<br>
+
 ## 17. Próximos pasos recomendados
 
 ### Fase 1: cierre del frontend tallerista
@@ -865,6 +905,8 @@ Es necesario distribuir la información de esta documentación general entre:
 
 ---
 
+<br>
+
 ## 18. Criterios de aceptación generales
 
 El sistema podrá considerarse funcional cuando:
@@ -886,6 +928,8 @@ El sistema podrá considerarse funcional cuando:
 
 ---
 
+<br>
+
 ## 19. Conclusión
 
 El proyecto cuenta con una base visual amplia y una arquitectura que permite continuar creciendo. El principal avance técnico se encuentra en el frontend del tallerista, que ya utiliza módulos JavaScript, datos relacionados, navegación mediante identificadores y persistencia temporal.
@@ -897,6 +941,8 @@ La prioridad siguiente debe ser cerrar técnicamente el frontend del tallerista,
 Una vez realizadas esas tareas, el equipo podrá comenzar PHP y MySQL con una estructura más clara y con menos necesidad de modificar las interfaces ya construidas.
 
 ---
+
+<br>
 
 ## 20. Fuentes utilizadas
 
