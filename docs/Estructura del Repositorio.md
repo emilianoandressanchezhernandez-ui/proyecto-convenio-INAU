@@ -1,20 +1,6 @@
-# Proyecto Convenio INAU
+# Estructura del repositorio — proyecto-convenio-INAU
 
-**TheNewfutures — Sistema de Gestión de Talleres en Convenio con INAU**
-
-Aplicación web para la gestión de talleres socioeducativos realizados en convenio con INAU: administración de talleres y participantes, control de asistencia, publicación de material y tareas, corrección de entregas y generación de informes.
-
-## Integrantes
-
-- Emiliano Sánchez (Coordinador)
-- Gabriel Rendon (Subcoordinador)
-- Ignacio Viera
-- Maximiliano Leal
-- Thiago Ferragut
-
----
-
-## Estructura del repositorio
+<br>
 
 ```text
 proyecto-convenio-INAU/
@@ -132,7 +118,7 @@ proyecto-convenio-INAU/
 
 <br>
 
-### Resumen por carpeta
+## Resumen por carpeta
 
 | Carpeta | Contenido | Archivos |
 | --- | --- | --- |
@@ -140,11 +126,11 @@ proyecto-convenio-INAU/
 | `backend/` | Marcador de carpeta | 1 |
 | `backend/DataBase/` | Script de creación de la base de datos con datos de prueba | 1 |
 | `docs/` | Índice de la estructura del repositorio | 1 |
-| `docs/01-gestion/` | Actas de reuniones, charter, declaración de uso ético de IA y revisión de coherencia | 4 |
+| `docs/01-gestion/` | Actas de reuniones, project charter, declaración de uso ético de IA y revisión de coherencia | 4 |
 | `docs/02-analisis/` | Documento principal del proyecto, requerimientos y planificación | 3 |
 | `docs/03-diseño/` | Identidad visual y justificación tecnológica | 2 |
 | `docs/03-diseño/Modelado/` | Modelo de clases y MER, anexo de derivación y análisis del modelo | 3 |
-| `docs/04-implementacion/` | Estado de desarrollo, infraestructura, documentación de API y de pruebas | 4 |
+| `docs/04-implementacion/` | Estado del desarrollo, entorno de infraestructura, documentación de API y de pruebas | 4 |
 | `docs/ciberseguridad/` | Identificación de amenazas (asignatura electiva) | 1 |
 | `frontend/frontend-admin/` | Panel del administrador: 11 páginas, 1 hoja de estilos, 15 scripts | 28 |
 | `frontend/frontend-tallerista/` | Panel del tallerista: 9 páginas, 1 hoja de estilos, 12 scripts | 23 |
@@ -153,38 +139,27 @@ proyecto-convenio-INAU/
 
 <br>
 
-## Tecnologías
+## Criterio de organización
 
-| Capa | Tecnología |
-| --- | --- |
-| Frontend | HTML5, CSS3, Bootstrap 5.3, JavaScript sin framework |
-| Backend | PHP con API REST *(previsto)* |
-| Base de datos | MySQL 8.0 |
-| Control de versiones | Git y GitHub |
+La documentación se agrupa en cinco carpetas que reflejan la etapa del proyecto a la que corresponde cada documento: gestión, análisis, diseño e implementación, más una carpeta independiente para la asignatura electiva. La numeración de las cuatro primeras garantiza que el listado respete el orden lógico del proceso en lugar del orden alfabético.
+
+Los documentos de modelado se ubican en una subcarpeta propia dentro de `03-diseño`, dado que constituyen un conjunto de tres piezas que se referencian entre sí: el modelo, su derivación justificada y el análisis de cómo resuelve la operativa.
+
+La revisión de coherencia se ubica en `01-gestion` por tratarse de un control de calidad sobre el conjunto del proyecto, y no de un artefacto técnico de una etapa determinada.
+
+El trabajo de identificación de amenazas corresponde a una asignatura distinta del proyecto principal. Se conserva en el repositorio para mantener la trazabilidad del trabajo del equipo, pero en una carpeta separada para no confundirlo con la documentación del sistema.
+
+El script de base de datos se ubica dentro de `backend/`, junto al código que lo consumirá, en lugar de dejarlo en la raíz del repositorio.
 
 <br>
 
-## Estado del desarrollo
+## Estado de la implementación
 
 | Componente | Estado |
 | --- | --- |
 | Panel del administrador | Páginas, estilos y lógica completos, con datos simulados |
 | Panel del tallerista | Páginas, estilos y lógica completos, con datos simulados |
-| Panel del alumno | Páginas y estilos definidos; lógica pendiente |
+| Panel del alumno | Páginas y estilos definidos; lógica pendiente de implementar |
 | Pantalla de acceso | Interfaz terminada; autenticación pendiente |
-| Base de datos | Script definido con trece tablas; pendiente de despliegue |
-| Backend | Desarrollo iniciado |
-
-<br>
-
-## Documentación
-
-La documentación se organiza en carpetas numeradas según la etapa del proyecto:
-
-| Carpeta | Contenido |
-| --- | --- |
-| `01-gestion` | Gestión del proyecto: actas, charter, declaración de uso de IA y control de coherencia |
-| `02-analisis` | Relevamiento, requerimientos, historias de usuario y planificación de sprints |
-| `03-diseño` | Modelo de clases, modelo entidad-relación, identidad visual y justificación tecnológica |
-| `04-implementacion` | Estado del desarrollo, entorno de ejecución, API y pruebas |
-| `ciberseguridad` | Trabajo de la asignatura electiva |
+| Base de datos | Script definido; pendiente de ejecución en el servidor |
+| Backend | Desarrollo iniciado; sin avances incorporados al repositorio |

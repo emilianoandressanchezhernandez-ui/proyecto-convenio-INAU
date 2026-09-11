@@ -32,7 +32,7 @@
 
 <br><br>
 
-## Detalle de herramientas de IA utilizadas (si corresponde):
+## Detalle de uso de IA utilizadas:
 
 
 | Herramienta | Etapa / documento | Tipo de uso (investigación / redacción) | Integrante |
@@ -46,7 +46,10 @@
 | Claude Sonnet 5 | Redacción (Electiva Ciberseguridad) | Redacción: se realizó una transcripción a formato Markdown para agregarlo a la documentación; la información no recibió ningún tipo de alteración. Coherencia: verificó la coherencia del documento, luego de que el alcanse inicial fuera modificado, todo fue supervisado por el Subcoordinador y Líder. | Gabriel Rendon |
 | Claude Sonnet 5 | Redacción y Revision de Coherencia(Primera vista) | Redacción: se realizó una transcripción a formato Markdown para agregarlo a la documentación; la información no recibió ningún tipo de alteración.  | Gabriel Rendon |
 | ChatGPT: GPT-5.5 Instant | Frontend (HTML y CSS) | Código: se utilizó la IA para la revisión del código y como ayuda en la estructura; fue revisado por el Subcoordinador. | Emiliano Sánchez |
-
+| Gemini: 3 Flash | Redacción (Primera Entrega) | Redacción: ajustes de formato a un tono formal, corrección de errores ortográficos y de formato previos en los documento, al pasarlos a formato PDF. | Gabriel Rendon |
+| Claude Sonnet 5 | Documentación de infraestructura (scripts, Dockerfiles, etc.) | Redacción: se documentó la infraestructura del proyecto (scripts, archivos Docker, configuración de despliegue) en formato Markdown, a partir del código y la configuración existentes. Revisión: se verificó la coherencia y precisión técnica de la documentación generada, supervisada por Gabriel Rendon. | Maximiliano Leal, Ignacio viera |
+| Claude Sonnet 5 | frontend-alumno (HTML y CSS) | Código: se utilizó la IA para la revisión del código y como ayuda en la estructura; fue revisado por el Subcoordinador(Gabriel Rendon). | Maximiliano leal|
+| Claude Opus 5 | Redacción y Revision de Coherencia (Anexo UML y MER, Analisis UML y MER, y Modelado UML y MER) | Redacción: ajustes de formato a un tono formal y corrección de errores ortográficos. Revision coherencia: Verificacion de coherencia con los documentos previos. | Gabriel Rendon |
 ---
 
 <br><br>
