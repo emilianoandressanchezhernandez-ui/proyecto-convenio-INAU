@@ -24,7 +24,6 @@ proyecto-convenio-INAU/
 │   │
 │   ├── 02-analisis/
 │   │   ├── Doc.md
-│   │   ├── planificacion.md
 │   │   └── requerimientos.md
 │   │
 │   ├── 03-diseño/
@@ -127,7 +126,7 @@ proyecto-convenio-INAU/
 | `backend/DataBase/` | Script de creación de la base de datos con datos de prueba | 1 |
 | `docs/` | Índice de la estructura del repositorio | 1 |
 | `docs/01-gestion/` | Actas de reuniones, project charter, declaración de uso ético de IA y revisión de coherencia | 4 |
-| `docs/02-analisis/` | Documento principal del proyecto, requerimientos y planificación | 3 |
+| `docs/02-analisis/` | Documento principal del proyecto y requerimientos | 2 |
 | `docs/03-diseño/` | Identidad visual y justificación tecnológica | 2 |
 | `docs/03-diseño/Modelado/` | Modelo de clases y MER, anexo de derivación y análisis del modelo | 3 |
 | `docs/04-implementacion/` | Estado del desarrollo, entorno de infraestructura, documentación de API y de pruebas | 4 |
@@ -135,7 +134,7 @@ proyecto-convenio-INAU/
 | `frontend/frontend-admin/` | Panel del administrador: 11 páginas, 1 hoja de estilos, 15 scripts | 28 |
 | `frontend/frontend-tallerista/` | Panel del tallerista: 9 páginas, 1 hoja de estilos, 12 scripts | 23 |
 | `frontend/frontend-alumno/` | Panel del alumno: 7 páginas y 1 hoja de estilos | 8 |
-| **Total** | | **81** |
+| **Total** | | **80** |
 
 <br>
 

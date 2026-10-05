@@ -30,8 +30,7 @@ Los problemas pendientes se concentran en tres frentes: **dos esquemas SQL diver
 | Base de datos | Completa como diseño | Trece tablas con claves, restricciones, índices y datos de prueba. Conviven dos scripts divergentes (ver 4.1). |
 | API REST | Implementada | Sin documentar: `docs/04-implementacion/api.md` está vacío. |
 | Modelo de datos documental | Completo | Modelo de clases, MER, anexo de derivación y análisis del modelo. |
-| Planificación documental | **Perdida** | `docs/02-analisis/planificacion.md` figura con 0 bytes en todas las ramas. |
-| Testing documental | Pendiente | `docs/04-implementacion/testing.md` está vacío. |
+| Planificación documental | Integrada en Doc.md | El backlog priorizado de los seis sprints está en `Doc.md` (§22). El archivo `planificacion.md` solo contenía un resumen general redundante y se elimina (ver 4.10). |
 | Seguridad | Mixta | El control de acceso de la API es sólido; hay dos claves secretas publicadas en el repositorio (ver 4.2). |
 | Infraestructura | Definida como propuesta | Documentación de entorno Docker; el stack todavía no está reflejado en el repositorio. |
 | Identidad visual | Definida | Documentación completa y hojas de estilo por panel. |
@@ -70,7 +69,6 @@ proyecto-convenio-INAU/
 │   │
 │   ├── 02-analisis/
 │   │   ├── Doc.md
-│   │   ├── planificacion.md
 │   │   └── requerimientos.md
 │   │
 │   ├── 03-diseño/
@@ -227,14 +225,13 @@ Describe un estado anterior: no incluye el panel del alumno, indica menos archiv
 Tres documentos permanecen vacíos:
 
 ```text
-docs/02-analisis/planificacion.md
 docs/04-implementacion/api.md
 docs/04-implementacion/testing.md
 ```
 
 `api.md` y `testing.md` corresponden a fases posteriores, aunque `api.md` ya cuenta con material disponible: la API está implementada con 47 rutas.
-
-`planificacion.md` es un caso distinto y más grave: contuvo el backlog priorizado de los seis sprints y hoy figura con 0 bytes en todas las ramas, por lo que el contenido no puede recuperarse del repositorio.
+ 
+Caso aparte es `planificacion.md`: figuraba con 0 bytes, pero su contenido **no se perdió**. La planificación real —el backlog priorizado de los seis sprints— está en `Doc.md` (§22); el archivo solo había alojado un resumen general del proyecto, redundante con `Doc.md`. Por eso se resuelve **eliminarlo** en lugar de recuperarlo, y retirar su referencia del README y de la estructura documental.
 
 ### 4.11 Archivos con nomenclatura irregular o ausentes
 
@@ -309,7 +306,7 @@ De los veintiséis requerimientos definidos, veinte integran el alcance de la pr
 | NRF11 | Restricción de formatos | Documentada y respetada en el esquema definitivo; contradicha por los datos de prueba de `backend/api/database.sql`. |
 | NRF12 | Restricción de tamaño | Configurada en el entorno Docker; validación en la API pendiente de verificar. |
 | NRF13 | Código organizado | Cumplido: frontend modular por pantalla y backend en capas. |
-| NRF14 | Documentación técnica | Avanzada; restan `api.md`, `testing.md` y la recuperación de `planificacion.md`. |
+| NRF14 | Documentación técnica | Avanzada; restan `api.md` y `testing.md`. |
 | NRF15 | Uso de Git | Implementado. |
 | NRF16 | Pull Requests obligatorias | Declarado en la documentación y respaldado por el flujo de ramas del repositorio. |
 
@@ -386,7 +383,7 @@ El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez com
 1. Retirar las dos claves secretas publicadas y generar claves nuevas.
 2. Unificar los dos esquemas SQL en uno solo.
 3. Evitar que la API exponga detalles de la base de datos ante un error.
-4. Recuperar el contenido de `planificacion.md`.
+4. Eliminar `planificacion.md` (su contenido es redundante con `Doc.md`, que ya contiene el backlog de los seis sprints) y retirar su referencia del README y la estructura.
 5. Alinear los identificadores del mock data con los del SQL.
 6. Implementar el JavaScript del panel del alumno o retirar sus referencias.
 7. Integrar el login del frontend con la API, definiendo antes si el acceso es por cédula o por correo.
@@ -408,7 +405,7 @@ El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez com
         ↓
 4. Corregir la filtración de errores de la API
         ↓
-5. Recuperar planificacion.md y seguridad.md
+5. Eliminar planificacion.md (redundante con Doc.md) y recuperar seguridad.md
         ↓
 6. Actualizar los dos README y la estructura documental
         ↓
