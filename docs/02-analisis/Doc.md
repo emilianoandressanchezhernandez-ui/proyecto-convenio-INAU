@@ -234,6 +234,8 @@ El sistema debe permitir la emisión de los siguientes reportes:
 15. Consulta de datos sensibles utilizados en la plataforma por parte del administrador.
 16. Consulta del listado de alumnos inscritos en el taller por parte del tallerista.
 
+>Nota: este alcance corresponde a la definición inicial, previa al ajuste por plazo. 
+>Seis funciones fueron postergadas posteriormente; ver la sección 16.
 
 ---
 
@@ -357,6 +359,31 @@ El sistema debe permitir la emisión de los siguientes reportes:
 | **EP6** | Gestión de perfil de usuario | RF14 | 2 |
 | **Total** | | **20 RF** | **76** |
 
+<br>
+
+### 15.1 Reconciliación con el backlog
+
+La estimación por épicas y la suma de las historias de usuario arrojan totales distintos. La diferencia no responde a un error de cálculo, sino a que corresponden a dos momentos del análisis:
+
+| Épica | Estimación por épica | Suma de sus historias | Diferencia |
+|---|---:|---:|---:|
+| EP1 — Autenticación y control de acceso | 8 | 8 | — |
+| EP2 — Gestión de usuarios y talleres | 18 | 13 | −5 |
+| EP3 — Gestión de asistencia | 7 | 6 | −1 |
+| EP4 — Gestión de material y tareas | 24 | 19 | −5 |
+| EP5 — Reportes e informes | 17 | 15 | −2 |
+| EP6 — Gestión de perfil de usuario | 2 | 2 | — |
+| **Total** | **76** | **63** | **−13** |
+
+La estimación por épicas se realizó de forma descendente, asignando un valor al bloque completo antes de conocer su composición interna. La estimación del backlog es ascendente: parte de cada historia ya descompuesta, con su requerimiento de origen identificado.
+
+Al descomponer las épicas en historias, varias resultaron sobreestimadas. La diferencia se concentra en EP2 y EP4, que son las de mayor alcance y, por lo tanto, las que presentaban mayor incertidumbre en la estimación inicial.
+
+**Criterio adoptado:** se toman los **63 puntos del backlog** como base de planificación y de cálculo de costos, por tratarse de la estimación con mayor nivel de detalle. Los valores por épica se conservan como registro del proceso de estimación.
+
+Esta decisión resulta además necesaria para la viabilidad del plan: con un límite de 11 puntos por sprint, los seis sprints ofrecen una capacidad máxima de 66 puntos. Los 63 puntos del backlog entran dentro de ese margen; los 76 de la estimación por épicas lo excederían, haciendo inviable el cronograma.
+
+La secuencia 91 → 76 → 63 refleja dos ajustes sucesivos: el primero por la exclusión de seis requerimientos para respetar el plazo (sección 16), y el segundo por el refinamiento que produjo la descomposición en historias de usuario.
 
 ---
 
@@ -410,7 +437,7 @@ El sistema debe permitir la emisión de los siguientes reportes:
 | **Total primer año** | | **USD 4.395** |
 | **Mantenimiento anual posterior** | Hosting + dominio | **USD 75 / año** |
 
-**Costo por punto de esfuerzo:** USD 4.320 ÷ 76 puntos ≈ **USD 56,8 por punto**. Este indicador permite estimar funcionalidades futuras: una historia de 3 puntos equivale aproximadamente a USD 170, y una de 5 puntos, a USD 284.
+**Costo por punto de esfuerzo:** USD 4.320 ÷ 63 puntos ≈ **USD 68,6 por punto**. Este indicador permite estimar funcionalidades futuras: una historia de 3 puntos equivale aproximadamente a USD 206, y una de 5 puntos, a USD 343.
 
 ---
 

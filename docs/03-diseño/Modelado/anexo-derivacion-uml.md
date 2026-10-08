@@ -668,7 +668,7 @@ Existen tres formas estándar de traducir una jerarquía de herencia. La elecci�
 | `RegistroAsistencia` | `registros_asistencia` | — |
 | `Contenido` *(abstracta)* | `contenidos` | Absorbe a `Material` y `Tarea` mediante el discriminador `tipo` |
 | `Material` | — | Sin tabla propia |
-| `Tarea` | — | Sin tabla propia; aporta `consigna` y `fecha_limite` |
+| `Tarea` | — | Sin tabla propia; aporta `fecha_limite`. La consigna se almacena en `descripcion` |
 | `Entrega` | `entregas` | — |
 | `Adjunto` | `adjuntos` | — |
 | `Informe` | `reportes` | — |

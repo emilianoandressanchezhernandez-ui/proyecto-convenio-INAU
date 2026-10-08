@@ -169,7 +169,7 @@ Las dos jerarquías de herencia (`Usuario` y `Contenido`) se implementan mediant
 | RegistroAsistencia | `registros_asistencia` | — |
 | Contenido | `contenidos` | Absorbe a Material y Tarea |
 | Material | — | `contenidos` con tipo = Material |
-| Tarea | — | `contenidos` con tipo = Tarea; aporta `consigna` y `fecha_limite` |
+| Tarea | — | `contenidos` con tipo = Tarea; aporta `fecha_limite`. La consigna se almacena en `descripcion` |
 | Entrega | `entregas` | — |
 | Adjunto | `adjuntos` | — |
 | Informe | `reportes` | — |
