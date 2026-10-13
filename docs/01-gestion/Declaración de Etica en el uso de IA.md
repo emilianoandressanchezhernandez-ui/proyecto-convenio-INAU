@@ -6,12 +6,10 @@
 
 ---
 
-### Equipo (integrantes): 
+### Equipo (integrantes):
 
 - Emiliano Sánchez – Líder/Scrum Master.
 - Gabriel Rendon – Subcoordinador.
-- Ignacio Viera – Desarrollador Frontend/Backend.
-- Maximiliano Leal – Desarrollador Frontend/Backend.
 - Thiago Ferragut – Desarrollador Frontend/Backend.
 
 ---
@@ -23,17 +21,17 @@
 ---
 
 <br>
- 
+
 ### Declaración:
 
 >Declaramos que el contenido de la documentación entregada es de nuestra autoría exclusiva como equipo. Las herramientas de Inteligencia Artificial (IA) fueron utilizadas únicamente como apoyo a la redacción, la investigación teórica y la creación de ilustraciones, según el detalle indicado abajo, y no fueron utilizadas para generar los contenidos del proyecto en nuestro lugar.
+>Posteriormente. Las herramientas de Inteligencia Artificial (IA), tubieron que ser utilizada para la generacion de codigo, debido a falta de tiempo. Todo el proceso fue supervisado y verificadon por el equipo.
 >Entendemos que el uso no ético de IA, de ser detectado, tiene consecuencias académicas que asumimos como equipo.
 ---
 
 <br><br>
 
 ## Detalle de uso de IA utilizadas:
-
 
 | Herramienta | Etapa / documento | Tipo de uso (investigación / redacción) | Integrante |
 | --- | --- | --- | --- |
@@ -42,14 +40,17 @@
 | Claude Sonnet 5 | Redacción (Anotaciones de la entrevista) | Redacción: ajustes de formato a un tono formal, corrección de errores ortográficos y de formato previos. | Gabriel Rendon |
 | Claude Sonnet 5 | Coherencia y redacción (Actas de reuniones) | Coherencia: verificó la coherencia de las actas, todo fue supervisado por el Subcoordinador y Líder. Redacción: ajustes de formato a un tono formal, corrección de errores ortográficos y de formato previos. | Gabriel Rendon |
 | Claude Sonnet 5 | Redacción (Declaración de Ética en el uso de IA) | Redacción: ajustes de formato a un tono formal, corrección de errores ortográficos y de formato previos. | Gabriel Rendon |
-| Claude Sonnet 5 | Contenido visual (Electiva Ciberseguridad) | Contenido visual: se utilizó para la generación de imágenes de un documento de la materia de Ciberseguridad. | Maximiliano Leal |
+| Claude Sonnet 5 | Contenido visual (Electiva Ciberseguridad) | Contenido visual: se utilizó para la generación de imágenes de un documento de la materia de Ciberseguridad. | Emiliano Sánchez |
 | Claude Sonnet 5 | Redacción (Electiva Ciberseguridad) | Redacción: se realizó una transcripción a formato Markdown para agregarlo a la documentación; la información no recibió ningún tipo de alteración. Coherencia: verificó la coherencia del documento, luego de que el alcanse inicial fuera modificado, todo fue supervisado por el Subcoordinador y Líder. | Gabriel Rendon |
 | Claude Sonnet 5 | Redacción y Revision de Coherencia(Primera vista) | Redacción: se realizó una transcripción a formato Markdown para agregarlo a la documentación; la información no recibió ningún tipo de alteración.  | Gabriel Rendon |
 | ChatGPT: GPT-5.5 Instant | Frontend (HTML y CSS) | Código: se utilizó la IA para la revisión del código y como ayuda en la estructura; fue revisado por el Subcoordinador. | Emiliano Sánchez |
 | Gemini: 3 Flash | Redacción (Primera Entrega) | Redacción: ajustes de formato a un tono formal, corrección de errores ortográficos y de formato previos en los documento, al pasarlos a formato PDF. | Gabriel Rendon |
-| Claude Sonnet 5 | Documentación de infraestructura (scripts, Dockerfiles, etc.) | Redacción: se documentó la infraestructura del proyecto (scripts, archivos Docker, configuración de despliegue) en formato Markdown, a partir del código y la configuración existentes. Revisión: se verificó la coherencia y precisión técnica de la documentación generada, supervisada por Gabriel Rendon. | Maximiliano Leal, Ignacio viera |
-| Claude Sonnet 5 | frontend-alumno (HTML y CSS) | Código: se utilizó la IA para la revisión del código y como ayuda en la estructura; fue revisado por el Subcoordinador(Gabriel Rendon). | Maximiliano leal|
+| Claude Sonnet 5 | Documentación de infraestructura (scripts, Dockerfiles, etc.) | Redacción: se documentó la infraestructura del proyecto (scripts, archivos Docker, configuración de despliegue) en formato Markdown, a partir del código y la configuración existentes. Revisión: se verificó la coherencia y precisión técnica de la documentación generada, supervisada por Gabriel Rendon. | Emiliano Sánchez |
+| Claude Sonnet 5 | frontend-alumno (HTML y CSS) | Código: se utilizó la IA para la revisión del código y como ayuda en la estructura; fue revisado por el Subcoordinador(Gabriel Rendon). | Emiliano Sánchez |
 | Claude Opus 5 | Redacción y Revision de Coherencia (Anexo UML y MER, Analisis UML y MER, y Modelado UML y MER) | Redacción: ajustes de formato a un tono formal y corrección de errores ortográficos. Revision coherencia: Verificacion de coherencia con los documentos previos. | Gabriel Rendon |
+| Claude Opus 5 | Redacción y Revision de Coherencia del Documentación de infraestructura(scripts, Dockerfiles, etc.) | Redacción: ajustes de formato a un tono formal y corrección de errores ortográficos. Revision coherencia: Verificacion de coherencia con los documentos previos. **Nota: Se reescribio el 89% del documento.** | Gabriel Rendon |
+| Gpt 5.6 Sol / Claude Sonnet 5 | Backend (Generación supervisada) | Backend: Se utilizó IA para la creación del Backend para acelerar el proceso, debido a falta de tiempo. La IA fue supervisada en todo momento, asegurando no cometer errores, supervisada por Thiago Ferragut y recibió apoyo de Emiliano Sánchez | Thiago Ferragut |
+
 ---
 
 <br><br>
@@ -60,6 +61,6 @@
 | --- | --- |
 | Emiliano Sánchez – Líder/Scrum Master. | Emiliano Sánchez - 04/08/26 |
 | Gabriel Rendon – Subcoordinador. | Gabriel Rendon - 04/08/26 |
-| Ignacio Viera – Desarrollador Frontend/Backend. | Ignacio Viera - 04/08/26 |
-| Maximiliano Leal – Desarrollador Frontend/Backend. | Maximiliano Leal - 04/08/26 |
 | Thiago Ferragut – Desarrollador Frontend/Backend. | Thiago Ferragut - 04/08/26 |
+
+Justes: Eliminar a Maximo y Ignacio, y arreglar el primer parrafo, o una nota con el detalle de que se genero codigo con IA. >Cumplido.
