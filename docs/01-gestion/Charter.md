@@ -126,3 +126,12 @@
 
 ### Criterios de éxito: 
 **El proyecto será exitoso cuando la plataforma permita gestionar talleres, alumnos y asistencias de forma organizada, segura y accesible, cumpliendo con las necesidades del cliente.**
+
+Arreglo:
+      - Documento de Control de cambios.
+      - Documento de reconstruccion del servidor.
+      - Ajustar todos los documentos. >En proceso.
+      - Arreglar el documento de "infraestructura-docker", Separar la parte del codigo, de docker. >Cumplido a espera de
+         verificacion.
+      - REVISAR TODOS LOS DOCUMENTOS. ASEGURATE DE LA INFORMACION EN LOS DOCUMENTOS, COINCIDA CON LOS TITULOS. >En proceso.
+      - Arreglar el documento de Justificacion tecnologia. >Cumplido a espera de verificacion.

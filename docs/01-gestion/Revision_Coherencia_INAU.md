@@ -421,3 +421,5 @@ El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez com
         ↓
 12. Testing integral y completar testing.md
 ```
+
+Ajuste: Revisa y corregir.

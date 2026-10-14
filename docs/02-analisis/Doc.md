@@ -581,3 +581,6 @@ Cada historia incluirá criterios de aceptación para saber cuándo puede consid
 | 5 | 9-10 | 11 | Dentro del límite (11) | R5 |
 | 6 | 11-12 | 9 | Dentro del límite (11) | R6 |
 | **Total** | **12 semanas** | **63** | | **6 reportes** |
+
+
+Ajuste: Facilitar el entendimiento. **Llevar al lector de la mano**. >En proceso.
