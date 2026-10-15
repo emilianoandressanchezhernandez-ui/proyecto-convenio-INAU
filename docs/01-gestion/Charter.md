@@ -12,8 +12,6 @@
 ### Equipo: 
 > -Emiliano Sánchez: Líder / Scrum Master <br>
 > -Gabriel Rendon: Subcoordinador <br>
-> -Ignacio Viera: desarrollador Frontend y Backend <br>
-> -Maximiliano Leal: desarrollador Frontend y Backend <br>
 > -Thiago Ferragut: desarrollador Frontend y Backend 
 
 ---
@@ -127,7 +125,7 @@
 ### Criterios de éxito: 
 **El proyecto será exitoso cuando la plataforma permita gestionar talleres, alumnos y asistencias de forma organizada, segura y accesible, cumpliendo con las necesidades del cliente.**
 
-Arreglo:
+Arreglos:
       - Documento de Control de cambios.
       - Documento de reconstruccion del servidor.
       - Ajustar todos los documentos. >En proceso.
@@ -135,3 +133,6 @@ Arreglo:
          verificacion.
       - REVISAR TODOS LOS DOCUMENTOS. ASEGURATE DE LA INFORMACION EN LOS DOCUMENTOS, COINCIDA CON LOS TITULOS. >En proceso.
       - Arreglar el documento de Justificacion tecnologia. >Cumplido a espera de verificacion.
+      - Arquitectura propuesta, HACER ESTE DOCUMENTO.
+      - Entrevistas (notas del equipo pre y post entrevistas) >Extraer la informacion del doc. y usarla para crear este documento.
+      - Acta de cierre. >Hacer el acta de cierre.

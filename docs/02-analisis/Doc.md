@@ -53,9 +53,6 @@
 | --- | --- | --- |
 | Usuario experto | Lemuel Szwec González, tallerista | Explica el proceso operativo actual y las necesidades del rol tallerista dentro de la plataforma. |
 | Equipo de desarrollo | Emiliano Sánchez, líder de equipo | Relevar necesidades y transformar la información en backlog. |
-| Equipo de desarrollo | Maximiliano Leal, desarrollador FE | Relevar necesidades y transformar la información en backlog. |
-
-
 
 <br>
 
@@ -415,7 +412,7 @@ La secuencia 91 → 76 → 63 refleja dos ajustes sucesivos: el primero por la e
 | Duración | 12 semanas (6 sprints de 2 semanas cada uno). |
 | Metodología | Scrum, con 6 sprints de 2 semanas. |
 | Entregas | Incremento funcional al final de cada sprint. |
-| Forma de trabajo | Equipo de 5 integrantes (Emiliano Sánchez — Líder/Scrum Master, Gabriel Rendon — Subcoordinador, Ignacio Viera, Maximiliano Leal, Thiago Ferragut), con reuniones periódicas de seguimiento y reparto de tareas por sprint. |
+| Forma de trabajo | Equipo de 5 integrantes (Emiliano Sánchez — Líder/Scrum Master, Gabriel Rendon — Subcoordinador, Thiago Ferragut), con reuniones periódicas de seguimiento y reparto de tareas por sprint. |
 | Primera versión | Autenticación por rol, gestión de usuarios y talleres (incluyendo consulta de datos sensibles y del listado de alumnos por taller), registro y consulta de asistencia, carga/entrega/corrección/eliminación de material y tareas, reportes de asistencia/talleres/alumnos/talleristas, gestión de perfil. |
 | Exclusiones | Foros, soporte multiformato (PNG/MP4), asistencia detallada por métricas, listado e historial ampliado de tareas entregadas, notificaciones automáticas, mensajería administrador-tallerista, eliminación de asistencia, modificación de material ya subido, visualización de notas por el alumno, histórico de calificaciones, ficha detallada de alumnos, eliminación de datos de perfil. |
 

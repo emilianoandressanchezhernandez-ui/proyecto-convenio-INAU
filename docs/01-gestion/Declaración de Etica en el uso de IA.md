@@ -62,5 +62,3 @@
 | Emiliano Sánchez – Líder/Scrum Master. | Emiliano Sánchez - 04/08/26 |
 | Gabriel Rendon – Subcoordinador. | Gabriel Rendon - 04/08/26 |
 | Thiago Ferragut – Desarrollador Frontend/Backend. | Thiago Ferragut - 04/08/26 |
-
-Justes: Eliminar a Maximo y Ignacio, y arreglar el primer parrafo, o una nota con el detalle de que se genero codigo con IA. >Cumplido.

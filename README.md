@@ -8,8 +8,6 @@ Aplicación web para la gestión de talleres socioeducativos realizados en conve
 
 - Emiliano Sánchez (Coordinador)
 - Gabriel Rendon (Subcoordinador)
-- Ignacio Viera
-- Maximiliano Leal
 - Thiago Ferragut
 
 ---
