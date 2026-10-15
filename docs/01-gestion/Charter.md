@@ -129,10 +129,12 @@ Arreglos:
       - Documento de Control de cambios.
       - Documento de reconstruccion del servidor.
       - Ajustar todos los documentos. >En proceso.
+      - REVISAR TODOS LOS DOCUMENTOS. ASEGURATE DE LA INFORMACION EN LOS DOCUMENTOS, COINCIDA CON LOS TITULOS. >En proceso. Haces esto <:
+      - Acta de cierre. >Hacer el acta de cierre.
+      - Acta de reuniones y Declaracion de Etica de IA.
+
+Cumplido:
       - Arreglar el documento de "infraestructura-docker", Separar la parte del codigo, de docker. >Cumplido a espera de
          verificacion.
-      - REVISAR TODOS LOS DOCUMENTOS. ASEGURATE DE LA INFORMACION EN LOS DOCUMENTOS, COINCIDA CON LOS TITULOS. >En proceso.
       - Arreglar el documento de Justificacion tecnologia. >Cumplido a espera de verificacion.
-      - Arquitectura propuesta, HACER ESTE DOCUMENTO.
-      - Entrevistas (notas del equipo pre y post entrevistas) >Extraer la informacion del doc. y usarla para crear este documento.
-      - Acta de cierre. >Hacer el acta de cierre.
+      - Entrevistas (notas del equipo pre y post entrevistas) >Extraer la informacion del doc. y usarla para crear este documento. >Cumplido a espera de verificacion.

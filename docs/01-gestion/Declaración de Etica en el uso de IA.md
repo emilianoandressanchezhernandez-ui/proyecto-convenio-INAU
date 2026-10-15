@@ -4,6 +4,8 @@
 
 ### Nombre del proyecto: *TheNewfutures - Proyecto Sistema de Gestión de Talleres en Convenio con INAU*
 
+### Fecha: 04/08/26
+
 ---
 
 ### Equipo (integrantes):
@@ -16,12 +18,6 @@
 
 <br>
 
-### Fecha: *04/08/26*
-
----
-
-<br>
-
 ### Declaración:
 
 >Declaramos que el contenido de la documentación entregada es de nuestra autoría exclusiva como equipo. Las herramientas de Inteligencia Artificial (IA) fueron utilizadas únicamente como apoyo a la redacción, la investigación teórica y la creación de ilustraciones, según el detalle indicado abajo, y no fueron utilizadas para generar los contenidos del proyecto en nuestro lugar.
@@ -29,7 +25,7 @@
 >Entendemos que el uso no ético de IA, de ser detectado, tiene consecuencias académicas que asumimos como equipo.
 ---
 
-<br><br>
+<br>
 
 ## Detalle de uso de IA utilizadas:
 

@@ -194,3 +194,5 @@ El sistema debe permitir la emisión de los siguientes reportes:
 
 - *Criterio de Aceptación:* El cliente validará el sistema cuando este sea plenamente funcional en la operativa del día a día, cumpliendo con las características requeridas.
 - *Plazo de Entrega:* Finales del año en curso.
+
+> **Trazabilidad.** Los requerimientos derivados de esta entrevista están formalizados en `docs/02-analisis/requerimientos.md`, y su trazabilidad hacia el modelo (qué clase y tabla resuelve cada uno) se documenta en `docs/03-diseño/Modelado/Análisis del Modelo.md`.
