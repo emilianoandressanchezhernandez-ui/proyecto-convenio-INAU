@@ -7,8 +7,6 @@
 - Emiliano Sanchez
 - Gabriel Rendon
 - Thiago Ferragut
-- Maximiliano Leal
-- Ignacio Viera
 
 ---
 

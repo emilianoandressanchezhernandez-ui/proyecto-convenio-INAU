@@ -1,9 +1,9 @@
 # Proyecto Sistema de Gestión de Talleres en Convenio con INAU — Acta de Reuniones
 
-<br>
+
 <br>
 
-**Primera entrega**
+## Primera entrega - Face 1
 
 | ID | Fecha | Modalidad | Asistentes | Temas tratados | Temas pendientes | Acuerdos | Desacuerdos |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -15,7 +15,7 @@
 
 <br>
 
-**Segunda entrega**
+## Segunda entrega - Face 2
 
 | ID | Fecha | Modalidad | Asistentes | Temas tratados | Temas pendientes | Acuerdos | Desacuerdos |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -23,6 +23,14 @@
 | **R-07** | Segunda semana | Virtual | Equipo completo: Emiliano Sánchez, Gabriel Rendon, Thiago Ferragut | Retrasos en el frontend y ajuste en el alcance. | Backend y distribución de tareas secundarias(Thiago Ferragut terminar frontend, Gabriel Rendon completar documentacion, Emiliano Sánchez rama de ciberseguridad). | Reducir el alcance de la primera versión y reorganizar la lógica del frontend. | Ninguno. |
 | **R-08** | Tercera semana | Presencial | Equipo no completo: Gabriel Rendon, Thiago Ferragut | Distribución de tareas (documentación para la rama de ciberseguridad y ajustes menores en el frontend). | Comenzar con el backend y base de datos. | Thiago Ferragut: ajustes del frontend. | Ninguno. |
 | **R-09** | Semana pre-segunda entrega | Presencial | Equipo completo: Emiliano Sánchez, Gabriel Rendon, Thiago Ferragut | Tareas pendientes para la segunda entrega (base de datos, backend y documentación). | Ninguno. | Se asignaron las últimas tareas pendientes entre los integrantes del equipo: Thiago Ferragut, base de datos. Gabriel Rendon, diagramas UML y MER, y backend. Emiliano Sánchez, apoyo en backend y base de datos. | Ninguno. |
+
+<br>
+
+## Tercera entrega - Face 3
+
+| ID | Fecha | Modalidad | Asistentes | Temas tratados | Temas pendientes | Acuerdos | Desacuerdos |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+
 
 <br>
 
