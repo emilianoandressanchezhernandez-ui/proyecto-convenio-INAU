@@ -42,10 +42,7 @@
 | Seguridad y datos | ¿Qué datos personales de alumnos y talleristas se manejan? ¿Cuáles se consideran sensibles? |
 | Plazo | ¿Cuándo necesitan tener una primera versión funcionando? |
 
-
-
 <br>
-
 
 ## 4. Participantes de la entrevista
 
@@ -53,126 +50,84 @@
 | --- | --- | --- |
 | Usuario experto | Lemuel Szwec González, tallerista | Explica el proceso operativo actual y las necesidades del rol tallerista dentro de la plataforma. |
 | Equipo de desarrollo | Emiliano Sánchez, líder de equipo | Relevar necesidades y transformar la información en backlog. |
-| Equipo de desarrollo | Maximiliano Leal, desarrollador FE | Relevar necesidades y transformar la información en backlog. |
-
-
 
 <br>
 
-## 5. Anotaciones de la entrevista con el cliente
+## 5. Entrevista al cliente (reconstrucción)
 
-### 1. Definición del Problema y Necesidad Principal
+> **Nota:** esta es una **reconstrucción aproximada** de la entrevista, armada a partir de las notas tomadas durante la reunión. **No es una transcripción literal:** reordena en forma de diálogo lo que quedó registrado. Donde la entrevista no definió algo, así se deja constancia; no se agrega información que no se haya relevado. Participan **Emiliano Sánchez** (entrevistador) y **Lemuel Szwec González** (tallerista, experto consultado).
 
-El problema principal a resolver es la falta de una plataforma web centralizada que otorgue acceso a estudiantes, talleristas y administradores a funciones específicas que faciliten, mejoren, aseguren la privacidad y avancen en términos de accesibilidad, disponibilidad y organización.
+### Roles y usuarios
 
-Actualmente, el proceso presenta fallas en la accesibilidad y facilidad al momento de ejecutar las tareas operativas. Se busca optimizar su funcionalidad integral.
+**Entrevistador:** ¿Qué roles van a existir dentro de la plataforma, y qué puede hacer cada uno?
 
+**Lemuel:** Son tres: alumno, tallerista y administrador. El **alumno** ve el material, las tareas y la información de sus talleres, sus notas y sus datos personales; puede enviar entregas, cambiar su contraseña y editar algo de su perfil (foto, biografía), pero no modificar una entrega ya enviada. El **tallerista** ve solo lo de su taller —material, tareas, lista de alumnos, asistencias y ciertos datos del estudiante—: publica material, asigna y corrige tareas, pone notas, registra asistencia y manda informes a la administración, y puede ajustar o borrar material, calificaciones y asistencias de su taller. El **administrador** ve y gestiona todo, con una excepción: no modifica directamente datos personales como la cédula.
 
-### 2. Visión del Sistema
+### Talleres
 
-Se proyecta alcanzar una plataforma con características similares a la plataforma Crea, estructurada para que:
+**Entrevistador:** ¿Cómo se organiza un taller? ¿Un tallerista puede tener varios talleres, o un taller varios talleristas?
 
-- *Alumnos:* Accedan a sus talleres, tareas, información académica y foros.
-- *Talleristas:* Publiquen material, compartan información, evalúen, gestionen entregas y lleven el control de asistencia.
-- *Administradores:* Tengan visibilidad y control global de las actividades y eventos dentro del sistema.
+**Lemuel:** Cada taller tiene su material, sus tareas, su lista de alumnos y su asistencia, y el tallerista trabaja solo sobre el suyo. La relación exacta entre talleristas y talleres no la cerramos en la reunión; queda para definir con el equipo.
 
-(Nota: En el proceso actual no se especificó la metodología exacta con la que se realizan estas tareas hoy en día).
+### Participantes
 
+**Entrevistador:** ¿Cómo se identifica a cada alumno? ¿Se inscribe a un taller o a varios?
 
-### 3. Definición de Roles y Permisos de Usuario
+**Lemuel:** El alumno accede a "sus talleres", en plural, así que la idea es que pueda estar en más de uno. La forma exacta de identificarlo dentro del sistema no la detallamos.
 
-#### 3.1. Alumno
+### Asistencia
 
-- *Visualización:* Materiales, tareas e información de sus respectivos talleres; sus notas asignadas por el tallerista y su información personal.
-- *Acciones/Carga:* Consultas y envío de archivos requeridos para la entrega de tareas.
-- *Modificación:* Cambio de contraseña y edición limitada de ciertos elementos del perfil. Sin acceso a modificar los archivos de entregas una vez enviados.
-- *Eliminación:* Edición/eliminación de ciertos datos de su perfil (ej. foto de perfil, biografía).
+**Entrevistador:** ¿Cómo se registra la asistencia? ¿Por clase, por día, por taller?
 
-#### 3.2. Tallerista
+**Lemuel:** El tallerista pasa lista en su taller, indicando la fecha, y después puede consultar o corregir lo cargado. Lo básico es registrar quién asistió en cada jornada. Un control más fino, con historial y métricas, sería deseable pero para más adelante, no para la primera versión.
 
-- *Visualización:* Únicamente la información correspondiente a su taller (materiales, tareas, listado de alumnos inscritos, asistencias y ciertos datos del estudiante).
-- *Acciones/Carga:* Publicar material didáctico, asignar y corregir tareas, comunicarse con los alumnos, registrar asistencia de su taller e ingresar notas e informes para la administración.
-- *Modificación:* Ajuste de materiales de su taller, registros de asistencia y calificaciones asignadas a los alumnos.
-- *Eliminación:* Borrado de materiales, calificaciones e historial de asistencias de su taller.
+### Material y tareas
 
-#### 3.3. Administrador
+**Entrevistador:** ¿Qué tipo de contenido suben los talleristas? ¿Cómo entregan los alumnos?
 
-- *Visualización:* Acceso integral a toda la información del sistema, observando y supervisando el orden y el uso adecuado de la plataforma.
-- *Acciones/Carga:* Gestión completa para subir, modificar, eliminar y consultar cualquier información (con excepción de la modificación directa de datos personales de los usuarios como el número de cédula).
+**Lemuel:** El tallerista sube material y asigna tareas; al principio no fijamos restricciones finas de formato o tamaño. El alumno entra, ve lo que hay y sube el archivo de su entrega. Soportar varios formatos —PDF, imágenes, video— estaría bueno, pero no es imprescindible en el arranque.
 
+### Foros
 
-### 4. Alcance del Proyecto
+**Entrevistador:** ¿Qué esperan de un foro? ¿Por taller, general, o incluye a las familias?
 
-#### 4.1. Alcance de la Primera Versión (MVP)
+**Lemuel:** Lo pensamos por taller: un espacio con imágenes y novedades que puedan ver los usuarios y también sus familias. De todos modos, lo tenemos como funcionalidad deseable para una etapa futura.
 
-- Operatividad general y funcional de la plataforma.
-- Capacidades para que los talleristas suban material y asignen tareas (sin especificar inicialmente restricciones de imágenes, datos o archivos extra).
-- Módulo para el pase de lista / control de asistencias por parte de los talleristas.
-- Interfaz para que los alumnos visualicen los contenidos y envíen sus entregas.
-- Panel de administración con acceso y supervisión global del sistema.
+### Usuarios técnicos
 
-#### 4.2. Funcionalidades Deseables (Fases Futuras)
+**Entrevistador:** ¿Quiénes van a usar el sistema en el día a día?
 
-- *Foros por Taller:* Espacios interactivos donde se puedan publicar imágenes y novedades para ser visualizados por los usuarios y sus familiares.
-- *Soporte Multiformato:* Compatibilidad para la subida de archivos tipo PDF, PNG, MP4 y JPG.
-- *Módulo Avanzado de Asistencia:* Control detallado e historial de asistencia con métricas semanales, mensuales, anuales, etc.
-- *Canal de Comunicación Interna:* Envío de informes directos de los talleristas hacia la administración.
+**Lemuel:** Los tres roles: administradores, talleristas y alumnos. Si hubiera otro personal, no lo definimos en la reunión.
 
+### Infraestructura
 
-### 5. Requerimientos de Información y Auditoría
+**Entrevistador:** ¿Desde qué dispositivos se va a acceder? ¿Hay conectividad estable donde se dictan los talleres?
 
-#### 5.1. Registros Obligatorios
+**Lemuel:** Lo importante es que se pueda usar desde cualquier dispositivo —computadora, tablet o teléfono—, adaptándose a la pantalla. Los detalles de infraestructura y de conectividad no los relevamos en esta entrevista.
 
-El sistema deberá registrar:
+### Seguridad y datos
 
-- Usuarios y contraseñas.
-- Asistencias.
-- Elementos enviados y subidos.
-- Informes generados.
-- Traza de archivos subidos, modificados o eliminados.
-- Datos de contacto de los talleristas e información personal de cada usuario.
+**Entrevistador:** ¿Qué datos personales se manejan? ¿Cuáles consideran sensibles?
 
-#### 5.2. Consultas y Protección de Datos
+**Lemuel:** Datos de las cuentas —usuarios y contraseñas—, datos de contacto de los talleristas e información personal de cada usuario, incluida la cédula. Son sensibles y hay que protegerlos: acceso por rol, y el administrador debe poder consultar qué datos sensibles se usan. No fijamos un nivel de seguridad específico, pero la protección de datos es obligatoria.
 
-- Consulta de datos sensibles utilizados.
+### Plazo y criterio de aceptación
 
+**Entrevistador:** ¿Cuándo necesitan una primera versión? ¿Cuándo la darían por buena?
 
-### 6. Generación de Reportes
+**Lemuel:** Para finales de año. La damos por válida cuando funcione en la operativa del día a día y cumpla con lo pedido.
 
-El sistema debe permitir la emisión de los siguientes reportes:
+### Visión general
 
-- Listas de alumnos.
-- Mapeo de talleres y sus respectivos talleristas asignados.
-- Histórico de calificaciones de alumnos.
-- Información detallada de alumnos y talleristas.
-- Reportes emitidos por los talleristas.
-- Registros de asistencias.
-- Listado e historial de tareas entregadas.
+**Entrevistador:** En una frase, ¿a qué les gustaría que se pareciera?
 
+**Lemuel:** A algo tipo la plataforma Crea: que el alumno entre a sus talleres y tareas; que el tallerista publique material, evalúe, lleve asistencia y se comunique; y que la administración tenga visión completa de todo. Hoy el proceso falla justo en eso: en que la información esté accesible, disponible y ordenada en un solo lugar.
 
-### 7. Requerimientos No Funcionales
-
-- *Notificaciones:* El sistema deberá emitir notificaciones automáticas ante eventos relevantes (correcciones de tareas, faltas de asistencia, nuevas entregas, etc.).
-- *Integración / Módulos no especificados:* (No especificado en la entrevista).
-- *Seguridad y Protección de Datos:* Aunque no se definió un nivel de seguridad específico, se exige el cumplimiento obligatorio de medidas para la protección de los datos de los usuarios.
-- *Rendimiento:* Se requiere un tiempo de respuesta rápido en la ejecución de tareas habituales.
-- *Multiplataforma y Accesibilidad:* Diseño adaptable a todos los dispositivos, permitiendo el acceso remoto desde cualquier ubicación.
-- *Disponibilidad:* Sistema disponible en modalidad 24/7.
-- *Marco Legal y Reglas de Negocio:*
- - Las reglas de negocio no fueron especificadas en la entrevista.
- - Las restricciones legales no fueron detalladas en la entrevista.
-
-
-### 8. Criterios de Aceptación y Plazos
-
-- *Criterio de Aceptación:* El cliente validará el sistema cuando este sea plenamente funcional en la operativa del día a día, cumpliendo con las características requeridas.
-- *Plazo de Entrega:* Finales del año en curso.
+> **Temas que quedaron sin definir en la entrevista** (registrados como pendientes): la metodología con la que se trabaja hoy, la relación exacta tallerista–taller, la forma de identificar al alumno, la infraestructura y conectividad, el riesgo operativo, las reglas de negocio y las restricciones legales.
 
 ---
 
-
 <br>
-
 
 ## 6. Información obtenida en la entrevista
 
@@ -187,7 +142,6 @@ El sistema debe permitir la emisión de los siguientes reportes:
 | Seguridad | Acceso por roles, protección de datos sensibles de los usuarios. |
 | Riesgo operativo | No se especificó. |
 | Restricción técnica | No se especificó. |
-
 
 
 <br>
@@ -234,8 +188,8 @@ El sistema debe permitir la emisión de los siguientes reportes:
 15. Consulta de datos sensibles utilizados en la plataforma por parte del administrador.
 16. Consulta del listado de alumnos inscritos en el taller por parte del tallerista.
 
->Nota: este alcance corresponde a la definición inicial, previa al ajuste por plazo. 
->Seis funciones fueron postergadas posteriormente; ver la sección 16.
+>Nota: este alcance corresponde a la definición inicial, previa al ajuste por plazo.
+>Seis funciones fueron postergadas posteriormente; ver la sección 14, Paso 2.
 
 ---
 
@@ -318,54 +272,59 @@ El sistema debe permitir la emisión de los siguientes reportes:
 
 ## 13. Épicas
 
+> Una **épica** es un grupo grande de funciones relacionadas. Para organizar el trabajo, todo el sistema se dividió en 6 épicas.
+
 | Código | Épica | Descripción |
 | --- | --- | ---|
-| **EP1** | Autenticación y control de acceso | Permitir el ingreso seguro y diferenciado a la plataforma según el rol del usuario. |
-| **EP2** | Gestión de usuarios y talleres | Administrar los usuarios (alumnos, talleristas) y su relación con los talleres, incluyendo la consulta de datos sensibles y del listado de alumnos por taller. |
-| **EP3** | Gestión de asistencia | Registrar, controlar y eliminar la asistencia de los alumnos a los talleres. |
-| **EP4** | Gestión de material y tareas | Permitir la carga, modificación, entrega, corrección, eliminación y visualización de material, tareas y notas de cada taller. |
-| **EP5** | Reportes e informes | Generar y exportar información consolidada de asistencia, talleres, alumnos y talleristas, incluyendo el histórico de calificaciones. |
-| **EP6** | Gestión de perfil de usuario | Permitir a cada usuario administrar su propia información personal.|
-
-
-<br>
-
-
-## 14. Estimación por Épica
-
-
-| Código | Épica | Estimación en puntos |
-| --- | --- | --- |
-| **EP1** | Autenticación y control de acceso | 8 |
-| **EP2** | Gestión de usuarios y talleres | 18 |
-| **EP3** | Gestión de asistencia | 10 |
-| **EP4** | Gestión de material y tareas | 30 |
-| **EP5** | Reportes e informes | 22 |
-| **EP6** | Gestión de perfil de usuario | 3 |
-| **EP Totales** | **6 EP** | **91** |
+| EP1 | Autenticación y control de acceso | Permitir el ingreso seguro y diferenciado a la plataforma según el rol del usuario. |
+| EP2 | Gestión de usuarios y talleres | Administrar los usuarios (alumnos, talleristas) y su relación con los talleres, incluyendo la consulta de datos sensibles y del listado de alumnos por taller. |
+| EP3 | Gestión de asistencia | Registrar, controlar y eliminar la asistencia de los alumnos a los talleres. |
+| EP4 | Gestión de material y tareas | Permitir la carga, modificación, entrega, corrección, eliminación y visualización de material, tareas y notas de cada taller. |
+| EP5 | Reportes e informes | Generar y exportar información consolidada de asistencia, talleres, alumnos y talleristas, incluyendo el histórico de calificaciones. |
+| EP6 | Gestión de perfil de usuario | Permitir a cada usuario administrar su propia información personal. |
 
 <br>
 
+## 14. Esfuerzo estimado y cómo se ajustó
 
-## 15. Estimación por Épicas, ajustadas
+> **¿Qué es un "punto"?** Es una medida de esfuerzo relativo —qué tan grande o difícil es una función comparada con otra—, **no una cantidad de horas**. Sirve para planificar cuánto trabajo entra en cada quincena.
 
-| Código | Épica | RF que la conforman | Puntos |
-|---|---|---|---|
-| **EP1** | Autenticación y control de acceso | RF01 | 8 |
-| **EP2** | Gestión de usuarios y talleres | RF02, RF03, RF24, RF25 | 18 |
-| **EP3** | Gestión de asistencia | RF04, RF05 | 7 |
-| **EP4** | Gestión de material y tareas | RF06, RF07, RF08, RF09, RF10, RF16, RF17 | 24 |
-| **EP5** | Reportes e informes | RF11, RF12, RF13, RF19, RF22 | 17 |
-| **EP6** | Gestión de perfil de usuario | RF14 | 2 |
-| **Total** | | **20 RF** | **76** |
+El esfuerzo total se estimó al inicio y se corrigió **dos veces** a medida que el plan se afinaba. El recorrido fue **91 → 76 → 63 puntos**, en tres pasos:
 
-<br>
+### Paso 1 — Primera estimación: 91 puntos
 
-### 15.1 Reconciliación con el backlog
+Se le asignó un valor a cada épica como bloque completo, "a ojo", antes de conocer su detalle interno. Con las 26 funciones originales, el total daba 91 puntos.
 
-La estimación por épicas y la suma de las historias de usuario arrojan totales distintos. La diferencia no responde a un error de cálculo, sino a que corresponden a dos momentos del análisis:
+| Épica | Puntos |
+| --- | ---: |
+| EP1 — Autenticación y control de acceso | 8 |
+| EP2 — Gestión de usuarios y talleres | 18 |
+| EP3 — Gestión de asistencia | 10 |
+| EP4 — Gestión de material y tareas | 30 |
+| EP5 — Reportes e informes | 22 |
+| EP6 — Gestión de perfil de usuario | 3 |
+| **Total** | **91** |
 
-| Épica | Estimación por épica | Suma de sus historias | Diferencia |
+### Paso 2 — Se recortan 6 funciones para entrar en el plazo: quedan 76 puntos
+
+Para respetar las 12 semanas, 6 funciones se dejaron para más adelante. Estas son:
+
+| Función excluida | Épica |
+| --- | --- |
+| Eliminación de datos de perfil del alumno (foto, biografía) | EP6 |
+| Eliminación de un registro de asistencia | EP3 |
+| Informe con histórico de calificaciones | EP5 |
+| Informe con información detallada de alumnos | EP5 |
+| Visualización de notas por parte del alumno | EP4 |
+| Modificación de material o tareas ya subidas | EP4 |
+
+En conjunto, esas 6 funciones representaban **15 puntos** (EP3 −3, EP4 −6, EP5 −5, EP6 −1). Al quitarlas, el total baja de 91 a **76 puntos**, repartidos entre 20 funciones.
+
+### Paso 3 — Se desglosa en historias de usuario y se recalcula: 63 puntos
+
+Al partir cada épica en historias de usuario concretas (ver sección 19), varias resultaron más chicas de lo estimado "a ojo". El total afinado baja a **63 puntos**. La diferencia se concentra en EP2 y EP4, que eran las más grandes y, por lo tanto, las más inciertas al inicio:
+
+| Épica | Estimado a ojo (paso 2) | Sumando sus historias (paso 3) | Diferencia |
 |---|---:|---:|---:|
 | EP1 — Autenticación y control de acceso | 8 | 8 | — |
 | EP2 — Gestión de usuarios y talleres | 18 | 13 | −5 |
@@ -375,39 +334,17 @@ La estimación por épicas y la suma de las historias de usuario arrojan totales
 | EP6 — Gestión de perfil de usuario | 2 | 2 | — |
 | **Total** | **76** | **63** | **−13** |
 
-La estimación por épicas se realizó de forma descendente, asignando un valor al bloque completo antes de conocer su composición interna. La estimación del backlog es ascendente: parte de cada historia ya descompuesta, con su requerimiento de origen identificado.
+> **Nota:** la fila de EP3 pasa de 10 (paso 1) a 7 (paso 2) al quitarse su función excluida; lo mismo ocurre con EP4, EP5 y EP6. Por eso el paso 3 parte de 76 y no de 91.
 
-Al descomponer las épicas en historias, varias resultaron sobreestimadas. La diferencia se concentra en EP2 y EP4, que son las de mayor alcance y, por lo tanto, las que presentaban mayor incertidumbre en la estimación inicial.
+### Qué número se usa para planificar
 
-**Criterio adoptado:** se toman los **63 puntos del backlog** como base de planificación y de cálculo de costos, por tratarse de la estimación con mayor nivel de detalle. Los valores por épica se conservan como registro del proceso de estimación.
-
-Esta decisión resulta además necesaria para la viabilidad del plan: con un límite de 11 puntos por sprint, los seis sprints ofrecen una capacidad máxima de 66 puntos. Los 63 puntos del backlog entran dentro de ese margen; los 76 de la estimación por épicas lo excederían, haciendo inviable el cronograma.
-
-La secuencia 91 → 76 → 63 refleja dos ajustes sucesivos: el primero por la exclusión de seis requerimientos para respetar el plazo (sección 16), y el segundo por el refinamiento que produjo la descomposición en historias de usuario.
-
----
-
-<br>
-
-
-## 16. Ajuste de alcance para respetar plazo.
-
-| RF | Épica de origen | Función excluida |
-|---|---|---|
-| **RF15** | EP6 | Eliminación de datos de perfil (foto, biografía) por parte del alumno |
-| **RF18** | EP3 | Eliminación de un registro de asistencia |
-| **RF20** | EP5 | Generación de informe con histórico de calificaciones |
-| **RF21** | EP5 | Generación de informe con información detallada de alumnos |
-| **RF23** | EP4 | Visualización de notas por parte del alumno |
-| **RF26** | EP4 | Modificación de material/tareas ya subidas |
-
-**Total: 6 funciones excluidas.**
+Se planifica con los **63 puntos**, por ser la estimación más detallada. Además es la única que entra en el cronograma: 6 quincenas × 11 puntos de capacidad = **66 puntos máximos**. Los 63 entran en ese margen; los 76 lo excederían y harían inviable el plazo.
 
 
 <br>
 
 
-## 17. Propuesta presentada al cliente
+## 15. Propuesta presentada al cliente
 
 | Elemento | Propuesta |
 | --- | --- |
@@ -415,7 +352,7 @@ La secuencia 91 → 76 → 63 refleja dos ajustes sucesivos: el primero por la e
 | Duración | 12 semanas (6 sprints de 2 semanas cada uno). |
 | Metodología | Scrum, con 6 sprints de 2 semanas. |
 | Entregas | Incremento funcional al final de cada sprint. |
-| Forma de trabajo | Equipo de 5 integrantes (Emiliano Sánchez — Líder/Scrum Master, Gabriel Rendon — Subcoordinador, Ignacio Viera, Maximiliano Leal, Thiago Ferragut), con reuniones periódicas de seguimiento y reparto de tareas por sprint. |
+| Forma de trabajo | Equipo de 3 integrantes (Emiliano Sánchez — Líder/Scrum Master, Gabriel Rendon — Subcoordinador, Thiago Ferragut), con reuniones periódicas de seguimiento y reparto de tareas por sprint. |
 | Primera versión | Autenticación por rol, gestión de usuarios y talleres (incluyendo consulta de datos sensibles y del listado de alumnos por taller), registro y consulta de asistencia, carga/entrega/corrección/eliminación de material y tareas, reportes de asistencia/talleres/alumnos/talleristas, gestión de perfil. |
 | Exclusiones | Foros, soporte multiformato (PNG/MP4), asistencia detallada por métricas, listado e historial ampliado de tareas entregadas, notificaciones automáticas, mensajería administrador-tallerista, eliminación de asistencia, modificación de material ya subido, visualización de notas por el alumno, histórico de calificaciones, ficha detallada de alumnos, eliminación de datos de perfil. |
 
@@ -423,31 +360,31 @@ La secuencia 91 → 76 → 63 refleja dos ajustes sucesivos: el primero por la e
 <br>
 
 
-## 18. Estimación de costos
+## 16. Estimación de costos
 
 > **Nota:** El costo está estimado en forma simplificada, como estimación didáctica. En un proyecto real, el presupuesto dependería de tarifas, tecnología, infraestructura, contratos, licencias, soporte y mantenimiento.
 
 | Concepto | Detalle | Costo |
 | --- | --- | --- |
-| **Recursos humanos** | 5 integrantes × 6 h semanales × 12 semanas = 360 h, a USD 12/h (perfil junior) | USD 4.320 |
+| **Recursos humanos** | 3 integrantes × 6 h semanales × 12 semanas = 216 h, a USD 12/h (perfil junior) | USD 2.592 |
 | **Hosting** | Plan compartido con soporte PHP y MySQL, USD 5 mensuales | USD 60 / año |
 | **Dominio** | Registro anual `.uy` o `.com` | USD 15 / año |
 | **Certificado SSL** | Incluido en el hosting (Let's Encrypt) | USD 0 |
 | **Herramientas y licencias** | Git/GitHub, VS Code, XAMPP, Bootstrap, PHP y MySQL: todas libres o gratuitas | USD 0 |
-| **Total primer año** | | **USD 4.395** |
+| **Total primer año** | | **USD 2.667** |
 | **Mantenimiento anual posterior** | Hosting + dominio | **USD 75 / año** |
 
-**Costo por punto de esfuerzo:** USD 4.320 ÷ 63 puntos ≈ **USD 68,6 por punto**. Este indicador permite estimar funcionalidades futuras: una historia de 3 puntos equivale aproximadamente a USD 206, y una de 5 puntos, a USD 343.
+**Costo por punto de esfuerzo:** USD 2.592 ÷ 63 puntos ≈ **USD 41,1 por punto**. Este indicador permite estimar funcionalidades futuras: una historia de 3 puntos equivale aproximadamente a USD 123, y una de 5 puntos, a USD 206.
 
 ---
 
-## 19. Aprobación ficticia del cliente
+## 17. Aprobación ficticia del cliente
 
 Luego de revisar la propuesta, el cliente responde:
 
 > "La propuesta está dentro del presupuesto máximo que habíamos previsto. Nos parece correcto empezar por una versión inicial.
 >
-> Lo más importante para nosotros es que los talleristas puedan registrar la asistencia y subir el material sin complicaciones, y que la administración pueda ver en todo momento qué está pasando en cada taller. 
+> Lo más importante para nosotros es que los talleristas puedan registrar la asistencia y subir el material sin complicaciones, y que la administración pueda ver en todo momento qué está pasando en cada taller.
 >
 >Entendemos que algunas funciones, como los foros y las notificaciones automáticas, queden para más adelante.
 >
@@ -457,7 +394,7 @@ Aprobamos el proyecto con 6 ciclos de trabajo de 2 semanas. Queremos participar 
 
 <br>
 
-## 20. Formato de historia de usuario
+## 18. Formato de historia de usuario
 
 Se utilizará el siguiente formato:
 
@@ -469,7 +406,7 @@ Cada historia incluirá criterios de aceptación para saber cuándo puede consid
 
 <br>
 
-## 21. Historias de Usuario iniciales.
+## 19. Historias de Usuario iniciales.
 
 | Código | Épica | RF | Historia de Usuario | Puntos | Prioridad |
 | --- | --- | --- | --- | --- | --- |
@@ -499,7 +436,7 @@ Cada historia incluirá criterios de aceptación para saber cuándo puede consid
 
 <br>
 
-## 22. Backlog priorizado
+## 20. Backlog priorizado
 
 ### Sprint 1 (Semanas 1-2)
 
@@ -532,6 +469,7 @@ Cada historia incluirá criterios de aceptación para saber cuándo puede consid
 | HU20 | RF14 | Como usuario, quiero modificar mi contraseña y datos de perfil, para mantenerlos actualizados. | 2 | Media |
 
 **Subtotal: 10 puntos**
+
 
 
 ### Sprint 4 (Semanas 7-8)
@@ -570,7 +508,7 @@ Cada historia incluirá criterios de aceptación para saber cuándo puede consid
 
 ---
 
-### 22.1 Backlog priorizado: Resumen de puntos por sprint
+### 20.1 Backlog priorizado: Resumen de puntos por sprint
 
 | Sprint | Semanas | Puntos | Estado | Reporte quincenal |
 | --- | --- | --- | --- | --- |

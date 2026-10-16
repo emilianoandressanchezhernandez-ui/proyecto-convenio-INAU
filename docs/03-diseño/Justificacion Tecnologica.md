@@ -1,10 +1,11 @@
-# Justificación Tecnológica y Arquitectura
+# Justificación Tecnológica y Arquitectura - Sistema de Gestión de Talleres en Convenio con INAU
 
-## Sistema de Gestión de Talleres en Convenio con INAU
-
----
+<br>
+<br>
 
 ## 1. Stack tecnológico
+
+<br>
 
 ### 1.1 Frontend
 
@@ -15,8 +16,10 @@
 | **Bootstrap 5.3** | Diseño responsive y componentes | La propuesta del proyecto admitía Tailwind o Bootstrap; se optó por Bootstrap por su curva de aprendizaje más accesible y su sistema de componentes predefinidos, que reduce el tiempo de desarrollo — factor crítico dado el plazo de 12 semanas. Resuelve directamente NRF01. |
 | **Bootstrap Icons** | Iconografía | Consistencia visual sin necesidad de gestionar íconos sueltos, integrado con el mismo framework. |
 | **JavaScript Vanilla** | Comportamiento dinámico | Establecido en la propuesta original del proyecto. Evita la curva de aprendizaje de un framework, priorizando que el equipo comprenda y mantenga su propio código. |
-| **localStorage** | Persistencia temporal | Solución provisional para demostración mientras no existe backend. No reemplaza la base de datos, no ofrece seguridad real y no almacena contraseñas. |
-| **Mock data** | Simulación de datos | Permite construir y validar la lógica de las tres interfaces sin depender de que el backend esté terminado. |
+| **localStorage** | Persistencia temporal | Solución provisional para la demostración mientras no existe backend (ver sección 3). |
+| **Mock data** | Simulación de datos | Datos simulados que permiten construir y validar la lógica de las tres interfaces sin depender del backend (ver sección 3). |
+
+<br>
 
 ### 1.2 Backend (previsto)
 
@@ -30,17 +33,24 @@
 
 > **Nota:** la propuesta original del proyecto presenta una ambigüedad entre PHP puro, indicado en su stack tecnológico, y Laravel, mencionado en su plantilla de README. Esta definición se encuentra pendiente de resolución con el docente y el equipo.
 
+<br>
+
 ### 1.3 Herramientas de desarrollo
 
 | Herramienta | Justificación |
 |---|---|
-| **Git / GitHub** | Requisito obligatorio del proyecto. Permite trazabilidad de cambios y trabajo simultáneo del equipo de 5 integrantes. Cumple NRF15 y NRF16. |
+| **Git / GitHub** | Requisito obligatorio del proyecto. Permite trazabilidad de cambios y trabajo simultáneo del equipo. Cumple NRF15 y NRF16. |
 | **Visual Studio Code** | Entorno gratuito, liviano y ampliamente documentado, adecuado para un equipo en formación. |
 | **XAMPP / servidor local** | Simula un entorno PHP + MySQL en el equipo de cada integrante durante el desarrollo, sin requerir hosting hasta el despliegue. |
 
 ---
 
+<br>
+
+
 ## 2. Arquitectura del sistema
+
+<br>
 
 ### 2.1 Visión general
 
@@ -69,45 +79,12 @@ El sistema se compone de **interfaces web diferenciadas por rol** y un **backend
       └───────────────┘             └──────────────────┘
 ```
 
+
 ### 2.2 Estructura del repositorio
 
-```text
-proyecto-convenio-INAU/
-│
-├── index.html                    → Pantalla de login única
-├── README.md
-│
-├── backend/
-│   └── DataBase/
-│       └── inau_talleres.sql     → Script de creación de la base de datos
-│
-├── docs/                         → Documentación organizada por etapa
-│   ├── 01-gestion/               → Actas de reuniones, charter, declaración de IA
-│   ├── 02-analisis/              → Documento principal, requerimientos, planificación
-│   ├── 03-diseño/                → Identidad visual, justificación tecnológica
-│   │   └── Modelado/             → Modelo de clases y MER, anexo, análisis
-│   ├── 04-implementacion/        → Documentación de API y de pruebas
-│   └── ciberseguridad/           → Identificación de amenazas
-│
-└── frontend/
-    ├── frontend-admin/
-    │   ├── css/styles.css
-    │   ├── js/ (main, utils, mock-data, auth + 1 archivo por pantalla)
-    │   └── 11 páginas HTML
-    │
-    ├── frontend-tallerista/
-    │   ├── css/styles.css
-    │   ├── js/ (main, utils, mock-data + 1 archivo por pantalla)
-    │   └── 9 páginas HTML
-    │
-    └── frontend-alumno/
-        ├── css/styles.css
-        └── 7 páginas HTML
-```
 
-**Diferencia respecto a la plantilla original:** la propuesta del proyecto ubicaba `frontend-admin/` y `frontend-tallerista/` en la raíz del repositorio. El equipo optó por agruparlos dentro de una carpeta `frontend/` común, para mantener la raíz más limpia y facilitar la distinción entre las capas del sistema (frontend, backend, documentación). Se agregó además `frontend-alumno/`, correspondiente al tercer rol incorporado tras el relevamiento con el cliente.
+La estructura completa del repositorio —el árbol de carpetas y la justificación de su organización— se documenta en `docs/Estructura del Repositorio.md`.
 
-La documentación, por su parte, se organiza en carpetas numeradas según la etapa del proyecto a la que corresponde cada documento, en lugar de mantenerse plana como en la plantilla original. La numeración garantiza que el listado respete el orden lógico del proceso en lugar del alfabético, decisión adoptada ante el volumen de documentos generados durante el análisis.
 
 ### 2.3 Organización del código JavaScript
 
@@ -124,6 +101,8 @@ Esta organización cumple NRF13 y permite que distintos integrantes trabajen en 
 
 ---
 
+<br>
+
 ## 3. Decisiones arquitectónicas
 
 **Login único con redirección por rol.** En lugar de tres pantallas de acceso independientes, existe un único `index.html`. El backend identificará el rol del usuario autenticado y lo redirigirá al panel correspondiente. Reduce duplicación de código y cumple RF01.
@@ -138,48 +117,23 @@ Esta organización cumple NRF13 y permite que distintos integrantes trabajen en 
 
 ---
 
+<br>
+
 ## 4. Modelo de datos
 
-El modelo de datos del sistema se deriva del modelo de clases mediante el método de derivación en cinco pasos, documentado en `docs/03-diseño/Modelado/`. Consta de trece tablas: once de entidad y dos intermedias.
-
-| Tabla | Contenido |
-|---|---|
-| `usuarios` | Credenciales, datos de acceso y rol. Absorbe a administradores, talleristas y cuentas de alumno mediante la columna discriminadora `rol` |
-| `alumnos` | Ficha del participante, independiente de su cuenta de acceso |
-| `talleres` | Información general de cada taller |
-| `taller_tallerista` | Relación N:M entre talleres y talleristas, con la fecha de asignación |
-| `horarios_taller` | Franjas de día y hora en que se dicta cada taller |
-| `inscripciones` | Relación N:M entre talleres y alumnos, con la fecha de inscripción |
-| `asistencias` | Cabecera de cada jornada de asistencia, identificada por taller y fecha |
-| `registros_asistencia` | Detalle del estado de cada alumno dentro de una jornada |
-| `contenidos` | Material y tareas publicados en cada taller, diferenciados por la columna `tipo` |
-| `entregas` | Envío de un alumno para una tarea, con su corrección y calificación |
-| `adjuntos` | Archivos asociados a un contenido o a una entrega, con sus metadatos |
-| `reportes` | Informes generados, con su tipo, formato y contenido consolidado |
-| `trazabilidad` | Registro de las acciones relevantes ejecutadas por los usuarios (NRF10) |
-
-**Diferencia respecto a la propuesta original del proyecto.** El modelo mínimo establecido por la propuesta contemplaba diez tablas, entre ellas `roles`, `talleristas`, `participantes`, `taller_participante`, `mensajes_internos` e `historial_actividad`. El modelo definitivo difiere en cuatro aspectos:
-
-- **`roles` y `talleristas` no se implementan como tablas independientes.** El rol constituye un conjunto cerrado de tres valores sin atributos ni comportamiento propios, por lo que se resuelve como enumeración dentro de `usuarios`. El tallerista, por su parte, aporta un único atributo propio (`especialidad`), lo que no justifica una tabla separada.
-- **`mensajes_internos` no se incorpora**, dado que la mensajería quedó fuera del alcance de la primera versión.
-- **Se agregan `contenidos` y `entregas`**, necesarias para RF06 a RF10. El modelo mínimo no contemplaba estructura alguna para almacenar material, tareas ni calificaciones.
-- **La asistencia se divide en dos niveles**, `asistencias` y `registros_asistencia`, dado que la fecha corresponde a la jornada completa mientras que el estado corresponde a cada alumno en particular.
-
-La justificación completa de estas decisiones se encuentra en el Paso 5 del anexo de derivación.
+El modelo de datos se deriva del modelo de clases mediante el método de derivación en cinco pasos. Consta de trece tablas: once de entidad y dos intermedias. Su detalle tabla por tabla, y la justificación de las diferencias respecto al modelo mínimo de la propuesta original, se encuentran en `docs/03-diseño/Modelado/` —en particular, en el Paso 5 del anexo de derivación.
 
 ---
 
+<br>
+
 ## 5. Organización del trabajo
+
+<br>
 
 ### 5.1 Roles del equipo
 
-| Integrante | Rol |
-|---|---|
-| Emiliano Sánchez | Líder de proyecto / Scrum Master |
-| Gabriel Rendon | Subcoordinador |
-| Ignacio Viera | Desarrollo Frontend y Backend |
-| Maximiliano Leal | Desarrollo Frontend y Backend |
-| Thiago Ferragut | Desarrollo Frontend y Backend |
+La composición del equipo y la asignación de roles se detallan en el Project Charter (`docs/01-gestion/Charter.md`).
 
 ### 5.2 Control de versiones
 
@@ -196,6 +150,8 @@ La justificación completa de estas decisiones se encuentra en el Paso 5 del ane
 - **Reporte de avance quincenal**, coincidente con el cierre de cada sprint.
 
 ---
+
+<br>
 
 ## 6. Alineación con los requerimientos no funcionales
 
@@ -217,6 +173,8 @@ La justificación completa de estas decisiones se encuentra en el Paso 5 del ane
 
 ---
 
+<br>
+
 ## 7. Estado actual de la implementación
 
 | Componente | Estado |
@@ -230,3 +188,5 @@ La justificación completa de estas decisiones se encuentra en el Paso 5 del ane
 | Documentación técnica | Análisis, diseño y modelado completos. `api.md` y `testing.md` pendientes de contenido |
 
 Esta justificación tecnológica seguirá vigente durante el desarrollo del backend, momento en el que se evaluará si las herramientas previstas (PHP, MySQL) siguen siendo las más adecuadas según los avances del equipo.
+
+>Pendiente: Revisar por Diego.

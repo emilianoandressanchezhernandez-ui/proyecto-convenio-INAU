@@ -12,8 +12,6 @@
 ### Equipo: 
 > -Emiliano Sánchez: Líder / Scrum Master <br>
 > -Gabriel Rendon: Subcoordinador <br>
-> -Ignacio Viera: desarrollador Frontend y Backend <br>
-> -Maximiliano Leal: desarrollador Frontend y Backend <br>
 > -Thiago Ferragut: desarrollador Frontend y Backend 
 
 ---
@@ -126,3 +124,17 @@
 
 ### Criterios de éxito: 
 **El proyecto será exitoso cuando la plataforma permita gestionar talleres, alumnos y asistencias de forma organizada, segura y accesible, cumpliendo con las necesidades del cliente.**
+
+Arreglos:
+      - Documento de Control de cambios.
+      - Documento de reconstruccion del servidor.
+      - Ajustar todos los documentos. >En proceso.
+      - REVISAR TODOS LOS DOCUMENTOS. ASEGURATE DE LA INFORMACION EN LOS DOCUMENTOS, COINCIDA CON LOS TITULOS. >En proceso. Haces esto <:
+      - Acta de cierre. >Hacer el acta de cierre.
+      - Acta de reuniones y Declaracion de Etica de IA.
+
+Cumplido:
+      - Arreglar el documento de "infraestructura-docker", Separar la parte del codigo, de docker. >Cumplido a espera de
+         verificacion.
+      - Arreglar el documento de Justificacion tecnologia. >Cumplido a espera de verificacion.
+      - Entrevistas (notas del equipo pre y post entrevistas) >Extraer la informacion del doc. y usarla para crear este documento. >Cumplido a espera de verificacion.
