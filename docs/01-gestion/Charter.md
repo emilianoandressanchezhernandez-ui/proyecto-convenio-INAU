@@ -130,8 +130,9 @@ Arreglos:
       - Documento de reconstruccion del servidor.
       - Ajustar todos los documentos. >En proceso.
       - REVISAR TODOS LOS DOCUMENTOS. ASEGURATE DE LA INFORMACION EN LOS DOCUMENTOS, COINCIDA CON LOS TITULOS. >En proceso. Haces esto <:
-      - Acta de cierre. >Hacer el acta de cierre.
+      - Hacer el Acta de Cierre.
       - Acta de reuniones y Declaracion de Etica de IA.
+      - Hacer el resumen de los sprints, Cierre del proyecto, y Anexo en el doc.
 
 Cumplido:
       - Arreglar el documento de "infraestructura-docker", Separar la parte del codigo, de docker. >Cumplido a espera de
