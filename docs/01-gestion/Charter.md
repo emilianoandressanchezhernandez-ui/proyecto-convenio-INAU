@@ -127,7 +127,7 @@
 
 Arreglos:
       - Documento de Control de cambios.
-      - Documento de reconstruccion del servidor. >Completado, revisar y crear el otro documento de reconstruccion.
+      - Documento de reconstruccion del servidor. >Completado y falta mostrar al resto del equipo.
       - Ajustar todos los documentos. >En proceso.
       - REVISAR TODOS LOS DOCUMENTOS. ASEGURATE DE LA INFORMACION EN LOS DOCUMENTOS, COINCIDA CON LOS TITULOS. >En proceso. Haces esto <:
       - Hacer el Acta de Cierre.

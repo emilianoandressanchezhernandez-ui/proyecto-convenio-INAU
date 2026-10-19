@@ -29,10 +29,10 @@
 ## Tercera entrega — Fase 3
 
 | ID | Fecha | Modalidad | Asistentes | Temas tratados | Temas pendientes | Acuerdos | Desacuerdos |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| **R-10** | Tercera parte del proyecto (Primera semana) | Presencial | Equipo completo: Emiliano Sánchez, Gabriel Rendon, Thiago Ferragut | Estado del proyecto (avances en la documentación y el código). | Conectar el frontend con el backend, completar la documentación. | Thiago Ferragut realiza la conexión del frontend con el backend; se suben todos los cambios al main. | Ninguno. |
-| **R-11** | Tercera parte del proyecto (Segunda semana) | Presencial | Equipo no completo: Gabriel Rendon, Thiago Ferragut | Estado del proyecto (tiempos y estimación de plazos). | Preparar la defensa del proyecto. | Terminar el proyecto; antes, preparar la defensa. | Ninguno. |
-| **R-12** | Tercera parte del proyecto (Tercera semana) | Presencial | Equipo completo: Emiliano Sánchez, Gabriel Rendon, Thiago Ferragut | Estado del proyecto y preparación para la defensa. | Revisar la coherencia entre la documentación y el código. | Subir todo al main y revisar los documentos. | Ninguno. |
+|---|---|---|---|---|---|---|---|
+| **R-10** | Tercera parte del proyecto (primera semana) | Presencial | Equipo completo: Emiliano Sánchez, Gabriel Rendon y Thiago Ferragut. | Revisión del estado del proyecto, incluidos los avances en la documentación y el código. | Conectar el frontend con el backend y completar la documentación. | Thiago Ferragut se encargará de conectar el frontend con el backend. Gabriel Rendon completará la documentación del proyecto. Emiliano Sánchez completará la documentación correspondiente a la electiva de ciberseguridad y preparará la distribución de la defensa. Se acordó subir todos los cambios a la rama `main`. | Ninguno. |
+| **R-11** | Tercera parte del proyecto (segunda semana) | Presencial | Equipo incompleto: Gabriel Rendon y Thiago Ferragut. | Revisión del estado del proyecto, los tiempos de trabajo y la estimación de los plazos. | Preparar la defensa del proyecto. | Se acordó continuar trabajando en el proyecto antes de comenzar con la preparación de la defensa. | Ninguno. |
+| **R-12** | Tercera parte del proyecto (tercera semana) | Presencial | Equipo completo: Emiliano Sánchez, Gabriel Rendon y Thiago Ferragut. | Revisión grupal del estado general del proyecto. | Verificar la coherencia entre la documentación y el código. | Se acordó subir los cambios a la rama `main` y revisar la documentación para asegurar su coherencia con el código. | Ninguno. |
 
 <br>
 
