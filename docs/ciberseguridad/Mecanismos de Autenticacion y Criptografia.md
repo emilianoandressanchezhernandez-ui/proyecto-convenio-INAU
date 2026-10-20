@@ -1,7 +1,11 @@
+// ACTUALIZAR CUANDO SE COMPLETE LA CONEXIÓN CON LA API
+
+# Proyecto: TheNewfutures – Plataforma de gestión de talleres en convenio con INAU - Rama de Ciberseguridad 
+
+<br>
+
 # Mecanismos de Autenticación y Criptografía
 
-**Proyecto:** TheNewfutures — Sistema de Gestión de Talleres en Convenio con INAU  
-**Área:** Ciberseguridad  
 **Fecha de elaboración:** 10 de octubre de 2026  
 
 ---
