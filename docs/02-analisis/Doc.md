@@ -725,3 +725,84 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 | Después del Sprint 5 | La administración dispone de informes exportables. |
 | Después del Sprint 6 | Se cierra el alcance de la primera versión. |
 | Cierre | Las seis funciones postergadas por plazo (RF15, RF18, RF20, RF21, RF23 y RF26) quedan para etapas futuras. |
+
+---
+
+<br>
+
+## 23. Actividades de cierre
+
+Al finalizar el proyecto, el equipo realiza las siguientes actividades:
+
+1. Presentación final al cliente.
+2. Validación de los requerimientos cumplidos.
+3. Entrega de acceso al sistema.
+4. Entrega de guía básica de uso.
+5. Capacitación breve a usuarios principales.
+6. Revisión de pendientes y mejoras futuras.
+7. Registro de lecciones aprendidas.
+8. Cierre formal del proyecto.
+
+---
+
+<br>
+
+## 24. Requerimientos cumplidos al cierre
+
+| Área | Requerimientos | Estado |
+| --- | --- | --- |
+| Autenticación y acceso por rol | RF01 | Cumplido. |
+| Gestión de usuarios y talleres | RF02, RF03 | Cumplido. |
+| Registro y corrección de asistencia | RF04, RF05 | Cumplido. |
+| Material, tareas y entregas | RF06, RF07, RF08 | Cumplido. |
+| Corrección y calificación | RF09, RF10, RF16, RF17 | Cumplido. |
+| Informes y exportación | RF11, RF12, RF13, RF19, RF22 | Cumplido. |
+| Gestión de perfil | RF14 | Cumplido. |
+| Datos sensibles y listado por taller | RF24, RF25 | Cumplido. |
+| Funciones postergadas por plazo | RF15, RF18, RF20, RF21, RF23, RF26 | Pendiente para fase futura. |
+| Foros, notificaciones y mensajería interna | Alcance excluido | Pendiente para fase futura. |
+| Soporte multiformato y asistencia avanzada | Alcance excluido | Pendiente para fase futura. |
+
+---
+
+<br>
+
+## 25. Lecciones aprendidas (Sprint Retrospective)
+
+| Lección | Explicación |
+| --- | --- |
+| La necesidad inicial no alcanza para construir el sistema | El cliente planteó una idea general; la entrevista permitió definir roles, permisos, alcance y prioridades. |
+| Sin retroalimentación del cliente, el alcance queda fijo | Al no haber Sprint Reviews con el cliente, los requerimientos no pudieron validarse ni ajustarse durante el desarrollo; todo dependió de la entrevista inicial. |
+| La estimación gruesa tiende a sobreestimar | La estimación por épicas (91 y luego 76 puntos) se redujo a 63 al descomponer el trabajo en historias de usuario. |
+| No todo entra en la primera versión | Seis funciones se postergaron para respetar el plazo de doce semanas. |
+| El modelado revela requerimientos faltantes | Al derivar el modelo de clases se detectaron requerimientos presentes en la entrevista que la especificación no había recogido. |
+| El cierre no significa que el producto no pueda evolucionar | El sistema queda operativo y se identifican mejoras futuras. |
+
+---
+
+<br>
+
+## 26. Glosario breve
+
+| Término | Explicación |
+| --- | --- |
+| Cliente | Persona u organización que necesita el sistema. En este proyecto, INAU. |
+| Patrocinador (sponsor) | Persona u organización que aprueba el presupuesto, las prioridades y las decisiones importantes. |
+| Stakeholder | Persona afectada por el sistema o interesada en sus resultados. |
+| Tallerista | Persona a cargo de dictar un taller: publica material, corrige tareas y registra la asistencia. |
+| Requerimiento funcional (RF) | Acción o función que el sistema debe realizar. |
+| Requerimiento no funcional (NRF) | Condición de calidad, seguridad, rendimiento, usabilidad o restricción técnica que el sistema debe cumplir. |
+| Épica | Funcionalidad grande que se divide en historias de usuario más pequeñas. |
+| Historia de usuario | Descripción breve de una necesidad desde el punto de vista de un usuario, con el formato "Como…, quiero…, para…". |
+| Punto | Medida de esfuerzo relativo de una historia comparada con otras; no equivale a horas. |
+| Product Backlog | Lista priorizada del trabajo pendiente del producto. |
+| Scrum | Marco de trabajo ágil que organiza el desarrollo en iteraciones cortas con entregas incrementales. |
+| Sprint | Iteración corta de trabajo; en este proyecto, de dos semanas. |
+| Sprint Planning | Reunión donde se decide qué historias se harán en el sprint. |
+| Incremento | Parte funcional del producto que se entrega al final de un sprint. |
+| Sprint Review | Revisión del incremento con el cliente o los interesados al cierre de un sprint. |
+| Primera versión (MVP) | Versión inicial del sistema con las funciones mínimas necesarias para que resulte útil. |
+| Función postergada | Requerimiento que forma parte del proyecto pero se dejó para una etapa futura para respetar el plazo. |
+| Alcance excluido | Funcionalidades que el cliente mencionó pero que no forman parte de la primera versión. |
+| Trazabilidad | Registro de las acciones importantes realizadas en el sistema: quién hizo qué y cuándo. |
+| Cierre | Etapa final en la que se valida el producto, se documenta y se registran los pendientes futuros. |
