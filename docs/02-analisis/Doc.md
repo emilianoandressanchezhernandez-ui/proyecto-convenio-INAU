@@ -438,6 +438,8 @@ Cada historia incluirá criterios de aceptación para saber cuándo puede consid
 
 ## 20. Backlog priorizado
 
+<br>
+
 ### Sprint 1 (Semanas 1-2)
 
 | Código | RF | Historia de Usuario | Puntos | Prioridad |
@@ -519,3 +521,288 @@ Cada historia incluirá criterios de aceptación para saber cuándo puede consid
 | 5 | 9-10 | 11 | Dentro del límite (11) | R5 |
 | 6 | 11-12 | 9 | Dentro del límite (11) | R6 |
 | **Total** | **12 semanas** | **63** | | **6 reportes** |
+
+---
+
+<br>
+
+## 21. Planificación de sprints
+
+Esta sección detalla el objetivo, el incremento esperado y el resultado de cada sprint. Las historias de usuario asignadas a cada uno, con sus puntos y prioridades, figuran en el backlog priorizado (sección 20).
+
+<br>
+
+### 21.1 Sprint 1 (Semanas 1-2): Acceso al sistema y asignación a talleres
+
+#### Objetivo del sprint
+
+Construir la base del sistema: inicio de sesión con acceso diferenciado por rol y vinculación de alumnos y talleristas con sus talleres.
+
+#### Historias seleccionadas
+
+HU01 y HU03 — **11 puntos** (detalle en la sección 20, Sprint 1).
+
+#### Incremento esperado
+
+Al finalizar el sprint, el sistema permitirá:
+
+- Iniciar sesión con usuario y contraseña.
+- Acceder únicamente a las funciones correspondientes al propio rol (alumno, tallerista o administrador).
+- Asignar alumnos y talleristas a un taller, de modo que cada uno acceda solo a la información que le corresponde.
+
+#### Sprint Review
+
+Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
+
+#### Resultado del sprint:
+
+---
+
+### 21.2 Sprint 2 (Semanas 3-4): Gestión de usuarios, talleres y asistencia
+
+#### Objetivo del sprint
+
+Permitir al administrador gestionar alumnos, talleristas y talleres, y al tallerista registrar, consultar y corregir la asistencia de su taller.
+
+#### Historias seleccionadas
+
+HU02, HU06 y HU07 — **11 puntos** (detalle en la sección 20, Sprint 2).
+
+#### Incremento esperado
+
+Al finalizar el sprint, el sistema permitirá:
+
+- Crear, modificar, eliminar y consultar alumnos, talleristas y talleres, manteniendo actualizada la información de la plataforma.
+- Registrar la asistencia de los alumnos de un taller en una fecha determinada.
+- Consultar y modificar la asistencia ya registrada, para corregir errores de carga sin duplicar el registro.
+
+#### Sprint Review
+
+Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
+
+#### Resultado del sprint:
+
+
+---
+
+### 21.3 Sprint 3 (Semanas 5-6): Material, tareas y entregas
+
+#### Objetivo del sprint
+
+Habilitar el circuito básico de contenidos: el tallerista publica material y tareas, el alumno los consulta y envía sus entregas, y cada usuario gestiona su perfil.
+
+#### Historias seleccionadas
+
+HU08, HU09, HU10 y HU20 — **10 puntos** (detalle en la sección 20, Sprint 3).
+
+#### Incremento esperado
+
+Al finalizar el sprint, el sistema permitirá:
+
+- Subir material de estudio y asignar tareas a un taller.
+- Que el alumno vea el material y las tareas de su taller y sepa qué debe entregar.
+- Que el alumno envíe los archivos de una tarea asignada, completando su entrega dentro de la plataforma.
+- Que cada usuario modifique su contraseña y algunos datos de su perfil.
+
+#### Sprint Review
+
+Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
+
+#### Resultado del sprint:
+
+---
+
+### 21.4 Sprint 4 (Semanas 7-8): Corrección, calificación y depuración de contenidos
+
+#### Objetivo del sprint
+
+Completar el ciclo de evaluación: el tallerista corrige entregas, asigna y elimina notas, y retira material que ya no corresponde.
+
+#### Historias seleccionadas
+
+HU11, HU12, HU13 y HU14 — **11 puntos** (detalle en la sección 20, Sprint 4).
+
+#### Incremento esperado
+
+Al finalizar el sprint, el sistema permitirá:
+
+- Corregir las tareas entregadas por los alumnos y dar seguimiento a su desempeño.
+- Asignar una nota a cada alumno por tarea entregada, registrando formalmente su evaluación.
+- Eliminar material del taller que ya no corresponde mostrar.
+- Eliminar la nota asignada a un alumno, para corregir un registro erróneo.
+
+#### Sprint Review
+
+Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
+
+#### Resultado del sprint
+
+---
+
+### 21.5 Sprint 5 (Semanas 9-10): Informes y exportación
+
+#### Objetivo del sprint
+
+Dar a la administración una visión consolidada: informes de asistencia por taller y de talleres con sus talleristas, exportables a PDF o Excel.
+
+#### Historias seleccionadas
+
+HU15, HU16 y HU17 — **11 puntos** (detalle en la sección 20, Sprint 5).
+
+#### Incremento esperado
+
+Al finalizar el sprint, el sistema permitirá:
+
+- Generar un informe de asistencia por taller, para supervisar la participación sin revisar cada registro manualmente.
+- Generar un informe de talleres con sus talleristas asignados, con una visión general de la organización de la plataforma.
+- Exportar los informes generados en PDF o Excel, para compartirlos fuera de la plataforma.
+
+#### Sprint Review
+
+Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
+
+#### Resultado del sprint
+
+---
+
+### 21.6 Sprint 6 (Semanas 11-12): Consultas complementarias y cierre
+
+#### Objetivo del sprint
+
+Cerrar el alcance de la primera versión con las consultas restantes: datos sensibles, listado de alumnos por taller, listado general de alumnos e informe de talleristas.
+
+#### Historias seleccionadas
+
+HU04, HU05, HU18 y HU19 — **9 puntos** (detalle en la sección 20, Sprint 6).
+
+#### Incremento esperado
+
+Al finalizar el sprint, el sistema permitirá:
+
+- Consultar los datos sensibles utilizados en la plataforma, para supervisar su correcto uso y protección.
+- Que el tallerista consulte el listado de alumnos inscritos en su taller.
+- Generar un listado de alumnos, como registro consolidado de todos los inscritos.
+- Generar un informe con información detallada de los talleristas, como registro consolidado del personal a cargo de los talleres.
+
+#### Sprint Review
+
+Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
+
+#### Resultado del sprint
+
+---
+
+<br>
+
+## 22. Resumen de los sprints
+
+### 22.1 Tabla general de sprints
+
+| Sprint | Objetivo | Incremento entregado | Puntos | Resultado |
+| --- | --- | --- | --- | --- |
+| Sprint 1 | Acceso al sistema y asignación a talleres | Inicio de sesión por rol y asignación de alumnos y talleristas a talleres | 11 | Completado |
+| Sprint 2 | Gestión de usuarios, talleres y asistencia | Gestión de alumnos, talleristas y talleres; registro y corrección de asistencia | 11 | Completado |
+| Sprint 3 | Material, tareas y entregas | Publicación de material y tareas, consulta y entrega del alumno, gestión de perfil | 10 | Completado |
+| Sprint 4 | Corrección, calificación y depuración | Corrección de entregas, asignación y eliminación de notas, eliminación de material | 11 | Completado |
+| Sprint 5 | Informes y exportación | Informes de asistencia y de talleres, exportación a PDF o Excel | 11 | Completado |
+| Sprint 6 | Consultas complementarias y cierre | Consulta de datos sensibles, listados de alumnos e informe de talleristas | 9 | Completado |
+| **Total** | | | **63** | |
+
+---
+
+### 22.2 Evolución del proyecto
+
+| Momento | Estado |
+| --- | --- |
+| Inicio | Solo existe una necesidad general del cliente. |
+| Después de la entrevista | Se conocen el alcance, los usuarios, los roles y las prioridades. |
+| Después de las épicas | El trabajo se organiza en seis grandes bloques funcionales. |
+| Después del backlog | El equipo cuenta con veinte historias priorizadas y estimadas en 63 puntos. |
+| Después del Sprint 1 | Existe una base funcional con acceso por rol y asignación a talleres. |
+| Después del Sprint 2 | Se gestionan usuarios y talleres, y se registra la asistencia. |
+| Después del Sprint 3 | Funciona el circuito de material, tareas y entregas. |
+| Después del Sprint 4 | Se completa el ciclo de corrección y calificación. |
+| Después del Sprint 5 | La administración dispone de informes exportables. |
+| Después del Sprint 6 | Se cierra el alcance de la primera versión. |
+| Cierre | Las seis funciones postergadas por plazo (RF15, RF18, RF20, RF21, RF23 y RF26) quedan para etapas futuras. |
+
+---
+
+<br>
+
+## 23. Actividades de cierre
+
+Al finalizar el proyecto, el equipo realiza las siguientes actividades:
+
+1. Presentación final al cliente.
+2. Validación de los requerimientos cumplidos.
+3. Entrega de acceso al sistema.
+4. Entrega de guía básica de uso.
+5. Capacitación breve a usuarios principales.
+6. Revisión de pendientes y mejoras futuras.
+7. Registro de lecciones aprendidas.
+8. Cierre formal del proyecto.
+
+---
+
+<br>
+
+## 24. Requerimientos cumplidos al cierre
+
+| Área | Requerimientos | Estado |
+| --- | --- | --- |
+| Autenticación y acceso por rol | RF01 | Cumplido. |
+| Gestión de usuarios y talleres | RF02, RF03 | Cumplido. |
+| Registro y corrección de asistencia | RF04, RF05 | Cumplido. |
+| Material, tareas y entregas | RF06, RF07, RF08 | Cumplido. |
+| Corrección y calificación | RF09, RF10, RF16, RF17 | Cumplido. |
+| Informes y exportación | RF11, RF12, RF13, RF19, RF22 | Cumplido. |
+| Gestión de perfil | RF14 | Cumplido. |
+| Datos sensibles y listado por taller | RF24, RF25 | Cumplido. |
+| Funciones postergadas por plazo | RF15, RF18, RF20, RF21, RF23, RF26 | Pendiente para fase futura. |
+| Foros, notificaciones y mensajería interna | Alcance excluido | Pendiente para fase futura. |
+| Soporte multiformato y asistencia avanzada | Alcance excluido | Pendiente para fase futura. |
+
+---
+
+<br>
+
+## 25. Lecciones aprendidas (Sprint Retrospective)
+
+| Lección | Explicación |
+| --- | --- |
+| La necesidad inicial no alcanza para construir el sistema | El cliente planteó una idea general; la entrevista permitió definir roles, permisos, alcance y prioridades. |
+| Sin retroalimentación del cliente, el alcance queda fijo | Al no haber Sprint Reviews con el cliente, los requerimientos no pudieron validarse ni ajustarse durante el desarrollo; todo dependió de la entrevista inicial. |
+| La estimación gruesa tiende a sobreestimar | La estimación por épicas (91 y luego 76 puntos) se redujo a 63 al descomponer el trabajo en historias de usuario. |
+| No todo entra en la primera versión | Seis funciones se postergaron para respetar el plazo de doce semanas. |
+| El modelado revela requerimientos faltantes | Al derivar el modelo de clases se detectaron requerimientos presentes en la entrevista que la especificación no había recogido. |
+| El cierre no significa que el producto no pueda evolucionar | El sistema queda operativo y se identifican mejoras futuras. |
+
+---
+
+<br>
+
+## 26. Glosario breve
+
+| Término | Explicación |
+| --- | --- |
+| Cliente | Persona u organización que necesita el sistema. En este proyecto, INAU. |
+| Patrocinador (sponsor) | Persona u organización que aprueba el presupuesto, las prioridades y las decisiones importantes. |
+| Stakeholder | Persona afectada por el sistema o interesada en sus resultados. |
+| Tallerista | Persona a cargo de dictar un taller: publica material, corrige tareas y registra la asistencia. |
+| Requerimiento funcional (RF) | Acción o función que el sistema debe realizar. |
+| Requerimiento no funcional (NRF) | Condición de calidad, seguridad, rendimiento, usabilidad o restricción técnica que el sistema debe cumplir. |
+| Épica | Funcionalidad grande que se divide en historias de usuario más pequeñas. |
+| Historia de usuario | Descripción breve de una necesidad desde el punto de vista de un usuario, con el formato "Como…, quiero…, para…". |
+| Punto | Medida de esfuerzo relativo de una historia comparada con otras; no equivale a horas. |
+| Product Backlog | Lista priorizada del trabajo pendiente del producto. |
+| Scrum | Marco de trabajo ágil que organiza el desarrollo en iteraciones cortas con entregas incrementales. |
+| Sprint | Iteración corta de trabajo; en este proyecto, de dos semanas. |
+| Sprint Planning | Reunión donde se decide qué historias se harán en el sprint. |
+| Incremento | Parte funcional del producto que se entrega al final de un sprint. |
+| Sprint Review | Revisión del incremento con el cliente o los interesados al cierre de un sprint. |
+| Primera versión (MVP) | Versión inicial del sistema con las funciones mínimas necesarias para que resulte útil. |
+| Función postergada | Requerimiento que forma parte del proyecto pero se dejó para una etapa futura para respetar el plazo. |
+| Alcance excluido | Funcionalidades que el cliente mencionó pero que no forman parte de la primera versión. |
+| Trazabilidad | Registro de las acciones importantes realizadas en el sistema: quién hizo qué y cuándo. |
+| Cierre | Etapa final en la que se valida el producto, se documenta y se registran los pendientes futuros. |

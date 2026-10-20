@@ -46,8 +46,13 @@
 | Claude Opus 5 | Redacción y Revision de Coherencia (Anexo UML y MER, Analisis UML y MER, y Modelado UML y MER) | Redacción: ajustes de formato a un tono formal y corrección de errores ortográficos. Revision coherencia: Verificacion de coherencia con los documentos previos. | Gabriel Rendon |
 | Claude Opus 5 | Redacción y Revision de Coherencia del Documentación de infraestructura(scripts, Dockerfiles, etc.) | Redacción: ajustes de formato a un tono formal y corrección de errores ortográficos. Revision coherencia: Verificacion de coherencia con los documentos previos. **Nota: Se reescribio el 89% del documento.** | Gabriel Rendon |
 | Gpt 5.6 Sol / Claude Sonnet 5 | Backend (Generación supervisada) | Backend: Se utilizó IA para la creación del Backend para acelerar el proceso, debido a falta de tiempo. La IA fue supervisada en todo momento, asegurando no cometer errores, supervisada por Thiago Ferragut y recibió apoyo de Emiliano Sánchez | Thiago Ferragut |
+| GPT-5.6 Luna | Guía y revisión (electiva de ciberseguridad). | Fue utilizado en todo momento para la revisión de coherencia, guía y trayectoria (electiva de ciberseguridad). | Emiliano Sánchez |
+| Claude Opus 4.8 | Documentación (Justificación Tecnológica y Doc). | Fue utilizado para la reducción del contenido innecesario (Justificación Tecnológica), bajo supervisión, y para la generación de una reconstrucción aproximada de la entrevista con el cliente (Doc). La reconstrucción de la entrevista fue usada en el documento **Entrevista**. La reconstrucción fue revisada por el equipo. | Gabriel Rendon |
+| Claude Opus 4.8 | Documentación (Documentos de reconstrucción e Infraestructura Docker). | Se utilizó para la eliminación de contenido innecesario (Infraestructura Docker) y para la redacción y revisión de coherencia de los dos documentos de reconstrucción (Documento de Reconstrucción-Doker desktop y Documento de Reconstrucción-Servidor). Se utilizó IA bajo la supervisión del subcoordinador (Gabriel Rendon). | Gabriel Rendon |
+| Claude Opus 4.8 | Documentación (Acta de Reuniones y Declaración de Ética de IA). | Se utilizó para la revisión de formato (Acta de Reuniones y Declaración de Ética de IA). No se usó la IA para la generación de estos documentos, solo para revisiones de formato y ortografía. | Gabriel Rendon |
 
 ---
+
 
 <br><br>
 
