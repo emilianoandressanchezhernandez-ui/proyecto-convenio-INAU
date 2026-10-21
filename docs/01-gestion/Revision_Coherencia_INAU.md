@@ -1,7 +1,7 @@
 # Revisión integral de coherencia — Proyecto TheNewfutures / INAU
 
-**Fecha de revisión:** 22 de septiembre de 2026
-**Fuente:** rama `main` del repositorio `proyecto-convenio-INAU`.
+**Fecha de revisión:** 15 de octubre de 2026
+**Fuente:** estado consolidado del proyecto — documentación de la rama `cambios-frontend` (última versión) integrada con el código (frontend y backend) presente en `main`, previo a su unificación.
 **Alcance:** documentación, estructura de repositorio, HTML, CSS, JavaScript, PHP y SQL presentes en el repositorio.
 
 > Esta revisión distingue entre lo que está realmente presente en el repositorio, lo que la documentación declara y lo que todavía está planificado. No se considera una implementación como terminada solo porque esté descrita en un documento.
@@ -10,9 +10,9 @@
 
 ## 1. Diagnóstico general
 
-El proyecto tiene una **arquitectura general coherente** y una separación clara entre frontend, backend y documentación. Desde la revisión anterior el cambio más importante es que **el backend dejó de ser una previsión**: `main` incorpora una API REST en PHP con 47 rutas, organizada en capas, con autenticación por token y control de acceso por rol.
+El proyecto tiene una **arquitectura general coherente** y una separación clara entre frontend, backend y documentación. El cambio más importante respecto de revisiones anteriores es que **el backend dejó de ser una previsión**: `main` incorpora una API REST en PHP con 47 rutas, organizada en capas, con autenticación por token y control de acceso por rol.
 
-El frontend del tallerista sigue siendo el bloque más maduro; el del administrador tiene todas sus pantallas con lógica; el del alumno conserva las vistas HTML y CSS pero no tiene JavaScript. La documentación está reorganizada por etapa y casi completa.
+Los tres frontends tienen ya su lógica JavaScript: el del tallerista sigue siendo el más maduro, el del administrador tiene todas sus pantallas con lógica, y **el del alumno —que antes solo tenía HTML y CSS— ya incorpora su carpeta `js/` con los módulos por pantalla**. La documentación está reorganizada por etapa y casi completa.
 
 Los problemas pendientes se concentran en tres frentes: **dos esquemas SQL divergentes conviviendo en el repositorio**, **dos claves secretas publicadas en el código de la API**, y la falta de integración entre el frontend y la API.
 
@@ -20,17 +20,17 @@ Los problemas pendientes se concentran en tres frentes: **dos esquemas SQL diver
 
 | Área | Estado | Observación |
 |---|---|---|
-| Análisis del problema | Completo | Entrevista, análisis, requerimientos, historias de usuario y backlog. |
+| Análisis del problema | Completo | Entrevista (reconstrucción y anotaciones), análisis, requerimientos, historias de usuario y backlog. |
 | Alcance | Definido | Alcance incluido, excluido y ajuste por plazo documentados de forma coherente. |
 | Frontend tallerista | Avanzado | Nueve páginas con lógica completa y datos simulados, incluida la gestión de material y la corrección de entregas. |
 | Frontend administrador | Avanzado | Once páginas y quince módulos de JavaScript funcionales con datos simulados. |
-| Frontend alumno | Inicial | Siete páginas HTML y hoja de estilos; no existe carpeta `js/`. |
+| Frontend alumno | Avanzado | Siete páginas HTML con su carpeta `js/` (diez módulos) y datos simulados. |
 | Login | Pendiente de integración | La API resuelve la autenticación; el frontend todavía no la consume. |
 | Backend PHP | Implementado | 47 rutas en arquitectura por capas, con autenticación JWT y verificación de rol por ruta. |
 | Base de datos | Completa como diseño | Trece tablas con claves, restricciones, índices y datos de prueba. Conviven dos scripts divergentes (ver 4.1). |
 | API REST | Implementada | Sin documentar: `docs/04-implementacion/api.md` está vacío. |
 | Modelo de datos documental | Completo | Modelo de clases, MER, anexo de derivación y análisis del modelo. |
-| Planificación documental | Integrada en Doc.md | El backlog priorizado de los seis sprints está en `Doc.md` (§22). El archivo `planificacion.md` solo contenía un resumen general redundante y se elimina (ver 4.10). |
+| Planificación documental | Integrada en Doc.md | El backlog priorizado de los seis sprints está en `Doc.md` (§20). El archivo `planificacion.md` fue eliminado por redundante (ver 4.10). |
 | Seguridad | Mixta | El control de acceso de la API es sólido; hay dos claves secretas publicadas en el repositorio (ver 4.2). |
 | Infraestructura | Definida como propuesta | Documentación de entorno Docker; el stack todavía no está reflejado en el repositorio. |
 | Identidad visual | Definida | Documentación completa y hojas de estilo por panel. |
@@ -69,6 +69,7 @@ proyecto-convenio-INAU/
 │   │
 │   ├── 02-analisis/
 │   │   ├── Doc.md
+│   │   ├── Entrevista.md
 │   │   └── requerimientos.md
 │   │
 │   ├── 03-diseño/
@@ -100,11 +101,11 @@ proyecto-convenio-INAU/
 |---|---:|---:|---:|
 | Administrador | 11 | 15 | 1 |
 | Tallerista | 9 | 12 | 1 |
-| Alumno | 7 | 0 | 1 |
+| Alumno | 7 | 10 | 1 |
 | Login (raíz) | 1 | 0 | usa CSS del panel tallerista |
-| Backend (PHP) | — | — | 72 archivos en total |
+| Backend (PHP) | — | — | 56 archivos |
 
-**Total: 151 archivos en el repositorio.**
+**Total: más de 160 archivos en el repositorio consolidado.**
 
 El README todavía describe un estado anterior y debe actualizarse.
 
@@ -130,11 +131,9 @@ Existe una arquitectura modular por pantalla y datos simulados más completos qu
 
 ### Alumno
 
-Hay siete páginas: dashboard, mis talleres, detalle del taller, tareas, detalle de tarea, asistencia y perfil.
+Hay siete páginas: dashboard, mis talleres, detalle del taller, tareas, detalle de tarea, asistencia y perfil, y **ya cuentan con su carpeta `js/`** (diez módulos: `mock-data.js`, `utils.js`, `main.js` y un archivo por pantalla), siguiendo la misma estructura modular de los otros dos paneles.
 
-**No existe la carpeta `js/`**, pero las siete páginas referencian cuatro archivos JavaScript cada una (`mock-data.js`, `utils.js`, `main.js` y el módulo propio de la pantalla). En consecuencia, ninguna página del panel del alumno funciona actualmente.
-
-**Conclusión:** la interfaz está diseñada, pero su funcionalidad no está implementada.
+**Conclusión:** el panel del alumno dejó de ser solo maqueta: funciona con datos simulados, pendiente de la migración a la API.
 
 ### API
 
@@ -184,11 +183,11 @@ Esto no afecta el funcionamiento actual, dado que ambas fuentes son independient
 
 **Acción recomendada:** dejar constancia de la divergencia como comentario al inicio de cada `mock-data.js`, de modo que el aviso aparezca frente a quien realice la migración a la API.
 
-### 4.4 El panel del alumno referencia archivos inexistentes
+### 4.4 Panel del alumno — resuelto
 
-Las siete páginas del panel del alumno incluyen etiquetas `<script>` hacia `js/mock-data.js`, `js/utils.js`, `js/main.js` y su módulo correspondiente. Ninguno de esos archivos existe.
+En revisiones anteriores, las siete páginas del panel del alumno referenciaban archivos JavaScript (`js/mock-data.js`, `js/utils.js`, `js/main.js` y su módulo propio) que no existían, por lo que ninguna página funcionaba.
 
-**Acción recomendada:** implementar la carpeta `js/` del panel siguiendo la misma estructura modular de los otros dos, o retirar temporalmente las referencias si la implementación se posterga.
+**Estado actual:** resuelto. El panel ya cuenta con su carpeta `js/` completa (diez módulos), por lo que las páginas funcionan con datos simulados, igual que los otros dos paneles. Resta la migración a la API.
 
 ### 4.5 El login del frontend no consume la API
 
@@ -218,11 +217,11 @@ La tabla de credenciales de `backend/api/README.md` proviene de la plantilla ori
 
 ### 4.9 El README del proyecto no refleja el estado actual
 
-Describe un estado anterior: no incluye el panel del alumno, indica menos archivos de los existentes, no refleja las páginas incorporadas al panel del tallerista y no menciona la API.
+Describe un estado anterior: indica menos archivos de los existentes, sigue referenciando `planificacion.md` (que ya no existe), no refleja las páginas incorporadas al panel del tallerista ni el JavaScript del panel del alumno, y no menciona la API.
 
-### 4.10 Documentación técnica pendiente o perdida
+### 4.10 Documentación técnica pendiente
 
-Tres documentos permanecen vacíos:
+Dos documentos permanecen vacíos:
 
 ```text
 docs/04-implementacion/api.md
@@ -230,8 +229,8 @@ docs/04-implementacion/testing.md
 ```
 
 `api.md` y `testing.md` corresponden a fases posteriores, aunque `api.md` ya cuenta con material disponible: la API está implementada con 47 rutas.
- 
-Caso aparte es `planificacion.md`: figuraba con 0 bytes, pero su contenido **no se perdió**. La planificación real —el backlog priorizado de los seis sprints— está en `Doc.md` (§22); el archivo solo había alojado un resumen general del proyecto, redundante con `Doc.md`. Por eso se resuelve **eliminarlo** en lugar de recuperarlo, y retirar su referencia del README y de la estructura documental.
+
+El archivo `planificacion.md` **ya fue eliminado**: su contenido real —el backlog priorizado de los seis sprints— está en `Doc.md` (§20), y lo que alojaba era un resumen general redundante. Resta únicamente **retirar su referencia del README y de la estructura documental**, que todavía lo mencionan.
 
 ### 4.11 Archivos con nomenclatura irregular o ausentes
 
@@ -259,8 +258,8 @@ De los veintiséis requerimientos definidos, veinte integran el alcance de la pr
 | RF04 | Registrar asistencia | API implementada; frontend avanzado con almacenamiento local. |
 | RF05 | Consultar y modificar asistencia | API implementada; frontend avanzado. |
 | RF06 | Subir material y tareas | API implementada, incluida la carga de adjuntos; frontend tallerista listo. |
-| RF07 | Alumno visualiza material y tareas | API implementada; el panel del alumno no tiene JavaScript. |
-| RF08 | Alumno envía archivos | API implementada; el panel del alumno no tiene JavaScript. |
+| RF07 | Alumno visualiza material y tareas | API implementada; panel del alumno con lógica JavaScript y datos simulados, pendiente la integración. |
+| RF08 | Alumno envía archivos | API implementada; panel del alumno con lógica JavaScript y datos simulados, pendiente la integración. |
 | RF09 | Tallerista corrige tareas | API implementada; frontend implementado en `correccion-tarea.js`. |
 | RF10 | Asignar notas | API implementada, con validación de rango; frontend implementado. |
 | RF11 | Informes de asistencia | Frontend avanzado con datos simulados; sin endpoints de informes en la API. |
@@ -296,7 +295,7 @@ De los veintiséis requerimientos definidos, veinte integran el alcance de la pr
 | NRF01 | Diseño responsive | Implementado mediante Bootstrap y hojas de estilo propias. |
 | NRF02 | Disponibilidad 24 horas | Objetivo de despliegue, aún no demostrable. |
 | NRF03 | Rapidez en operaciones | Índices definidos en el SQL; falta medición objetiva. |
-| NRF04 | Navegación clara y consistente | Avanzado en los paneles implementados. |
+| NRF04 | Navegación clara y consistente | Avanzado en los tres paneles. |
 | NRF05 | Validación en frontend y backend | Cumplido: la API valida con clases dedicadas por entidad, además de la validación del frontend. |
 | NRF06 | Separación frontend y backend | Cumplido: API REST con arquitectura en capas y frontend independiente. |
 | NRF07 | Control de acceso por rol | Cumplido en la API: verificación por rol y por pertenencia al taller en cada ruta. |
@@ -363,7 +362,7 @@ Los tres paneles comparten la misma base y se diferencian únicamente por su pal
 
 El proyecto cuenta con un acta de reuniones de R-01 a R-09, donde se registra la organización inicial del equipo, la entrevista con el cliente, la distribución de tareas, las dificultades de participación, los cambios de alcance, los avances de documentación y el comienzo del backend.
 
-El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez como líder y Scrum Master, cinco integrantes, una duración de doce semanas organizadas en seis sprints quincenales, un esfuerzo estimado de setenta y seis puntos y los riesgos principales del proyecto.
+El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez como líder y Scrum Master, **tres integrantes**, una duración de doce semanas organizadas en seis sprints quincenales, un esfuerzo estimado de setenta y seis puntos por épica —refinado a sesenta y tres como base de planificación tras la descomposición en historias de usuario— y los riesgos principales del proyecto.
 
 ---
 
@@ -383,14 +382,13 @@ El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez com
 1. Retirar las dos claves secretas publicadas y generar claves nuevas.
 2. Unificar los dos esquemas SQL en uno solo.
 3. Evitar que la API exponga detalles de la base de datos ante un error.
-4. Eliminar `planificacion.md` (su contenido es redundante con `Doc.md`, que ya contiene el backlog de los seis sprints) y retirar su referencia del README y la estructura.
+4. Retirar la referencia a `planificacion.md` del README y de la estructura documental (el archivo ya fue eliminado; su backlog está en `Doc.md`, §20).
 5. Alinear los identificadores del mock data con los del SQL.
-6. Implementar el JavaScript del panel del alumno o retirar sus referencias.
-7. Integrar el login del frontend con la API, definiendo antes si el acceso es por cédula o por correo.
-8. Corregir la ruta del CSS del login.
-9. Actualizar el README del proyecto y el de la API.
-10. Completar `api.md` y `testing.md`; recuperar `seguridad.md`.
-11. Crear `.gitignore` y `LICENSE`; renombrar `backend/.md` a `.gitkeep`.
+6. Integrar el login del frontend con la API, definiendo antes si el acceso es por cédula o por correo.
+7. Corregir la ruta del CSS del login.
+8. Actualizar el README del proyecto y el de la API.
+9. Completar `api.md` y `testing.md`; recuperar `seguridad.md`.
+10. Crear `.gitignore` y `LICENSE`; renombrar `backend/.md` a `.gitkeep`.
 
 ---
 
@@ -405,21 +403,17 @@ El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez com
         ↓
 4. Corregir la filtración de errores de la API
         ↓
-5. Eliminar planificacion.md (redundante con Doc.md) y recuperar seguridad.md
+5. Retirar la referencia a planificacion.md del README y la estructura; recuperar seguridad.md
         ↓
 6. Actualizar los dos README y la estructura documental
         ↓
 7. Integrar el login del frontend con la API
         ↓
-8. Implementar el JavaScript del panel alumno
+8. Reemplazar datos simulados por llamadas a la API (los tres paneles)
         ↓
-9. Reemplazar datos simulados por llamadas a la API
+9. Implementar los endpoints de informes y la trazabilidad
         ↓
-10. Implementar los endpoints de informes y la trazabilidad
+10. Completar api.md con las rutas implementadas
         ↓
-11. Completar api.md con las rutas implementadas
-        ↓
-12. Testing integral y completar testing.md
+11. Testing integral y completar testing.md
 ```
-
-Ajuste: Revisa y corregir.

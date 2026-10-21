@@ -80,7 +80,7 @@ Este documento presenta el modelo de clases resultante y su traducción al model
 
 | Atributos | Métodos |
 |---|---|
-| `fechaEntrega`, `estado`, `nota`, `comentarioCorreccion`, `comentarioAlumno`| `registrarEnvio()`, `asignarNota()`, `eliminarNota()`, `agregarComentario()`, `obtenerAdjuntos()`, `fueEntregadaATiempo()` |
+| `fechaEntrega`, `estado`, `nota`, `comentarioCorreccion`, `comentarioAlumno` | `registrarEnvio()`, `asignarNota()`, `eliminarNota()`, `agregarComentario()`, `obtenerAdjuntos()`, `fueEntregadaATiempo()` |
 
 ### 1.13 Adjunto
 

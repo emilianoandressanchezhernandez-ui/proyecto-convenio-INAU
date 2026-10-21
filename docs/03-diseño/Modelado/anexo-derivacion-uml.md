@@ -245,7 +245,7 @@ Sin atributos propios. Se distingue de la tarea por no requerir devolución ni a
 | `estado` | RF08, RF09 | Distingue pendiente, entregada y corregida, indicando al tallerista qué le resta corregir. |
 | `nota` | RF10, RF17 | RF10 la asigna y RF17 permite eliminarla, por lo que debe admitir valor nulo. |
 | `comentarioCorreccion` | RF09 | RF09 exige corregir, no solo calificar: la devolución cualitativa requiere campo propio. |
-| `comentarioAlumno` | RF08 | Permite que el alumno acompañe el envío con una aclaración dirigida al tallerista. No figura de forma literal en RF08: se incorporó durante la implementación como complemento del envío. Es opcional, por lo que admite valor nulo.
+| `comentarioAlumno` | RF08 | Permite que el alumno acompañe el envío con una aclaración dirigida al tallerista. No figura de forma literal en RF08: se incorporó durante la implementación como complemento del envío. Es opcional, por lo que admite valor nulo. |
 
 <br>
 
