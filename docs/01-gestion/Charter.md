@@ -130,11 +130,11 @@ Arreglos:
       - Documento de reconstruccion del servidor. >Completado y falta mostrar al resto del equipo.
       - Ajustar todos los documentos. >En proceso.
       - REVISAR TODOS LOS DOCUMENTOS. ASEGURATE DE LA INFORMACION EN LOS DOCUMENTOS, COINCIDA CON LOS TITULOS. >En proceso. Haces esto <:
-      - Hacer el Acta de Cierre. >En proceso falta del Parte 10: Resumen de las cuatro iteraciones en adelante.
       - Acta de reuniones y Declaracion de Etica de IA. >Falta la Etica de IA. Y ajustes en las reuniones.
-      - Hacer el resumen de los sprints, Cierre del proyecto, y Anexo en el doc.
-      - Arreglar el documento de "infraestructura-docker" por cambios del documento de reconstruccion.
+      - Hacer el resumen de los sprints, Cierre del proyecto, y Anexo en el doc. >Casi listo - Falta conclucion.
+      - Arreglar el documento de "infraestructura-docker" por cambios del documento de reconstruccion. >Falta lo de Thiago.
 
 Cumplido:
       - Arreglar el documento de Justificacion tecnologia. >Cumplido a espera de verificacion.
       - Entrevistas (notas del equipo pre y post entrevistas) >Extraer la informacion del doc. y usarla para crear este documento. >Cumplido a espera de verificacion.
+      - Hacer el Acta de Cierre.

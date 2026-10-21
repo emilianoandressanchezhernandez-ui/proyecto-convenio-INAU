@@ -730,24 +730,7 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 
 <br>
 
-## 23. Actividades de cierre
-
-Al finalizar el proyecto, el equipo realiza las siguientes actividades:
-
-1. Presentación final al cliente.
-2. Validación de los requerimientos cumplidos.
-3. Entrega de acceso al sistema.
-4. Entrega de guía básica de uso.
-5. Capacitación breve a usuarios principales.
-6. Revisión de pendientes y mejoras futuras.
-7. Registro de lecciones aprendidas.
-8. Cierre formal del proyecto.
-
----
-
-<br>
-
-## 24. Requerimientos cumplidos al cierre
+## 23. Requerimientos cumplidos al cierre
 
 | Área | Requerimientos | Estado |
 | --- | --- | --- |
@@ -767,7 +750,7 @@ Al finalizar el proyecto, el equipo realiza las siguientes actividades:
 
 <br>
 
-## 25. Lecciones aprendidas (Sprint Retrospective)
+## 24. Lecciones aprendidas (Sprint Retrospective)
 
 | Lección | Explicación |
 | --- | --- |
@@ -780,29 +763,4 @@ Al finalizar el proyecto, el equipo realiza las siguientes actividades:
 
 ---
 
-<br>
-
-## 26. Glosario breve
-
-| Término | Explicación |
-| --- | --- |
-| Cliente | Persona u organización que necesita el sistema. En este proyecto, INAU. |
-| Patrocinador (sponsor) | Persona u organización que aprueba el presupuesto, las prioridades y las decisiones importantes. |
-| Stakeholder | Persona afectada por el sistema o interesada en sus resultados. |
-| Tallerista | Persona a cargo de dictar un taller: publica material, corrige tareas y registra la asistencia. |
-| Requerimiento funcional (RF) | Acción o función que el sistema debe realizar. |
-| Requerimiento no funcional (NRF) | Condición de calidad, seguridad, rendimiento, usabilidad o restricción técnica que el sistema debe cumplir. |
-| Épica | Funcionalidad grande que se divide en historias de usuario más pequeñas. |
-| Historia de usuario | Descripción breve de una necesidad desde el punto de vista de un usuario, con el formato "Como…, quiero…, para…". |
-| Punto | Medida de esfuerzo relativo de una historia comparada con otras; no equivale a horas. |
-| Product Backlog | Lista priorizada del trabajo pendiente del producto. |
-| Scrum | Marco de trabajo ágil que organiza el desarrollo en iteraciones cortas con entregas incrementales. |
-| Sprint | Iteración corta de trabajo; en este proyecto, de dos semanas. |
-| Sprint Planning | Reunión donde se decide qué historias se harán en el sprint. |
-| Incremento | Parte funcional del producto que se entrega al final de un sprint. |
-| Sprint Review | Revisión del incremento con el cliente o los interesados al cierre de un sprint. |
-| Primera versión (MVP) | Versión inicial del sistema con las funciones mínimas necesarias para que resulte útil. |
-| Función postergada | Requerimiento que forma parte del proyecto pero se dejó para una etapa futura para respetar el plazo. |
-| Alcance excluido | Funcionalidades que el cliente mencionó pero que no forman parte de la primera versión. |
-| Trazabilidad | Registro de las acciones importantes realizadas en el sistema: quién hizo qué y cuándo. |
-| Cierre | Etapa final en la que se valida el producto, se documenta y se registran los pendientes futuros. |
+## 25. Conclucion.
