@@ -80,7 +80,7 @@ Este documento presenta el modelo de clases resultante y su traducción al model
 
 | Atributos | Métodos |
 |---|---|
-| `fechaEntrega`, `estado`, `nota`, `comentarioCorreccion` | `registrarEnvio()`, `asignarNota()`, `eliminarNota()`, `agregarComentario()`, `obtenerAdjuntos()`, `fueEntregadaATiempo()` |
+| `fechaEntrega`, `estado`, `nota`, `comentarioCorreccion`, `comentarioAlumno`| `registrarEnvio()`, `asignarNota()`, `eliminarNota()`, `agregarComentario()`, `obtenerAdjuntos()`, `fueEntregadaATiempo()` |
 
 ### 1.13 Adjunto
 
@@ -334,7 +334,7 @@ classDiagram
         +String biografia [v2]
         +visualizarMaterial(tallerId) List
         +visualizarTareas(tallerId) List
-        +entregarTarea(tareaId, archivos) Entrega
+        +entregarTarea(tareaId, archivos, comentario) Entrega
         +visualizarNotas() List [v2]
         +eliminarDatoPerfil(campo) void [v2]
     }
@@ -403,7 +403,8 @@ classDiagram
         +EstadoEntrega estado
         +int nota
         +String comentarioCorreccion
-        +registrarEnvio(archivos, fecha) void
+        +String comentarioAlumno
+        +registrarEnvio(archivos, fecha, comentario) void
         +asignarNota(nota) void
         +eliminarNota() void
         +agregarComentario(texto) void
@@ -644,6 +645,7 @@ erDiagram
         enum estado "Pendiente | Entregada | Corregida"
         tinyint nota "NULL - rango 1 a 10"
         text comentario "NULL"
+        text comentario_alumno "NULL"
     }
 
     ADJUNTOS {

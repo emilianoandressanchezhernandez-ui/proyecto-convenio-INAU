@@ -3,8 +3,11 @@
 **Proyecto:** TheNewfutures — Sistema de Gestión de Talleres en Convenio con INAU  
 **Área:** Ciberseguridad  
 **Fecha de elaboración:** 10 de octubre de 2026  
+**Última actualización:** 21 de octubre de 2026  
 
 ---
+
+<br>
 
 ## 1. Propósito y alcance
 
@@ -18,28 +21,32 @@ La documentación distingue expresamente entre:
 
 La existencia de una función de seguridad no implica que la API esté lista para producción. Al final se enumeran los riesgos detectados durante la revisión.
 
+---
+
+<br>
+
 ## 2. Fuentes utilizadas y método de análisis
 
 
 | Fuente del repositorio | Información utilizada |
 |---|---|
-| `backend/api/controllers/AuthController.php` | Endpoints de login, logout y perfil; creación y eliminación de cookie. |
-| `backend/api/services/AuthService.php` | Verificación de credenciales, estado de la cuenta y actualización de perfil. |
-| `backend/api/validators/AuthValidator.php` | Validación de los datos recibidos por login y perfil. |
-| `backend/api/dtos/LoginDTO.php` | Estructura de los datos de inicio de sesión. |
-| `backend/api/models/User.php` | Verificación de contraseña y datos que se devuelven al cliente. |
-| `backend/api/repositories/UserRepository.php` | Búsqueda por correo, lectura de `clave_hash` y actualización del último acceso. |
-| `backend/api/services/TalleristaService.php` | Generación de hashes cuando se crea o se cambia la contraseña de un tallerista. |
-| `backend/api/repositories/TalleristaRepository.php` | Persistencia del campo `clave_hash` en la tabla de usuarios. |
-| `backend/api/core/Token.php` | Creación, lectura, firma y vencimiento de JWT; atributos de la cookie. |
-| `backend/api/core/AuthMiddleware.php` | Validación de token y control de acceso según el rol requerido. |
-| `backend/api/routes.php` | Rutas y requisitos de autenticación/autorización. |
-| `backend/api/config.php` | Carga de variables de entorno, clave secreta y duración del token. |
-| `backend/api/.env.example` y `backend/api/.env.docker.example` | Variables necesarias para ejecutar la API. |
-| `backend/api/database.sql` | Campo `usuarios.clave_hash` y datos de prueba. |
-| `backend/api/composer.json` | Dependencia `firebase/php-jwt`. |
-| `backend/api/index.php` y `backend/api/README.md` | Punto de entrada, CORS y explicación general de la API. |
-| `backend/api/core/RateLimiter.php` | Implementación disponible de limitación de peticiones; se verificó si está conectada al flujo. |
+| `backend/api-completa/controllers/AuthController.php` | Endpoints de login, logout y perfil; creación y eliminación de cookie. |
+| `backend/api-completa/services/AuthService.php` | Verificación de credenciales, estado de la cuenta y actualización de perfil. |
+| `backend/api-completa/validators/AuthValidator.php` | Validación de los datos recibidos por login y perfil. |
+| `backend/api-completa/dtos/LoginDTO.php` | Estructura de los datos de inicio de sesión. |
+| `backend/api-completa/models/User.php` | Verificación de contraseña y datos que se devuelven al cliente. |
+| `backend/api-completa/repositories/UserRepository.php` | Búsqueda por correo, lectura de `clave_hash` y actualización del último acceso. |
+| `backend/api-completa/services/TalleristaService.php` | Generación de hashes cuando se crea o se cambia la contraseña de un tallerista. |
+| `backend/api-completa/repositories/TalleristaRepository.php` | Persistencia del campo `clave_hash` en la tabla de usuarios. |
+| `backend/api-completa/core/Token.php` | Creación, lectura, firma y vencimiento de JWT; atributos de la cookie. |
+| `backend/api-completa/core/AuthMiddleware.php` | Validación de token y control de acceso según el rol requerido. |
+| `backend/api-completa/routes.php` | Rutas y requisitos de autenticación/autorización. |
+| `backend/api-completa/config.php` | Carga de variables de entorno, clave secreta y duración del token. |
+| `backend/api-completa/.env.example` y `backend/api-completa/.env.docker.example` | Variables necesarias para ejecutar la API. |
+| `backend/api-completa/DataBase/inau_talleres.sql` | Campo `usuarios.clave_hash` y datos de prueba. |
+| `backend/api-completa/composer.json` | Dependencia `firebase/php-jwt`. |
+| `backend/api-completa/index.php` y `backend/api-completa/README.md` | Punto de entrada, CORS y explicación general de la API. |
+| `backend/api-completa/core/RateLimiter.php` | Implementación disponible de limitación de peticiones; se verificó si está conectada al flujo. |
 
 ### Método aplicado
 
@@ -50,6 +57,8 @@ La existencia de una función de seguridad no implica que la API esté lista par
 5. Se marcaron por separado las medidas presentes, las incompletas y las pendientes. Por ejemplo, el repositorio contiene `RateLimiter.php`, pero `index.php` no lo carga ni llama a `RateLimiter::check()`, por lo que no debe describirse como una protección activa.
 
 ---
+
+<br>
 
 ## 3. Resumen de la implementación
 
@@ -73,17 +82,21 @@ Las contraseñas no se comparan como texto plano. Se almacena un hash en la colu
 | Limitación efectiva de intentos en la API | La clase existe, pero no está conectada a `index.php` | `core/RateLimiter.php`, `index.php` |
 | Cambio de contraseña propio desde `PATCH /perfil` | No implementado; la ruta permite correo y teléfono | `AuthController.php`, `AuthValidator.php` |
 
+---
+
+<br>
+
 ## 4. Hashing de contraseñas
 
 ### 4.1 Qué se almacena
 
-La tabla `usuarios` tiene una columna `clave_hash VARCHAR(255) NOT NULL`, definida en `backend/api/database.sql`. No está diseñada para guardar la contraseña original. El hash es un resultado unidireccional: el sistema no necesita recuperar la contraseña original, sino verificar si la contraseña presentada coincide con el hash guardado.
+La tabla `usuarios` tiene una columna `clave_hash VARCHAR(255) NOT NULL`, definida en `backend/api-completa/DataBase/inau_talleres.sql`. No está diseñada para guardar la contraseña original. El hash es un resultado unidireccional: el sistema no necesita recuperar la contraseña original, sino verificar si la contraseña presentada coincide con el hash guardado.
 
 La columna tiene una longitud de 255 caracteres para que pueda guardar hashes producidos por los algoritmos predeterminados de PHP actuales y futuros.
 
 ### 4.2 Cómo se genera el hash
 
-En `backend/api/services/TalleristaService.php`, durante la creación de un tallerista, se ejecuta el equivalente a:
+En `backend/api-completa/services/TalleristaService.php`, durante la creación de un tallerista, se ejecuta el equivalente a:
 
 ```php
 $tallerista['clave_hash'] = password_hash(
@@ -102,7 +115,7 @@ Cuando el administrador actualiza la contraseña de un tallerista, el mismo serv
 
 ### 4.3 Cómo se verifica la contraseña
 
-En `backend/api/models/User.php` se encuentra el método:
+En `backend/api-completa/models/User.php` se encuentra el método:
 
 ```php
 public function checkPassword(string $plainPassword): bool
@@ -119,13 +132,15 @@ Además, `User::toArray()` no incluye la propiedad `claveHash`. Esto evita que e
 
 ### 4.4 Qué ocurre con los usuarios de prueba
 
-`backend/api/database.sql` incluye cuentas de demostración con hashes en `clave_hash`. Esos datos solo sirven para desarrollo y pruebas. Antes de usar el sistema con información real deben crearse cuentas nuevas, definir contraseñas de manera controlada y retirar las credenciales de demostración de los entornos públicos.
+`backend/api-completa/DataBase/inau_talleres.sql` incluye cuentas de demostración con hashes en `clave_hash`. Esos datos solo sirven para desarrollo y pruebas. Antes de usar el sistema con información real deben crearse cuentas nuevas, definir contraseñas de manera controlada y retirar las credenciales de demostración de los entornos públicos.
 
 ### 4.5 Limitación actual del cambio de contraseña
 
 El endpoint `PATCH /perfil` solo acepta `correo` y `telefono`. `AuthValidator::validateProfileUpdate()` rechaza los demás campos. Por eso el cambio de contraseña no está implementado como una operación de autoservicio del usuario. En el estado actual, el service de talleristas sí contempla generar un nuevo hash cuando se actualiza `clave` por el flujo administrativo.
 
 ---
+
+<br>
 
 ## 5. Flujo de autenticación paso a paso
 
@@ -189,11 +204,13 @@ La autorización se aplica del lado del servidor: ocultar un botón en el fronte
 
 ---
 
+<br>
+
 ## 6. Gestión del JWT y de la cookie
 
 ### 6.1 Contenido del token
 
-`backend/api/core/Token.php` crea un JWT con estos claims:
+`backend/api-completa/core/Token.php` crea un JWT con estos claims:
 
 | Claim | Propósito en el proyecto |
 |---|---|
@@ -203,7 +220,7 @@ La autorización se aplica del lado del servidor: ocultar un botón en el fronte
 | `iat` | Instante de emisión del token. |
 | `exp` | Instante de vencimiento del token. |
 
-El token se firma con el algoritmo `HS256` y el secreto `SECRET_KEY`. El código utiliza la biblioteca `firebase/php-jwt`, declarada en `backend/api/composer.json`.
+El token se firma con el algoritmo `HS256` y el secreto `SECRET_KEY`. El código utiliza la biblioteca `firebase/php-jwt`, declarada en `backend/api-completa/composer.json`.
 
 Un JWT firmado no es necesariamente cifrado: su payload puede leerse si alguien obtiene el token. La firma permite detectar modificaciones del contenido. Por ese motivo, el token no debe incluir contraseña, hash de contraseña ni otros datos que no sea necesario exponer.
 
@@ -241,19 +258,20 @@ Sin embargo, el backend no mantiene una lista de revocación ni una tabla de ses
 
 ---
 
+<br>
+
 ## 7. Configuración de secretos y variables de entorno
 
 ### 7.1 Archivos de configuración
 
-`backend/api/config.php` carga variables del archivo `.env` ubicado junto a `config.php` y define, entre otras, las constantes `APP_ENV`, `SECRET_KEY`, `TOKEN_LIFETIME`, `FRONTEND_ORIGIN`, `DB_HOST`, `DB_NAME`, `DB_USER` y `DB_PASSWORD`.
+`backend/api-completa/config.php` carga variables del archivo `.env` ubicado junto a `config.php` y define, entre otras, las constantes `APP_ENV`, `SECRET_KEY`, `TOKEN_LIFETIME`, `FRONTEND_ORIGIN`, `DB_HOST`, `DB_NAME`, `DB_USER` y `DB_PASSWORD`.
 
 La configuración evita arrancar si `SECRET_KEY` falta o coincide con una cadena de ejemplo específica. No obstante, hay una inconsistencia importante en el repositorio:
 
-- `backend/api/.env.example` contiene una clave de ejemplo concreta versionada.
-- `backend/api/compose.yaml` proporciona otra clave fija como valor predeterminado si no hay `SECRET_KEY` configurada.
-- La validación de `config.php` no rechaza esos dos valores concretos.
-- En el árbol de `main` revisado no aparece un `.gitignore` en la raíz ni en `backend/api/` que excluya el archivo real `.env`. `backend/api/.dockerignore` sí excluye `.env` de la imagen, pero **Docker ignore y Git ignore son mecanismos distintos**.
-- `backend/api/.env.docker.example` indica `FRONTEND_ORIGIN=http://localhost:8000`, mientras `compose.yaml` usa `http://localhost:5173` como valor predeterminado. La variable debe coincidir exactamente con el origen desde donde se sirve el frontend; si no coincide, el navegador no recibirá las cabeceras CORS esperadas para credenciales.
+- Las plantillas `backend/api-completa/.env.example` y `.env.docker.example` dejan `SECRET_KEY` vacía, con la instrucción para generarla.
+- `backend/api-completa/compose.yaml`, en cambio, proporciona una clave fija como valor predeterminado si no hay `SECRET_KEY` configurada.
+- La validación de `config.php` no rechaza ese valor de respaldo.
+- En el repositorio no aparece un `.gitignore` en la raíz ni en `backend/api-completa/` que excluya el archivo real `.env`. `backend/api-completa/.dockerignore` sí excluye `.env` de la imagen, pero **Docker ignore y Git ignore son mecanismos distintos**.
 
 Por lo tanto, no debe asumirse que las claves de ejemplo son secretos seguros ni que `.env` está protegido frente a un commit accidental.
 
@@ -262,7 +280,7 @@ Por lo tanto, no debe asumirse que las claves de ejemplo son secretos seguros ni
 Desde PowerShell, ubicarse en la carpeta de la API:
 
 ```powershell
-cd backend/api
+cd backend/api-completa
 Copy-Item .env.docker.example .env
 ```
 
@@ -274,7 +292,7 @@ php -r "echo bin2hex(random_bytes(32));"
 
 Copiar el resultado únicamente en `SECRET_KEY` del `.env` local. Definir también contraseñas propias para `DB_PASSWORD` y `MYSQL_ROOT_PASSWORD`. No incluir esos valores en capturas, entregas públicas ni mensajes de commit.
 
-Antes de usarlo, corregir la configuración de Docker para que no tenga una clave fija de respaldo y falle si falta una clave válida. Además, crear un `.gitignore` adecuado antes de crear o guardar secretos. Una opción es `backend/api/.gitignore` con:
+Antes de usarlo, corregir la configuración de Docker para que no tenga una clave fija de respaldo y falle si falta una clave válida. Además, crear un `.gitignore` adecuado antes de crear o guardar secretos. Una opción es `backend/api-completa/.gitignore` con:
 
 ```gitignore
 .env
@@ -294,13 +312,15 @@ Los valores de demostración del `compose.yaml` hacen más fácil el primer arra
 
 ---
 
+<br>
+
 ## 8. Prueba guiada de la autenticación
 
 Estas pruebas están pensadas para un entorno de desarrollo y con usuarios de prueba. No deben ejecutarse contra datos reales sin autorización.
 
 ### Paso 1. Iniciar la API
 
-Desde `backend/api`, con Docker instalado y ejecutándose:
+Desde `backend/api-completa`, con Docker instalado y ejecutándose:
 
 ```powershell
 docker compose up --build -d
@@ -349,20 +369,25 @@ En un entorno de prueba, consultar `usuarios.clave_hash` en MySQL. Debe tener un
 
 ---
 
+<br>
+
 ## 9. Limitaciones y medidas pendientes
 
 | Prioridad | Hallazgo verificado | Por qué importa | Acción recomendada |
 |---|---|---|---|
-| Crítica | `SECRET_KEY` aparece con valor fijo en `.env.example` y `compose.yaml` tiene otra clave de respaldo fija. | Si se conserva una clave conocida, una persona que la conozca podría fabricar JWT con claims modificados. | Eliminar valores utilizables de las plantillas, exigir una variable configurada y rotar cualquier clave expuesta. |
-| Crítica | No se encuentra `.gitignore` raíz ni de `backend/api` para excluir `.env`. | Un archivo local con credenciales podría añadirse accidentalmente a Git. | Crear reglas de ignorado, comprobar `git status` y revisar que `.env` no esté versionado. |
+| Crítica | `compose.yaml` define una `SECRET_KEY` fija como valor de respaldo. Las plantillas `.env` ya no incluyen clave. | Si se conserva una clave conocida, una persona que la conozca podría fabricar JWT con claims modificados. | Eliminar valores utilizables de las plantillas, exigir una variable configurada y rotar cualquier clave expuesta. |
+| Crítica | No se encuentra `.gitignore` raíz ni de `backend/api-completa` para excluir `.env`. | Un archivo local con credenciales podría añadirse accidentalmente a Git. | Crear reglas de ignorado, comprobar `git status` y revisar que `.env` no esté versionado. |
 | Alta | `Token::clearCookie()` solo elimina la cookie; no revoca un JWT previamente copiado. | Un token robado puede seguir válido hasta `exp`. | Evaluar un registro de sesiones/revocación, `jti` con lista de revocación o versión de token por usuario. |
 | Alta | No hay protección CSRF completa. La cookie `SameSite=Lax` y CORS no constituyen por sí solos una defensa completa para todas las operaciones. | Una petición no deseada podría intentar aprovechar credenciales que el navegador envía automáticamente. | Incorporar una defensa CSRF para operaciones de escritura y probarla con solicitudes de origen cruzado. |
 | Alta | `RateLimiter.php` existe, pero `index.php` no lo incluye ni llama a `RateLimiter::check()`. | No hay límite efectivo aplicado en el punto de entrada; quedan expuestos intentos repetidos de login. | Conectar el limiter, aplicar un límite adecuado especialmente a `/login` y probar el código HTTP `429`. |
 | Alta | El atributo `secure` de la cookie depende de `$_SERVER['HTTPS']`; en el entorno local HTTP queda desactivado. | En producción debe asegurarse de que la cookie viaje únicamente por HTTPS. | Publicar detrás de HTTPS y configurar correctamente la detección de HTTPS si hay proxy inverso. |
 | Media | El middleware autoriza usando el rol del JWT sin consultar en cada petición el estado actual del usuario. | Un cambio de rol o baja de cuenta no necesariamente invalida inmediatamente un token ya emitido. | Verificar estado/rol actual o implementar revocación/versión de sesión. |
 | Media | `AuthValidator` verifica campos presentes en login, pero no implementa un límite de intentos por sí mismo. | La validación de entrada no sustituye la defensa frente a fuerza bruta. | Aplicar rate limiting y registrar intentos fallidos sin almacenar contraseñas. |
-| Media | `FRONTEND_ORIGIN` tiene valores predeterminados distintos en `compose.yaml` y `.env.docker.example`. | La política CORS puede no coincidir con el origen real del frontend y dificultar o romper el uso de cookies desde el navegador. | Configurar un único origen exacto por entorno y probarlo en el navegador. |
 | Media | No existe un endpoint de cambio de contraseña del propio usuario. | La interfaz y la API no ofrecen el flujo completo de cambio seguro por autoservicio. | Definir un endpoint que pida contraseña actual, valide la nueva y guarde su hash; invalidar otros tokens si corresponde. |
+
+---
+
+<br>
 
 ## 10. Conclusión
 

@@ -245,6 +245,7 @@ Sin atributos propios. Se distingue de la tarea por no requerir devolución ni a
 | `estado` | RF08, RF09 | Distingue pendiente, entregada y corregida, indicando al tallerista qué le resta corregir. |
 | `nota` | RF10, RF17 | RF10 la asigna y RF17 permite eliminarla, por lo que debe admitir valor nulo. |
 | `comentarioCorreccion` | RF09 | RF09 exige corregir, no solo calificar: la devolución cualitativa requiere campo propio. |
+| `comentarioAlumno` | RF08 | Permite que el alumno acompañe el envío con una aclaración dirigida al tallerista. No figura de forma literal en RF08: se incorporó durante la implementación como complemento del envío. Es opcional, por lo que admite valor nulo.
 
 <br>
 
@@ -391,7 +392,7 @@ Este criterio evita que las clases de rol concentren la totalidad del comportami
 |---|---|---|---|
 | `visualizarMaterial(tallerId)` | "visualizar el material" | RF07 | RF07 lo acota al taller que le corresponde. |
 | `visualizarTareas(tallerId)` | "visualizar... las tareas" | RF07 | Ídem. |
-| `entregarTarea(tareaId, archivos)` | "enviar/subir los archivos" | RF08 | RF08 atribuye la acción al alumno. |
+| `entregarTarea(tareaId, archivos, comentario)` | "enviar/subir los archivos" | RF08 | RF08 atribuye la acción al alumno. |
 | `visualizarNotas()` **(v2)** | "visualizar las notas asignadas" | RF23 | Excluido de la primera versión. |
 | `eliminarDatoPerfil(campo)` **(v2)** | "eliminar ciertos datos de su perfil" | RF15 | Excluido de la primera versión. |
 
@@ -472,7 +473,7 @@ Sin métodos propios. Hereda el comportamiento de `Contenido` sin especializarlo
 
 | Método | Verbo de origen | RF | Justificación |
 |---|---|---|---|
-| `registrarEnvio(archivos, fecha)` | "enviar/subir los archivos" | RF08 | Almacena los archivos y marca la entrega como realizada. |
+| `registrarEnvio(archivos, fecha, comentario)` | "enviar/subir los archivos" | RF08 | Almacena los archivos y el comentario opcional del alumno, y marca la entrega como realizada. |
 | `asignarNota(nota)` | "asignar una nota" | RF10 | Valida el rango permitido y actualiza el estado a corregida. |
 | `eliminarNota()` | "eliminar la nota asignada" | RF17 | Restablece la nota a valor nulo y revierte el estado. |
 | `agregarComentario(texto)` | "corregir las tareas" | RF09 | Registra la devolución cualitativa del tallerista. |
