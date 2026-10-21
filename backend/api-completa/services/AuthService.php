@@ -55,9 +55,8 @@ class AuthService
         ];
     }
 
-    /**
-     * Devuelve los datos del usuario logueado.
-     */
+
+
     public function getProfile(int $id): array
     {
         $user = $this->repository->findById($id);
@@ -66,8 +65,35 @@ class AuthService
             Response::error('El usuario ya no existe.', 404);
         }
 
-        return $user->toArray();
+        $perfil = $user->toArray();
+
+        // Datos adicionales para el rol alumno.
+        if ($perfil['rol'] === 'alumno') {
+
+            $alumno = $this->alumnoRepository->obtenerPorUsuarioId($id);
+
+            if ($alumno === null) {
+                Response::error(
+                    'No se encontró el perfil de alumno asociado al usuario.',
+                    409
+                );
+            }
+
+            // Identificador de alumnos.id.
+            $perfil['alumno_id'] = (int) $alumno['id'];
+
+            // Información complementaria de la ficha del alumno.
+            $perfil['direccion'] = $alumno['direccion'];
+            $perfil['referente_adulto'] = $alumno['referente_adulto'];
+            $perfil['centro_referencia'] = $alumno['centro_referencia'];
+            $perfil['fecha_nacimiento'] = $alumno['fecha_nacimiento'];
+            $perfil['fecha_ingreso'] = $alumno['fecha_registro'];
+            $perfil['ultima_asistencia'] = $alumno['ultima_asistencia'];
+        }
+
+        return $perfil;
     }
+
 
     /**
      * Actualiza correo y/o teléfono del usuario logueado.

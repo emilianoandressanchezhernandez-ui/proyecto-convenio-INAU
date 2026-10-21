@@ -1,235 +1,694 @@
+
 /*
     DETALLE-REPORTE.JS - FRONTEND ADMIN
-    Responsabilidades:
-    - Mostrar los datos generales del reporte seleccionado.
-    - Mostrar un resumen del estado actual del sistema (en vivo).
-    - Listar el resumen por taller (en vivo).
-    - Permitir exportar (descarga de texto) e imprimir.
+
+    Integración real con MySQL mediante la API.
+
+    - Consulta GET /reportes/{id}
+    - Muestra el contenido histórico guardado
+    - Adapta las estadísticas según el tipo
+    - Permite exportar JSON e imprimir
+
+    No utiliza datos simulados ni localStorage.
 */
 
 let reporteActual = null;
 
-function inicializarDetalleReporte() {
-    try {
-        validarDatosSimulados();
+const DETALLE_REPORTE_API =
+    "http://localhost:8002";
 
-        const id = obtenerParametroURL("id");
-        reporteActual = buscarReportePorId(id);
+
+// ======================================
+// INICIALIZACIÓN
+// ======================================
+
+async function inicializarDetalleReporte() {
+    configurarAccionesDetalleReporte();
+
+    const parametros = new URLSearchParams(
+        window.location.search
+    );
+
+    const id = parametros.get("id");
+
+    if (
+        !id ||
+        !/^[1-9]\d*$/.test(id)
+    ) {
+        mostrarErrorDetalleReporte(
+            "No se especificó un ID de reporte válido."
+        );
+        return;
+    }
+
+    try {
+        const respuesta = await fetch(
+            `${DETALLE_REPORTE_API}/reportes/${id}`,
+            {
+                method: "GET",
+                credentials: "include"
+            }
+        );
+
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok || resultado.ok === false) {
+            throw new Error(
+                resultado.mensaje ||
+                "No se pudo cargar el reporte."
+            );
+        }
+
+        if (!resultado.datos) {
+            throw new Error(
+                "La API no devolvió información del reporte."
+            );
+        }
+
+        reporteActual = resultado.datos;
 
         mostrarDatosReporte(reporteActual);
-        mostrarResumenGeneral();
-        renderizarResumenPorTaller();
-        configurarAcciones();
+        mostrarContenidoReporte(reporteActual);
+
+        document.getElementById("btn-exportar").disabled = false;
+        document.getElementById("btn-imprimir").disabled = false;
 
     } catch (error) {
-        console.error("Error al cargar el detalle del reporte:", error);
-        mostrarAlerta("alerta-detalle-reporte", error.message, "danger");
+        console.error(
+            "Error al cargar el detalle del reporte:",
+            error
+        );
+
+        mostrarErrorDetalleReporte(error.message);
     }
 }
 
 
-// ==============================
-// VALIDACION Y BUSQUEDA
-// ==============================
+// ======================================
+// ERRORES
+// ======================================
 
-function validarDatosSimulados() {
-
-    if (!window.DATOS_SIMULADOS) {
-        throw new Error("No se pudieron cargar los datos simulados.");
-    }
-
-    if (!Array.isArray(window.DATOS_SIMULADOS.reportes)) {
-        throw new Error("La lista de reportes no está disponible.");
-    }
-}
-
-function buscarReportePorId(id) {
-
-    if (!id) {
-        throw new Error("No se especificó qué reporte mostrar.");
-    }
-
-    const reportes = obtenerListado(
-        "reportes",
-        window.DATOS_SIMULADOS.reportes
+function mostrarErrorDetalleReporte(mensaje) {
+    const alerta = document.getElementById(
+        "alerta-detalle-reporte"
     );
 
-    const reporte = reportes.find(
-        (r) => r.id === Number(id)
-    );
-
-    if (!reporte) {
-        throw new Error("No se encontró ningún reporte con ese id.");
+    if (alerta) {
+        alerta.textContent = mensaje;
+        alerta.classList.remove("d-none");
     }
 
-    return reporte;
+    const botonExportar = document.getElementById(
+        "btn-exportar"
+    );
+
+    const botonImprimir = document.getElementById(
+        "btn-imprimir"
+    );
+
+    if (botonExportar) {
+        botonExportar.disabled = true;
+    }
+
+    if (botonImprimir) {
+        botonImprimir.disabled = true;
+    }
 }
 
 
-// ==============================
-// DATOS DEL REPORTE
-// ==============================
+// ======================================
+// DATOS GENERALES DEL REPORTE
+// ======================================
 
 function mostrarDatosReporte(reporte) {
+    colocarTextoDetalleReporte(
+        "nombre-reporte",
+        reporte.nombre
+    );
 
-    colocarTexto("nombre-reporte", reporte.nombre);
-    colocarTexto("reporte-nombre", reporte.nombre);
-    colocarTexto("reporte-tipo", reporte.tipo);
-    colocarTexto("fecha-generacion", formatearFechaHora(reporte.fechaGeneracion));
-    colocarTexto("periodo", obtenerPeriodoLegible(reporte));
-    colocarTexto("estado", reporte.estado);
+    colocarTextoDetalleReporte(
+        "reporte-nombre",
+        reporte.nombre
+    );
+
+    colocarTextoDetalleReporte(
+        "reporte-tipo",
+        reporte.tipo
+    );
+
+    colocarTextoDetalleReporte(
+        "fecha-generacion",
+        formatearFechaHoraDetalleReporte(
+            reporte.fecha_generacion
+        )
+    );
+
+    colocarTextoDetalleReporte(
+        "periodo",
+        obtenerPeriodoDetalleReporte(reporte)
+    );
+
+    colocarTextoDetalleReporte(
+        "estado",
+        reporte.estado
+    );
 }
 
-function obtenerPeriodoLegible(reporte) {
 
-    if (!reporte.fechaInicio || !reporte.fechaFin) {
-        return "General (todo el sistema)";
+function obtenerPeriodoDetalleReporte(reporte) {
+    const inicio = reporte.fecha_inicio;
+    const fin = reporte.fecha_fin;
+
+    if (inicio && fin) {
+        return (
+            formatearFechaDetalleReporte(inicio) +
+            " al " +
+            formatearFechaDetalleReporte(fin)
+        );
     }
 
-    return `${formatearFecha(reporte.fechaInicio)} al ${formatearFecha(reporte.fechaFin)}`;
+    if (inicio) {
+        return (
+            "Desde " +
+            formatearFechaDetalleReporte(inicio)
+        );
+    }
+
+    if (fin) {
+        return (
+            "Hasta " +
+            formatearFechaDetalleReporte(fin)
+        );
+    }
+
+    return "Sin período específico";
 }
 
 
-// ==============================
-// RESUMEN GENERAL (en vivo, no depende del tipo de reporte)
-// ==============================
+// ======================================
+// CONTENIDO SEGÚN TIPO
+// ======================================
 
-function mostrarResumenGeneral() {
+function mostrarContenidoReporte(reporte) {
+    const contenido = reporte.contenido || {};
 
-    const d = window.DATOS_SIMULADOS;
+    if (reporte.tipo === "General") {
+        mostrarReporteGeneral(contenido);
+        return;
+    }
 
-    const talleres = obtenerListado("talleres", d.talleres);
-    const alumnos = obtenerListado("alumnos", d.alumnos);
-    const talleristas = obtenerListado("talleristas", d.talleristas);
-    const asistencias = obtenerListado("asistencias", d.asistencias);
+    if (reporte.tipo === "Asistencia") {
+        mostrarReporteAsistencia(
+            contenido,
+            reporte
+        );
+        return;
+    }
 
-    colocarTexto("total-talleres", talleres.length);
-    colocarTexto("total-alumnos", alumnos.length);
-    colocarTexto("promedio-asistencia", `${calcularAsistenciaPromedio(asistencias)}%`);
-    colocarTexto("total-talleristas", talleristas.length);
+    mostrarErrorDetalleReporte(
+        "Tipo de reporte no reconocido."
+    );
 }
 
-function calcularAsistenciaPromedio(asistencias) {
 
-    let totalRegistros = 0;
-    let totalPresentes = 0;
+// ======================================
+// REPORTE GENERAL
+// ======================================
 
-    asistencias.forEach((clase) => {
-        clase.registros.forEach((registro) => {
-            totalRegistros++;
-            if (registro.estado === "Presente") {
-                totalPresentes++;
+function mostrarReporteGeneral(contenido) {
+    cambiarEtiquetaTarjetaDetalle(
+        "total-talleres",
+        "Talleres"
+    );
+
+    cambiarEtiquetaTarjetaDetalle(
+        "total-alumnos",
+        "Alumnos"
+    );
+
+    cambiarEtiquetaTarjetaDetalle(
+        "promedio-asistencia",
+        "Asistencia %"
+    );
+
+    cambiarEtiquetaTarjetaDetalle(
+        "total-talleristas",
+        "Talleristas"
+    );
+
+    colocarTextoDetalleReporte(
+        "total-talleres",
+        mostrarValorDetalle(contenido.totalTalleres)
+    );
+
+    colocarTextoDetalleReporte(
+        "total-alumnos",
+        mostrarValorDetalle(contenido.totalAlumnos)
+    );
+
+    colocarTextoDetalleReporte(
+        "promedio-asistencia",
+        mostrarPorcentajeDetalle(
+            contenido.asistenciaPromedio
+        )
+    );
+
+    colocarTextoDetalleReporte(
+        "total-talleristas",
+        mostrarValorDetalle(
+            contenido.totalTalleristas
+        )
+    );
+
+    // El reporte general guarda totales,
+    // pero no un desglose individual por taller.
+    cambiarTituloTablaDetalle(
+        "Resumen del Sistema"
+    );
+
+    const tabla = document.getElementById(
+        "tabla-resumen"
+    );
+
+    if (tabla) {
+        cambiarColumnasDetalle([
+            "Indicador",
+            "Valor",
+            "Indicador",
+            "Valor"
+        ]);
+
+        tabla.innerHTML = `
+            <tr>
+                <td>Total de talleres</td>
+                <td>${mostrarValorDetalle(contenido.totalTalleres)}</td>
+                <td>Talleres activos</td>
+                <td>${mostrarValorDetalle(contenido.talleresActivos)}</td>
+            </tr>
+
+            <tr>
+                <td>Total de alumnos</td>
+                <td>${mostrarValorDetalle(contenido.totalAlumnos)}</td>
+                <td>Total de talleristas</td>
+                <td>${mostrarValorDetalle(contenido.totalTalleristas)}</td>
+            </tr>
+
+            <tr>
+                <td>Asistencia promedio</td>
+                <td>${mostrarPorcentajeDetalle(contenido.asistenciaPromedio)}</td>
+                <td>Tipo de resumen</td>
+                <td>General</td>
+            </tr>
+        `;
+    }
+
+    colocarTextoDetalleReporte(
+        "observaciones",
+        "Este reporte conserva las estadísticas generales " +
+        "del sistema correspondientes al momento de su generación. " +
+        "No incluye un desglose histórico individual por taller."
+    );
+}
+
+
+// ======================================
+// REPORTE DE ASISTENCIA
+// ======================================
+
+function mostrarReporteAsistencia(
+    contenido,
+    reporte
+) {
+    cambiarEtiquetaTarjetaDetalle(
+        "total-talleres",
+        "Jornadas"
+    );
+
+    cambiarEtiquetaTarjetaDetalle(
+        "total-alumnos",
+        "Registros"
+    );
+
+    cambiarEtiquetaTarjetaDetalle(
+        "promedio-asistencia",
+        "Asistencia %"
+    );
+
+    cambiarEtiquetaTarjetaDetalle(
+        "total-talleristas",
+        "Presentes"
+    );
+
+    colocarTextoDetalleReporte(
+        "total-talleres",
+        mostrarValorDetalle(contenido.totalClases)
+    );
+
+    colocarTextoDetalleReporte(
+        "total-alumnos",
+        mostrarValorDetalle(
+            contenido.asistenciasRegistradas
+        )
+    );
+
+    colocarTextoDetalleReporte(
+        "promedio-asistencia",
+        mostrarPorcentajeDetalle(
+            contenido.asistenciaPromedio
+        )
+    );
+
+    colocarTextoDetalleReporte(
+        "total-talleristas",
+        mostrarValorDetalle(contenido.presentes)
+    );
+
+    cambiarTituloTablaDetalle(
+        "Resumen de Asistencia"
+    );
+
+    cambiarColumnasDetalle([
+        "Taller",
+        "Estado",
+        "Cantidad",
+        "Porcentaje"
+    ]);
+
+    const tabla = document.getElementById(
+        "tabla-resumen"
+    );
+
+    if (tabla) {
+        const tallerNombre =
+            contenido.tallerNombre ||
+            reporte.taller_nombre ||
+            "Taller sin nombre";
+
+        const total = Number(
+            contenido.asistenciasRegistradas || 0
+        );
+
+        const estados = [
+            {
+                nombre: "Presente",
+                cantidad: Number(
+                    contenido.presentes || 0
+                )
+            },
+            {
+                nombre: "Ausente",
+                cantidad: Number(
+                    contenido.ausentes || 0
+                )
+            },
+            {
+                nombre: "Justificado",
+                cantidad: Number(
+                    contenido.justificados || 0
+                )
+            },
+            {
+                nombre: "Tardanza",
+                cantidad: Number(
+                    contenido.tardanzas || 0
+                )
             }
-        });
-    });
+        ];
 
-    if (totalRegistros === 0) {
-        return 0;
+        tabla.innerHTML = estados.map(estado => {
+            const porcentaje = total > 0
+                ? Math.round(
+                    estado.cantidad / total * 100
+                )
+                : 0;
+
+            return `
+                <tr>
+                    <td>${escaparHTMLDetalle(tallerNombre)}</td>
+                    <td>${escaparHTMLDetalle(estado.nombre)}</td>
+                    <td>${estado.cantidad}</td>
+                    <td>${porcentaje}%</td>
+                </tr>
+            `;
+        }).join("");
     }
 
-    return Math.round((totalPresentes / totalRegistros) * 100);
+    const jornadas = mostrarValorDetalle(
+        contenido.totalClases
+    );
+
+    const registros = mostrarValorDetalle(
+        contenido.asistenciasRegistradas
+    );
+
+    const promedio = mostrarPorcentajeDetalle(
+        contenido.asistenciaPromedio
+    );
+
+    colocarTextoDetalleReporte(
+        "observaciones",
+        `El taller registra ${jornadas} jornada(s) y ` +
+        `${registros} registro(s) de asistencia. ` +
+        `El porcentaje de registros marcados como ` +
+        `Presentes es ${promedio}. ` +
+        `Los valores corresponden al momento de ` +
+        `generación del reporte.`
+    );
 }
 
 
-// ==============================
-// RESUMEN POR TALLER (en vivo)
-// ==============================
+// ======================================
+// MODIFICACIONES MÍNIMAS DE LA VISTA
+// ======================================
 
-function renderizarResumenPorTaller() {
+function cambiarEtiquetaTarjetaDetalle(
+    idValor,
+    textoEtiqueta
+) {
+    const valor = document.getElementById(idValor);
 
-    const tabla = document.getElementById("tabla-resumen");
+    if (!valor) {
+        return;
+    }
+
+    const tarjeta = valor.closest(".card-body");
+
+    if (!tarjeta) {
+        return;
+    }
+
+    const etiqueta = tarjeta.querySelector("p");
+
+    if (etiqueta) {
+        etiqueta.textContent = textoEtiqueta;
+    }
+}
+
+
+function cambiarTituloTablaDetalle(titulo) {
+    const tabla = document.getElementById(
+        "tabla-resumen"
+    );
 
     if (!tabla) {
         return;
     }
 
-    const d = window.DATOS_SIMULADOS;
-    const talleres = obtenerListado("talleres", d.talleres);
+    const tarjeta = tabla.closest(".card-body");
 
-    if (talleres.length === 0) {
-        tabla.innerHTML = `
-            <tr>
-                <td colspan="4" class="text-center text-muted py-4">
-                    No hay talleres registrados.
-                </td>
-            </tr>
-        `;
+    const encabezado = tarjeta?.querySelector("h4");
+
+    if (encabezado) {
+        encabezado.textContent = titulo;
+    }
+}
+
+
+function cambiarColumnasDetalle(columnas) {
+    const tabla = document.getElementById(
+        "tabla-resumen"
+    );
+
+    const encabezados = tabla
+        ?.closest("table")
+        ?.querySelectorAll("thead th");
+
+    if (!encabezados) {
         return;
     }
 
-    tabla.innerHTML = talleres.map((taller) => {
-
-        const inscripcion = d.inscripciones.find(
-            (i) => i.tallerId === taller.id
-        );
-        const cantidadAlumnos = inscripcion ? inscripcion.alumnoIds.length : 0;
-
-        const clases = d.asistencias.filter(
-            (c) => c.tallerId === taller.id
-        );
-        const asistenciaTaller = calcularAsistenciaPromedio(clases);
-
-        const talleristas = obtenerListado("talleristas", d.talleristas);
-        const tallerista = talleristas.find((t) => t.id === taller.talleristaId);
-        const nombreTallerista = tallerista
-            ? `${tallerista.nombre} ${tallerista.apellido}`
-            : "Sin asignar";
-
-        return `
-            <tr>
-                <td>${escaparHTML(taller.nombre)}</td>
-                <td>${escaparHTML(nombreTallerista)}</td>
-                <td>${cantidadAlumnos}</td>
-                <td>${asistenciaTaller}%</td>
-            </tr>
-        `;
-    }).join("");
+    encabezados.forEach((encabezado, indice) => {
+        encabezado.textContent = columnas[indice] || "";
+    });
 }
 
 
-// ==============================
-// ACCIONES
-// ==============================
+// ======================================
+// EXPORTAR E IMPRIMIR
+// ======================================
 
-function configurarAcciones() {
+function configurarAccionesDetalleReporte() {
+    const botonExportar = document.getElementById(
+        "btn-exportar"
+    );
 
-    const botonExportar = document.getElementById("btn-exportar");
-    const botonImprimir = document.getElementById("btn-imprimir");
+    const botonImprimir = document.getElementById(
+        "btn-imprimir"
+    );
 
     if (botonExportar) {
-        botonExportar.addEventListener("click", exportarReporte);
+        botonExportar.disabled = true;
+
+        botonExportar.addEventListener(
+            "click",
+            exportarReporte
+        );
     }
 
     if (botonImprimir) {
-        botonImprimir.addEventListener("click", () => {
-            window.print();
-        });
+        botonImprimir.disabled = true;
+
+        botonImprimir.addEventListener(
+            "click",
+            () => {
+                if (reporteActual) {
+                    window.print();
+                }
+            }
+        );
     }
 }
 
-// Descarga provisional como archivo de texto, tal como ya hace el
-// panel de tallerista con sus informes (ver docs/primeraVista.md 6.5).
-// La generacion real de PDF/Excel queda para cuando exista el backend.
+
+// ======================================
+// EXPORTACIÓN JSON
+// ======================================
+
 function exportarReporte() {
+    if (!reporteActual) {
+        alert("No hay un reporte cargado.");
+        return;
+    }
 
-    const contenido = `
-REPORTE: ${reporteActual.nombre}
-Tipo: ${reporteActual.tipo}
-Fecha de generación: ${reporteActual.fechaGeneracion}
-Período: ${obtenerPeriodoLegible(reporteActual)}
-Estado: ${reporteActual.estado}
+    const contenido = JSON.stringify(
+        reporteActual,
+        null,
+        2
+    );
 
-Contenido:
-${JSON.stringify(reporteActual.contenido, null, 2)}
-    `.trim();
+    const archivo = new Blob(
+        [contenido],
+        {
+            type: "application/json;charset=utf-8"
+        }
+    );
 
-    const blob = new Blob([contenido], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(archivo);
 
     const enlace = document.createElement("a");
-    enlace.href = url;
-    enlace.download = `${reporteActual.nombre}.txt`;
-    enlace.click();
 
-    URL.revokeObjectURL(url);
+    const nombreSeguro = String(
+        reporteActual.nombre || "reporte"
+    )
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9_-]+/g, "_")
+        .slice(0, 80);
+
+    enlace.href = url;
+
+    enlace.download =
+        `${nombreSeguro}_${reporteActual.id}.json`;
+
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 1000);
+}
+
+
+// ======================================
+// FUNCIONES AUXILIARES
+// ======================================
+
+function colocarTextoDetalleReporte(id, valor) {
+    const elemento = document.getElementById(id);
+
+    if (elemento) {
+        elemento.textContent = valor ?? "-";
+    }
+}
+
+
+function mostrarValorDetalle(valor) {
+    if (
+        valor === null ||
+        valor === undefined ||
+        valor === ""
+    ) {
+        return "--";
+    }
+
+    return String(valor);
+}
+
+
+function mostrarPorcentajeDetalle(valor) {
+    if (
+        valor === null ||
+        valor === undefined ||
+        valor === ""
+    ) {
+        return "--";
+    }
+
+    return `${valor}%`;
+}
+
+
+function formatearFechaDetalleReporte(fecha) {
+    if (!fecha) {
+        return "-";
+    }
+
+    const [anio, mes, dia] = String(fecha)
+        .slice(0, 10)
+        .split("-");
+
+    if (!anio || !mes || !dia) {
+        return String(fecha);
+    }
+
+    return `${dia}/${mes}/${anio}`;
+}
+
+
+function formatearFechaHoraDetalleReporte(fecha) {
+    if (!fecha) {
+        return "-";
+    }
+
+    const fechaFormateada =
+        formatearFechaDetalleReporte(fecha);
+
+    const hora = String(fecha)
+        .split(" ")[1]
+        ?.slice(0, 5);
+
+    return hora
+        ? `${fechaFormateada} ${hora}`
+        : fechaFormateada;
+}
+
+
+function escaparHTMLDetalle(valor) {
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 }

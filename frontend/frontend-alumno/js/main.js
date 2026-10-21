@@ -1,57 +1,211 @@
 
 /*
-    MAIN.JS - FRONTEND ALUMNO
-
-    Archivo común a todas las páginas del panel del alumno.
-    Se encarga de:
-    - Mostrar el nombre del alumno en la barra de navegación.
-    - Configurar el cierre de sesión.
-    - Detectar la página actual e invocar su inicializador.
-
-    Los datos siguen siendo simulados. La autenticación y la integración
-    completa con la API deben resolverse cuando se conecte el backend.
-*/
+ * MAIN.JS - FRONTEND ALUMNO
+ *
+ * Archivo común a las páginas del panel alumno.
+ *
+ * Funciones:
+ * - Verificar sesión mediante la API real.
+ * - Comprobar el rol alumno.
+ * - Mostrar el usuario autenticado.
+ * - Conservar los inicializadores de cada página.
+ * - Mantener compatibilidad temporal con mock-data.js.
+ * - Cerrar sesión mediante POST /logout.
+ *
+ * IMPORTANTE:
+ * usuarios.id y alumnos.id son identificadores diferentes.
+ */
 
 "use strict";
 
-// Espera a que el HTML esté cargado antes de buscar elementos o inicializar
-// la pantalla específica.
+const ALUMNO_API_URL = "http://localhost:8002";
+const ALUMNO_LOGIN_URL = "../../index.html";
+
+// Evitar mostrar contenido antes de verificar la sesión.
+document.documentElement.style.visibility = "hidden";
+
 document.addEventListener("DOMContentLoaded", inicializarAplicacion);
 
-function inicializarAplicacion() {
-    mostrarUsuarioEnNavbar();
-    configurarLogout();
-    inicializarPaginaActual();
+
+// ==============================
+// INICIALIZACIÓN GENERAL
+// ==============================
+
+async function inicializarAplicacion() {
+    try {
+        const usuario = await verificarSesionAlumno();
+
+        if (!usuario) {
+            return;
+        }
+
+        window.USUARIO_AUTENTICADO = usuario;
+
+        sincronizarUsuarioAlumno(usuario);
+
+        mostrarUsuarioEnNavbar();
+        configurarLogout();
+
+        document.documentElement.style.visibility = "visible";
+
+        inicializarPaginaActual();
+
+    } catch (error) {
+        console.error(
+            "No se pudo verificar la sesión:",
+            error
+        );
+
+        mostrarErrorDeSesion();
+    }
 }
 
 
 // ==============================
-// DETECCIÓN E INICIALIZACIÓN DE LA PÁGINA
+// VERIFICACIÓN DE SESIÓN
+// ==============================
+
+async function verificarSesionAlumno() {
+
+    const response = await fetch(
+        `${ALUMNO_API_URL}/perfil`,
+        {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                Accept: "application/json"
+            },
+            cache: "no-store"
+        }
+    );
+
+    // Sin sesión válida.
+    if (response.status === 401) {
+        redirigirAlLogin();
+        return null;
+    }
+
+    if (!response.ok) {
+        throw new Error(
+            `GET /perfil devolvió HTTP ${response.status}`
+        );
+    }
+
+    const resultado = await response.json();
+
+    if (!resultado.ok) {
+        throw new Error(
+            resultado.mensaje ||
+            "No se pudo recuperar el perfil."
+        );
+    }
+
+    // La API actual devuelve el usuario en datos.
+    // También admitimos datos.usuario.
+    const usuario =
+        resultado.datos?.usuario ?? resultado.datos;
+
+    if (
+        !usuario ||
+        typeof usuario !== "object" ||
+        Array.isArray(usuario) ||
+        !usuario.rol
+    ) {
+        throw new Error(
+            "La API no devolvió un usuario válido."
+        );
+    }
+
+    if (usuario.rol !== "alumno") {
+
+        const destinos = {
+            admin: "../frontend-admin/dashboard.html",
+            tallerista: "../frontend-tallerista/dashboard.html"
+        };
+
+        window.location.replace(
+            destinos[usuario.rol] || ALUMNO_LOGIN_URL
+        );
+
+        return null;
+    }
+
+    return usuario;
+}
+
+
+function redirigirAlLogin() {
+    window.location.replace(ALUMNO_LOGIN_URL);
+}
+
+
+// ==============================
+// MANEJO DE ERRORES
+// ==============================
+
+function mostrarErrorDeSesion() {
+
+    document.documentElement.style.visibility = "visible";
+    document.body.replaceChildren();
+
+    const mensaje = document.createElement("main");
+    mensaje.className = "container py-5";
+
+    const titulo = document.createElement("h1");
+    titulo.className = "h4";
+    titulo.textContent = "No se pudo comprobar la sesión";
+
+    const detalle = document.createElement("p");
+    detalle.textContent =
+        "Comprobá que la API esté funcionando y volvé a intentar.";
+
+    const reintentar = document.createElement("button");
+    reintentar.className = "btn btn-primary";
+    reintentar.textContent = "Reintentar";
+
+    reintentar.addEventListener("click", () => {
+        window.location.reload();
+    });
+
+    mensaje.append(titulo, detalle, reintentar);
+    document.body.append(mensaje);
+}
+
+
+// ==============================
+// DETECCIÓN DE PÁGINA
 // ==============================
 
 function obtenerPaginaActual() {
-    // Es preferible usar data-page porque no depende del nombre del archivo.
+
     const paginaDefinida = document.body?.dataset?.page;
 
     if (paginaDefinida) {
         return paginaDefinida;
     }
 
-    // Alternativa por si en el futuro una página no incluye data-page.
-    const archivoActual = window.location.pathname.split("/").pop();
+    const archivoActual = window.location.pathname
+        .split("/")
+        .pop();
 
     if (!archivoActual) {
         return "dashboard";
     }
 
-    return archivoActual.replace(/\.html$/i, "") || "dashboard";
+    return archivoActual.replace(/\.html$/i, "") ||
+        "dashboard";
 }
 
+
+// ==============================
+// INICIALIZADORES
+// ==============================
+
 function inicializarPaginaActual() {
+
     const paginaActual = obtenerPaginaActual();
 
-    // Estos nombres deben coincidir con las funciones que se definirán en
-    // cada archivo específico (dashboard.js, tareas.js, perfil.js, etc.).
+    // Se conservan los siete inicializadores originales.
     const inicializadores = {
         "dashboard": "inicializarDashboard",
         "mis-talleres": "inicializarMisTalleres",
@@ -64,8 +218,6 @@ function inicializarPaginaActual() {
 
     const nombreFuncion = inicializadores[paginaActual];
 
-    // Durante el desarrollo puede que aún falte un archivo de página.
-    // Verificamos que exista la función antes de llamarla para evitar errores.
     if (!nombreFuncion) {
         console.warn(
             `No hay un inicializador registrado para la página "${paginaActual}".`
@@ -86,78 +238,90 @@ function inicializarPaginaActual() {
 
 
 // ==============================
-// USUARIO ACTUAL
+// USUARIO REAL Y DATOS SIMULADOS
 // ==============================
 
-function obtenerUsuarioActual() {
-    const usuarioPredeterminado = window.DATOS_SIMULADOS?.usuarioActual || {
-        id: null,
-        usuarioId: null,
-        nombre: "Alumno",
-        apellido: "",
-        rol: "Alumno"
-    };
 
-    // utils.js proporciona obtenerDato(). Se usa como lectura centralizada
-    // para no repetir el manejo de JSON/localStorage en todo el panel.
-    const datosGuardados = typeof obtenerDato === "function"
-        ? obtenerDato("usuarioActual")
-        : null;
-
-    if (
-        !datosGuardados ||
-        typeof datosGuardados !== "object" ||
-        Array.isArray(datosGuardados)
-    ) {
-        return usuarioPredeterminado;
-    }
-
-    // Conservamos los campos predeterminados que no estén en la sesión
-    // guardada (por ejemplo, fecha de ingreso o referente adulto).
-    const usuarioActual = {
-        ...usuarioPredeterminado,
-        ...datosGuardados
-    };
+function sincronizarUsuarioAlumno(usuario) {
 
     /*
-        El modelo SQL distingue:
-        - usuarios.id: identificador de la cuenta.
-        - alumnos.id: identificador de la ficha del alumno.
+     * La identidad real viene de la API.
+     *
+     * usuario.id corresponde a usuarios.id.
+     * usuario.alumno_id corresponde a alumnos.id.
+     */
 
-        En los datos de demostración, Sofía tiene alumnos.id = 1 y
-        usuarios.id = 4. Si la sesión guardada contiene solamente id = 4,
-        evitamos reemplazar accidentalmente el ID de alumno por el ID
-        de usuario.
+    const usuarioId = Number(usuario.id);
+    const alumnoId = Number(usuario.alumno_id);
 
-        Si la sesión ya trae alumnoId, lo usamos como ID de la ficha.
-    */
-    if (
-        datosGuardados.alumnoId !== undefined &&
-        datosGuardados.alumnoId !== null
-    ) {
-        usuarioActual.id = Number(datosGuardados.alumnoId);
-    } else if (
-        usuarioPredeterminado.usuarioId !== undefined &&
-        usuarioPredeterminado.usuarioId !== null &&
-        datosGuardados.id !== undefined &&
-        Number(datosGuardados.id) === Number(usuarioPredeterminado.usuarioId) &&
-        datosGuardados.usuarioId === undefined
-    ) {
-        usuarioActual.id = usuarioPredeterminado.id;
-        usuarioActual.usuarioId = Number(datosGuardados.id);
+    // Validar que ambos identificadores sean correctos.
+    if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+        throw new Error(
+            "La API no devolvió un ID de usuario válido."
+        );
     }
 
-    // Sincroniza los datos en memoria para que los módulos de página usen
-    // la misma información que se muestra en la barra de navegación.
+    if (!Number.isInteger(alumnoId) || alumnoId <= 0) {
+        throw new Error(
+            "La API no devolvió un ID de alumno válido."
+        );
+    }
+
+    // Compatibilidad temporal con las pantallas no integradas.
+    const datosSimulados =
+        window.DATOS_SIMULADOS?.usuarioActual;
+
+    const usuarioNormalizado = {
+        ...usuario,
+        usuarioId,
+        alumnoId,
+        id: alumnoId,
+        rol: "alumno"
+    };
+
+    // Conservar el perfil real recibido desde PHP.
+    window.USUARIO_AUTENTICADO = usuario;
+
+    // Identidad normalizada para los módulos del alumno.
+    window.ALUMNO_ACTUAL = usuarioNormalizado;
+
+    /*
+     * Los módulos todavía no integrados pueden seguir
+     * utilizando DATOS_SIMULADOS durante la etapa 5.
+     *
+     * La identidad siempre proviene de la API.
+     */
     if (window.DATOS_SIMULADOS) {
-        window.DATOS_SIMULADOS.usuarioActual = usuarioActual;
-    }
 
-    return usuarioActual;
+        const mismaCuenta =
+            datosSimulados &&
+            Number(datosSimulados.usuarioId) === usuarioId;
+
+        window.DATOS_SIMULADOS.usuarioActual = {
+            ...(mismaCuenta ? datosSimulados : {}),
+            ...usuarioNormalizado
+        };
+    }
 }
 
+function obtenerUsuarioActual() {
+
+    // Se utiliza la identidad validada por PHP.
+    // Nunca se autentica al usuario con localStorage.
+    return window.ALUMNO_ACTUAL ||
+        window.USUARIO_AUTENTICADO ||
+        null;
+}
+
+
+// ==============================
+// NAVBAR
+// ==============================
+
 function mostrarUsuarioEnNavbar() {
-    const elementoUsuario = document.getElementById("nombre-usuario");
+
+    const elementoUsuario =
+        document.getElementById("nombre-usuario");
 
     if (!elementoUsuario) {
         return;
@@ -165,13 +329,20 @@ function mostrarUsuarioEnNavbar() {
 
     const usuario = obtenerUsuarioActual();
 
-    const nombreCompleto = [usuario.nombre, usuario.apellido]
+    if (!usuario) {
+        return;
+    }
+
+    const nombreCompleto = [
+        usuario.nombre,
+        usuario.apellido
+    ]
         .filter(Boolean)
         .join(" ");
 
     const textoUsuario = nombreCompleto || "Alumno";
 
-    // Conserva el ícono de Bootstrap Icons si el enlace/span lo contiene.
+    // Conservar el icono existente.
     const icono = elementoUsuario.querySelector("i");
 
     if (icono) {
@@ -190,46 +361,97 @@ function mostrarUsuarioEnNavbar() {
 
 
 // ==============================
-// CIERRE DE SESIÓN
+// CONFIGURAR LOGOUT
 // ==============================
 
 function configurarLogout() {
+
     const botonesLogout = document.querySelectorAll(
         "#btn-logout, #btn-cerrar-sesion"
     );
 
     botonesLogout.forEach((boton) => {
-        // Evita agregar el mismo listener si la configuración se ejecuta
-        // más de una vez.
+
+        // Evitar registrar el mismo evento dos veces.
         if (boton.dataset.logoutConfigurado === "true") {
             return;
         }
 
         boton.dataset.logoutConfigurado = "true";
+
         boton.addEventListener("click", cerrarSesion);
     });
 }
 
-function cerrarSesion() {
-    const confirmarSalida = window.confirm("¿Deseás cerrar sesión?");
+
+// ==============================
+// CERRAR SESIÓN REAL
+// ==============================
+
+async function cerrarSesion(evento) {
+
+    evento?.preventDefault();
+
+    const confirmarSalida = window.confirm(
+        "¿Deseás cerrar sesión?"
+    );
 
     if (!confirmarSalida) {
         return;
     }
 
-    // Eliminamos solo los datos de autenticación conocidos. No usamos
-    // localStorage.clear(), porque borraría también los datos simulados
-    // y los cambios guardados en otras pantallas del panel.
+    const botones = document.querySelectorAll(
+        "#btn-logout, #btn-cerrar-sesion"
+    );
+
+    botones.forEach((boton) => {
+        boton.disabled = true;
+    });
+
     try {
+
+        const response = await fetch(
+            `${ALUMNO_API_URL}/logout`,
+            {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    Accept: "application/json"
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                `POST /logout devolvió HTTP ${response.status}`
+            );
+        }
+
+        /*
+         * Se borran solamente los datos antiguos de sesión.
+         * No eliminamos los demás registros simulados.
+         */
         localStorage.removeItem("usuarioActual");
         localStorage.removeItem("sesionActiva");
+
+        window.USUARIO_AUTENTICADO = null;
+        window.ALUMNO_ACTUAL = null;
+
+        redirigirAlLogin();
+
     } catch (error) {
+
         console.error(
-            "No se pudo limpiar la sesión del navegador:",
+            "No se pudo cerrar sesión:",
             error
         );
-    }
 
-    // Desde frontend/frontend-alumno/ subimos dos niveles para volver al login.
-    window.location.href = "../../index.html";
+        alert(
+            "No se pudo cerrar sesión. Comprobá la conexión e intentá otra vez."
+        );
+
+        botones.forEach((boton) => {
+            boton.disabled = false;
+        });
+    }
 }

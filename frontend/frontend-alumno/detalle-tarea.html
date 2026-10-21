@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -85,9 +86,23 @@
                                 <i class="bi bi-paperclip"></i>
                                 <span id="nombre-archivo-entregado">-</span>
                             </div>
+
+                            <button type="button" id="btn-descargar-entrega"
+                                class="btn btn-sm btn-outline-primary mt-2 d-none">
+                                <i class="bi bi-download me-1" aria-hidden="true"></i>
+                                Descargar mi archivo
+                            </button>
+
                             <p class="text-muted mt-2 mb-0">
                                 Entregado el <span id="fecha-entrega-realizada">-</span>
                             </p>
+
+
+                            <p id="comentario-alumno-actual" class="mt-2 mb-0 d-none">
+                                <strong>Mi comentario:</strong>
+                                <span id="texto-comentario-alumno"></span>
+                            </p>
+
                         </div>
 
                         <form id="form-entrega">
@@ -97,12 +112,7 @@
                                 </label>
                                 <div class="zona-archivo mb-2">
                                     <i class="bi bi-cloud-arrow-up-fill d-block mb-2"></i>
-                                    <input
-                                        type="file"
-                                        id="archivo-tarea"
-                                        class="form-control"
-                                        accept=".pdf,.jpg,.jpeg,.html,.css,.js"
-                                    >
+                                    <input type="file" id="archivo-tarea" class="form-control" accept=".pdf,.jpg,.jpeg">
                                 </div>
                                 <div class="form-text">
                                     Tamaño máximo permitido: 10 MB.
@@ -113,12 +123,8 @@
                                 <label for="comentario-entrega" class="form-label">
                                     Comentario (opcional)
                                 </label>
-                                <textarea
-                                    id="comentario-entrega"
-                                    class="form-control"
-                                    rows="3"
-                                    placeholder="Agregá un comentario para el tallerista..."
-                                ></textarea>
+                                <textarea id="comentario-entrega" class="form-control" rows="3"
+                                    placeholder="Agregá un comentario para el tallerista..."></textarea>
                             </div>
 
                             <button type="submit" id="btn-entregar" class="btn btn-primary">
@@ -164,7 +170,7 @@
                         <div id="con-nota" class="d-none">
                             <div class="d-flex align-items-center gap-3 mb-3">
                                 <span id="valor-nota" class="nota-destacada">-</span>
-                                <span class="text-muted">
+                                <span id="bloque-fecha-correccion" class="text-muted d-none">
                                     Corregida el <span id="fecha-correccion">-</span>
                                 </span>
                             </div>
@@ -187,4 +193,5 @@
     <script src="js/main.js"></script>
     <script src="js/detalle-tarea.js"></script>
 </body>
+
 </html>

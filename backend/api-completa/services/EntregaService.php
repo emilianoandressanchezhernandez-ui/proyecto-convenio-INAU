@@ -39,6 +39,67 @@ class EntregaService
         );
     }
 
+
+    public function getMiEntrega(
+        int $contenidoId,
+        array $usuario
+    ): ?array {
+        $contenido = $this->getTarea($contenidoId);
+
+        if (
+            !isset($usuario['id'], $usuario['rol']) ||
+            $usuario['rol'] !== 'alumno'
+        ) {
+            throw new RuntimeException(
+                'No tienes permiso para consultar esta entrega.',
+                403
+            );
+        }
+
+        $alumno = $this->alumnoRepository
+            ->obtenerPorUsuarioId(
+                (int) $usuario['id']
+            );
+
+        if (!$alumno) {
+            throw new RuntimeException(
+                'No se encontró el alumno asociado al usuario.',
+                403
+            );
+        }
+
+        $alumnoId = (int) $alumno['id'];
+
+        $inscripcion = $this->asignacionRepository
+            ->findAlumnoAssignment(
+                (int) $contenido['taller_id'],
+                $alumnoId
+            );
+
+        if (!$inscripcion) {
+            throw new RuntimeException(
+                'No tienes permiso para consultar esta tarea.',
+                403
+            );
+        }
+
+        $entrega = $this->repository
+            ->findByContenidoAndAlumno(
+                $contenidoId,
+                $alumnoId
+            );
+
+        if (!$entrega) {
+            return null;
+        }
+
+        return $this->agregarEstadoPlazo(
+            $entrega,
+            $contenido
+        );
+    }
+
+
     public function getByContenido(
         int $contenidoId,
         array $usuario
@@ -68,8 +129,25 @@ class EntregaService
 
     public function create(
         int $contenidoId,
-        int $usuarioId
+        int $usuarioId,
+        ?string $comentarioAlumno = null
     ): array {
+
+
+        if ($comentarioAlumno !== null) {
+            $comentarioAlumno = trim($comentarioAlumno);
+
+            if (mb_strlen($comentarioAlumno, 'UTF-8') > 2000) {
+                throw new InvalidArgumentException(
+                    'El comentario del alumno no puede superar los 2000 caracteres.'
+                );
+            }
+
+            if ($comentarioAlumno === '') {
+                $comentarioAlumno = null;
+            }
+        }
+
         $contenido = $this->getTarea($contenidoId);
 
         $taller = $this->getActiveTaller(
@@ -121,7 +199,8 @@ class EntregaService
         $id = $this->repository->create(
             $contenidoId,
             $alumnoId,
-            date('Y-m-d H:i:s')
+            date('Y-m-d H:i:s'),
+            $comentarioAlumno
         );
 
         $entrega = $this->getEntrega($id);

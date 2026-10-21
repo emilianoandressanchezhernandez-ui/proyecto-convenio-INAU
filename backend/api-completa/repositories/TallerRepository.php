@@ -150,4 +150,29 @@ class TallerRepository extends Repository
 
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function createHorario(int $tallerId, array $horario): int
+    {
+        $sql = "INSERT INTO horarios_taller (
+                taller_id,
+                dia,
+                hora_inicio,
+                hora_fin
+            ) VALUES (
+                :taller_id,
+                :dia,
+                :hora_inicio,
+                :hora_fin
+            )";
+
+        $query = $this->db->prepare($sql);
+
+        $query->execute([
+            'taller_id' => $tallerId,
+            'dia' => $horario['dia'],
+            'hora_inicio' => $horario['hora_inicio'],
+            'hora_fin' => $horario['hora_fin']
+        ]);
+
+        return (int) $this->db->lastInsertId();
+    }
 }

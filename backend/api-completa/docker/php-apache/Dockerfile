@@ -34,4 +34,11 @@ RUN composer install \
         --optimize-autoloader \
     && chown -R www-data:www-data /var/www/html
 
+# Preparar los permisos del volumen de archivos al iniciar el contenedor.
+COPY docker/php-apache/entrypoint.sh /usr/local/bin/inau-entrypoint
+RUN chmod +x /usr/local/bin/inau-entrypoint
+
+ENTRYPOINT ["/usr/local/bin/inau-entrypoint"]
+CMD ["apache2-foreground"]
+
 EXPOSE 80

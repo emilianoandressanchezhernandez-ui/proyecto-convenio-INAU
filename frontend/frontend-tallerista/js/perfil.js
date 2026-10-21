@@ -1,102 +1,177 @@
+
 /*
-    PERFIL.JS
-    Responsabilidades:
-    - Cargar los datos del usuario actual.
-    - Mostrar la información en el formulario.
+    PERFIL.JS - FRONTEND TALLERISTA
+
+    Integración real con PHP y MySQL.
+
+    GET   /perfil
+    PATCH /perfil
+
+    Permite:
+    - Consultar el perfil real.
+    - Actualizar correo y teléfono.
     - Validar los cambios.
-    - Guardar los datos temporalmente en localStorage.
-    - Actualizar la tarjeta y la navbar.
+    - Mostrar errores del backend.
+    - Mantener los cambios después de recargar.
+
+    No utiliza localStorage ni DATOS_SIMULADOS.
 */
 
-// VARIABLE PRINCIPAL
-
 let usuarioPerfilActual = null;
+let guardandoPerfil = false;
 
+
+// ========================================
 // INICIALIZACIÓN
+// ========================================
 
-function inicializarPerfil() {
+async function inicializarPerfil() {
+    configurarFormularioPerfil();
+    deshabilitarFormularioPerfil();
+
+    mostrarAlertaPerfil(
+        "Cargando datos del perfil...",
+        "info"
+    );
+
     try {
-        validarDatosPerfil();
+        await cargarPerfilReal();
 
-        usuarioPerfilActual =
-            obtenerUsuarioParaPerfil();
-
-        mostrarDatosPerfil(
-            usuarioPerfilActual
-        );
-
-        configurarFormularioPerfil();
+        habilitarFormularioPerfil();
+        ocultarAlertaPerfil();
 
     } catch (error) {
         console.error(
-            "Error al inicializar el perfil:",
+            "Error al cargar el perfil:",
             error
         );
 
         mostrarAlertaPerfil(
-            "No se pudieron cargar los datos del perfil.",
+            "No se pudo cargar el perfil. " + error.message,
             "danger"
         );
-
-        deshabilitarFormularioPerfil();
     }
 }
 
-// VALIDACIÓN INICIAL
 
-function validarDatosPerfil() {
-    if (!window.DATOS_SIMULADOS) {
+// ========================================
+// PETICIONES A LA API
+// ========================================
+
+async function solicitarPerfilAPI(
+    metodo = "GET",
+    datos = null
+) {
+    const opciones = {
+        method: metodo,
+        credentials: "include",
+        headers: {
+            Accept: "application/json"
+        }
+    };
+
+    if (datos !== null) {
+        opciones.headers["Content-Type"] =
+            "application/json";
+
+        opciones.body = JSON.stringify(datos);
+    }
+
+    let respuesta;
+
+    try {
+        respuesta = await fetch(
+            `${TALLERISTA_API_URL}/perfil`,
+            opciones
+        );
+    } catch {
         throw new Error(
-            "No se encontraron los datos simulados."
+            "No se pudo conectar con la API."
         );
     }
 
-    if (!window.DATOS_SIMULADOS.usuarioActual) {
+    let resultado;
+
+    try {
+        resultado = await respuesta.json();
+    } catch {
         throw new Error(
-            "No se encontró el usuario actual."
+            "La API no devolvió una respuesta JSON válida."
         );
     }
-}
 
-// OBTENER USUARIO
+    if (!respuesta.ok || resultado.ok === false) {
+        let mensaje = resultado.mensaje ||
+            `Error HTTP ${respuesta.status}`;
 
-function obtenerUsuarioParaPerfil() {
-    /*
-        Utilizamos la función de main.js para obtener
-        el usuario guardado o el usuario simulado.
-    */
+        const errores = resultado.errores;
 
-    if (typeof obtenerUsuarioActual === "function") {
-        return obtenerUsuarioActual();
+        if (Array.isArray(errores) && errores.length) {
+            mensaje += " " + errores.join(" ");
+        } else if (
+            errores &&
+            typeof errores === "object"
+        ) {
+            mensaje += " " +
+                Object.values(errores).join(" ");
+        }
+
+        throw new Error(mensaje);
     }
 
-    return window.DATOS_SIMULADOS.usuarioActual;
+    return resultado.datos;
 }
 
-// MOSTRAR DATOS
+
+// ========================================
+// CARGAR PERFIL REAL
+// ========================================
+
+async function cargarPerfilReal() {
+    const usuario = await solicitarPerfilAPI("GET");
+
+    if (
+        !usuario ||
+        typeof usuario !== "object" ||
+        Array.isArray(usuario)
+    ) {
+        throw new Error(
+            "No se recibieron datos válidos del usuario."
+        );
+    }
+
+    usuarioPerfilActual = usuario;
+
+    mostrarDatosPerfil(usuario);
+}
+
+
+// ========================================
+// MOSTRAR INFORMACIÓN
+// ========================================
 
 function mostrarDatosPerfil(usuario) {
-    colocarValorInput(
+    colocarValorInputPerfil(
         "nombre",
         usuario.nombre
     );
 
-    colocarValorInput(
+    colocarValorInputPerfil(
         "apellido",
         usuario.apellido
     );
 
-    colocarValorInput(
+    colocarValorInputPerfil(
         "cedula",
         usuario.cedula
     );
 
-    colocarValorInput(
+    colocarValorInputPerfil(
         "correo",
         usuario.correo
     );
 
-    colocarValorInput(
+    colocarValorInputPerfil(
         "telefono",
         usuario.telefono
     );
@@ -119,6 +194,7 @@ function mostrarDatosPerfil(usuario) {
     colocarTextoPerfil(
         "fecha-registro",
         formatearFechaPerfil(
+            usuario.fecha_registro ??
             usuario.fechaRegistro
         )
     );
@@ -126,12 +202,18 @@ function mostrarDatosPerfil(usuario) {
     colocarTextoPerfil(
         "ultimo-acceso",
         formatearFechaHoraPerfil(
+            usuario.ultimo_acceso ??
             usuario.ultimoAcceso
         )
     );
+
+    actualizarNombreNavbarPerfil(usuario);
 }
 
+
+// ========================================
 // FORMULARIO
+// ========================================
 
 function configurarFormularioPerfil() {
     const formulario = document.getElementById(
@@ -150,221 +232,148 @@ function configurarFormularioPerfil() {
     );
 }
 
-function guardarCambiosPerfil(event) {
-    // Evita que el formulario recargue la página
 
-    event.preventDefault();
+async function guardarCambiosPerfil(evento) {
+    evento.preventDefault();
 
-    ocultarAlertaPerfil();
-
-    const datosFormulario =
-        obtenerDatosFormularioPerfil();
-
-    const errorValidacion =
-        validarFormularioPerfil(
-            datosFormulario
-        );
-
-    if (errorValidacion) {
-        mostrarAlertaPerfil(
-            errorValidacion,
-            "warning"
-        );
-
+    if (guardandoPerfil || !usuarioPerfilActual) {
         return;
     }
 
-    // Conservamos las propiedades que el usuario no puede modificar, como ID, rol y fechas
+    ocultarAlertaPerfil();
 
-    const usuarioActualizado = {
-        ...usuarioPerfilActual,
+    const correo = obtenerValorInputPerfil("correo");
+    const telefono = obtenerValorInputPerfil("telefono");
 
-        nombre: datosFormulario.nombre,
-        apellido: datosFormulario.apellido,
-        cedula: datosFormulario.cedula,
-        correo: datosFormulario.correo,
-        telefono: datosFormulario.telefono
-    };
-
-    localStorage.setItem(
-        "usuarioActual",
-        JSON.stringify(usuarioActualizado)
+    const error = validarFormularioPerfil(
+        correo,
+        telefono
     );
 
-    // Sincronizamos los datos actuales para que los cambios se vean sin tener que recargar la página
+    if (error) {
+        mostrarAlertaPerfil(error, "warning");
+        return;
+    }
 
-    usuarioPerfilActual =
-        usuarioActualizado;
+    const cambios = {};
 
-    window.DATOS_SIMULADOS.usuarioActual =
-        usuarioActualizado;
+    const correoAnterior = String(
+        usuarioPerfilActual.correo ?? ""
+    ).trim();
 
-    actualizarDatosVisibles(
-        usuarioActualizado
+    const telefonoAnterior = String(
+        usuarioPerfilActual.telefono ?? ""
+    ).trim();
+
+    if (correo !== correoAnterior) {
+        cambios.correo = correo;
+    }
+
+    if (telefono !== telefonoAnterior) {
+        cambios.telefono = telefono;
+    }
+
+    if (Object.keys(cambios).length === 0) {
+        mostrarAlertaPerfil(
+            "No hay cambios para guardar.",
+            "info"
+        );
+        return;
+    }
+
+    const boton = document.getElementById(
+        "btn-guardar-perfil"
     );
 
-    limpiarCamposContrasena();
+    guardandoPerfil = true;
 
-    mostrarAlertaPerfil(
-        obtenerMensajeGuardado(
-            datosFormulario.password
-        ),
-        "success"
-    );
+    if (boton) {
+        boton.disabled = true;
+        boton.textContent = "Guardando...";
+    }
+
+    try {
+        await solicitarPerfilAPI(
+            "PATCH",
+            cambios
+        );
+
+        // Volvemos a consultar los datos
+        // realmente almacenados en MySQL.
+        await cargarPerfilReal();
+
+        mostrarAlertaPerfil(
+            "Los cambios del perfil se guardaron correctamente.",
+            "success"
+        );
+
+    } catch (error) {
+        console.error(
+            "Error al actualizar el perfil:",
+            error
+        );
+
+        mostrarAlertaPerfil(
+            "No se pudieron confirmar los cambios. " +
+            error.message,
+            "danger"
+        );
+
+    } finally {
+        guardandoPerfil = false;
+
+        if (boton) {
+            boton.disabled = false;
+
+            boton.innerHTML =
+                '<i class="bi bi-save-fill"></i> Guardar Cambios';
+        }
+    }
 }
 
-// LEER FORMULARIO
 
-function obtenerDatosFormularioPerfil() {
-    return {
-        correo: obtenerValorInput("correo"),
-        telefono: obtenerValorInput("telefono"),
-        password: obtenerValorInput("password"),
-        confirmarPassword:
-            obtenerValorInput("confirmar-password")
-    };
-}
-
+// ========================================
 // VALIDACIONES
+// ========================================
 
-function validarFormularioPerfil(datos) {
-    if (
-        !datos.correo ||
-        !datos.telefono
-    ) {
+function validarFormularioPerfil(correo, telefono) {
+    if (!correo || !telefono) {
         return "Debes completar el correo y el teléfono.";
     }
 
-    if (!validarCorreoPerfil(datos.correo)) {
+    const inputCorreo = document.getElementById(
+        "correo"
+    );
+
+    if (
+        inputCorreo &&
+        !inputCorreo.checkValidity()
+    ) {
+        return "El correo electrónico no es válido.";
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
         return "El correo electrónico no tiene un formato válido.";
     }
 
-    if (!validarTelefonoPerfil(datos.telefono)) {
-        return "El teléfono ingresado no tiene un formato válido.";
-    }
+    // Validación básica del formato.
+    // El backend realiza la validación definitiva.
+    const telefonoLimpio = telefono.replace(
+        /[\s()+-]/g,
+        ""
+    );
 
-    const escribioPassword =
-        datos.password !== "";
-
-    const escribioConfirmacion =
-        datos.confirmarPassword !== "";
-
-    if (
-        escribioPassword ||
-        escribioConfirmacion
-    ) {
-        if (
-            !escribioPassword ||
-            !escribioConfirmacion
-        ) {
-            return "Debes completar ambos campos de contraseña.";
-        }
-
-        if (datos.password.length < 8) {
-            return "La nueva contraseña debe tener al menos 8 caracteres.";
-        }
-
-        if (
-            datos.password !==
-            datos.confirmarPassword
-        ) {
-            return "Las contraseñas no coinciden.";
-        }
+    if (!/^\d{8,15}$/.test(telefonoLimpio)) {
+        return "El teléfono debe contener entre 8 y 15 dígitos.";
     }
 
     return null;
 }
 
-function validarCorreoPerfil(correo) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-        correo
-    );
-}
 
-function validarTelefonoPerfil(telefono) {
-    /*
-        Elimina espacios, guiones, paréntesis y el signo +.
-    */
-
-    const telefonoLimpio = telefono.replace(
-        /[\s\-()+]/g,
-        ""
-    );
-
-    return /^\d{8,15}$/.test(
-        telefonoLimpio
-    );
-}
-
-// ACTUALIZACIÓN VISUAL
-
-function actualizarDatosVisibles(usuario) {
-    colocarTextoPerfil(
-        "perfil-nombre",
-        obtenerNombreCompletoPerfil(usuario)
-    );
-
-    colocarTextoPerfil(
-        "perfil-rol",
-        usuario.rol || "Tallerista"
-    );
-
-    // Actualizamos también el nombre que aparece en la navbar
-
-    const elementoNavbar = document.getElementById(
-        "nombre-usuario"
-    );
-
-    if (elementoNavbar) {
-        const nombreCompleto =
-            obtenerNombreCompletoPerfil(usuario);
-
-        const icono = elementoNavbar.querySelector("i");
-
-        if (icono) {
-            elementoNavbar.replaceChildren();
-
-            elementoNavbar.append(
-                icono,
-                document.createTextNode(
-                    ` ${nombreCompleto}`
-                )
-            );
-        } else {
-            elementoNavbar.textContent =
-                nombreCompleto;
-        }
-    }
-}
-
-// CONTRASEÑA
-
-function limpiarCamposContrasena() {
-    colocarValorInput(
-        "password",
-        ""
-    );
-
-    colocarValorInput(
-        "confirmar-password",
-        ""
-    );
-}
-
-function obtenerMensajeGuardado(password) {
-    if (password) {
-        /*
-            No guardamos contraseñas en localStorage.
-            En la etapa del backend, PHP se encargará de enviarla de forma segura y almacenarla mediante hash.
-        */
-
-        return "Los datos se guardaron correctamente. El cambio de contraseña quedó simulado para la futura conexión con el backend.";
-    }
-
-    return "Los datos del perfil se guardaron correctamente.";
-}
-
-// FORMATO
+// ========================================
+// NOMBRE Y NAVBAR
+// ========================================
 
 function obtenerNombreCompletoPerfil(usuario) {
     return [
@@ -375,100 +384,143 @@ function obtenerNombreCompletoPerfil(usuario) {
         .join(" ") || "Tallerista";
 }
 
-function formatearFechaPerfil(fechaISO) {
-    if (!fechaISO) {
+
+function actualizarNombreNavbarPerfil(usuario) {
+    const elemento = document.getElementById(
+        "nombre-usuario"
+    );
+
+    if (!elemento) {
+        return;
+    }
+
+    const nombre = obtenerNombreCompletoPerfil(
+        usuario
+    );
+
+    const icono = elemento.querySelector("i");
+
+    if (icono) {
+        elemento.replaceChildren(
+            icono,
+            document.createTextNode(` ${nombre}`)
+        );
+    } else {
+        elemento.textContent = nombre;
+    }
+}
+
+
+// ========================================
+// FECHAS
+// ========================================
+
+function formatearFechaPerfil(valor) {
+    if (!valor) {
         return "Sin información";
     }
 
-    const partes = fechaISO.split("-");
+    const fecha = String(valor).slice(0, 10);
+    const partes = fecha.split("-");
 
     if (partes.length !== 3) {
-        return fechaISO;
+        return String(valor);
     }
 
-    const [anio, mes, dia] = partes;
-
-    return `${dia}/${mes}/${anio}`;
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
-function formatearFechaHoraPerfil(valorFecha) {
-    if (!valorFecha) {
+
+function formatearFechaHoraPerfil(valor) {
+    if (!valor) {
         return "Sin información";
     }
 
-    /*
-        También permite mostrar el formato utilizado inicialmente en mock-data.js:
-        2026-07-17 14:30
-    */
+    const texto = String(valor);
+    const fecha = formatearFechaPerfil(texto);
 
-    const fechaNormalizada = valorFecha.includes(" ")
-        ? valorFecha.replace(" ", "T")
-        : valorFecha;
+    const hora = texto.length >= 16
+        ? texto.slice(11, 16)
+        : "";
 
-    const fecha = new Date(
-        fechaNormalizada
-    );
-
-    if (Number.isNaN(fecha.getTime())) {
-        return valorFecha;
-    }
-
-    return fecha.toLocaleString(
-        "es-UY",
-        {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    );
+    return hora
+        ? `${fecha} ${hora}`
+        : fecha;
 }
 
-// FUNCIONES AUXILIARES
 
-function obtenerValorInput(elementoId) {
-    const elemento = document.getElementById(
-        elementoId
-    );
+// ========================================
+// INPUTS Y TEXTOS
+// ========================================
+
+function obtenerValorInputPerfil(id) {
+    const elemento = document.getElementById(id);
 
     return elemento
         ? elemento.value.trim()
         : "";
 }
 
-function colocarValorInput(
-    elementoId,
-    contenido
-) {
-    const elemento = document.getElementById(
-        elementoId
+
+function colocarValorInputPerfil(id, valor) {
+    const elemento = document.getElementById(id);
+
+    if (elemento) {
+        elemento.value = valor ?? "";
+    }
+}
+
+
+function colocarTextoPerfil(id, valor) {
+    const elemento = document.getElementById(id);
+
+    if (elemento) {
+        elemento.textContent = valor ?? "--";
+    }
+}
+
+
+// ========================================
+// ESTADO DEL FORMULARIO
+// ========================================
+
+function deshabilitarFormularioPerfil() {
+    const formulario = document.getElementById(
+        "form-perfil"
     );
 
-    if (!elemento) {
+    if (!formulario) {
         return;
     }
 
-    elemento.value = contenido ?? "";
+    formulario.querySelectorAll(
+        "#correo, #telefono, #btn-guardar-perfil"
+    ).forEach(elemento => {
+        elemento.disabled = true;
+    });
 }
 
-function colocarTextoPerfil(
-    elementoId,
-    contenido
-) {
-    const elemento = document.getElementById(
-        elementoId
+
+function habilitarFormularioPerfil() {
+    const formulario = document.getElementById(
+        "form-perfil"
     );
 
-    if (!elemento) {
+    if (!formulario) {
         return;
     }
 
-    elemento.textContent =
-        contenido ?? "--";
+    formulario.querySelectorAll(
+        "#correo, #telefono, #btn-guardar-perfil"
+    ).forEach(elemento => {
+        elemento.disabled = false;
+    });
 }
 
+
+// ========================================
 // ALERTAS
+// ========================================
 
 function mostrarAlertaPerfil(
     mensaje,
@@ -482,20 +534,10 @@ function mostrarAlertaPerfil(
         return;
     }
 
-    alerta.classList.remove(
-        "d-none",
-        "alert-success",
-        "alert-danger",
-        "alert-warning",
-        "alert-info"
-    );
-
-    alerta.classList.add(
-        `alert-${tipo}`
-    );
-
+    alerta.className = `alert alert-${tipo}`;
     alerta.textContent = mensaje;
 }
+
 
 function ocultarAlertaPerfil() {
     const alerta = document.getElementById(
@@ -506,32 +548,6 @@ function ocultarAlertaPerfil() {
         return;
     }
 
+    alerta.className = "alert d-none";
     alerta.textContent = "";
-
-    alerta.classList.add("d-none");
-
-    alerta.classList.remove(
-        "alert-success",
-        "alert-danger",
-        "alert-warning",
-        "alert-info"
-    );
-}
-
-function deshabilitarFormularioPerfil() {
-    const formulario = document.getElementById(
-        "form-perfil"
-    );
-
-    if (!formulario) {
-        return;
-    }
-
-    const campos = formulario.querySelectorAll(
-        "input, button"
-    );
-
-    campos.forEach((campo) => {
-        campo.disabled = true;
-    });
 }

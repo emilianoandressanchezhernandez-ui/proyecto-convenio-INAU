@@ -20,80 +20,151 @@ let tareaDetalleActual = null;
 let alumnoIdDetalleTarea = null;
 let entregaDetalleActual = null;
 
+let adjuntosDetalleActual = [];
+
 const MAXIMO_BYTES_ENTREGA = 10 * 1024 * 1024;
-const EXTENSIONES_ENTREGA_PERMITIDAS = ["pdf", "jpg", "jpeg", "html", "css", "js"];
+const EXTENSIONES_ENTREGA_PERMITIDAS = ["pdf", "jpg", "jpeg"];
 
 
 // ==============================
 // INICIALIZACIÓN
 // ==============================
 
-function inicializarDetalleTarea() {
+
+async function inicializarDetalleTarea() {
     try {
-        validarDatosDetalleTarea();
-
-        const idTarea = obtenerIdTareaDesdeURL();
-        const datos = window.DATOS_SIMULADOS;
-        const usuario = typeof obtenerUsuarioActual === "function"
-            ? obtenerUsuarioActual()
-            : datos.usuarioActual;
-
-        alumnoIdDetalleTarea = obtenerAlumnoIdDetalleTarea(usuario);
-
-        if (!Number.isFinite(alumnoIdDetalleTarea)) {
-            throw new Error("No se pudo identificar al alumno actual.");
-        }
-
-        const contenidos = obtenerListadoDetalleTarea("contenidos", datos.contenidos);
-        const talleres = obtenerListadoDetalleTarea("talleres", datos.talleres);
-        const inscripciones = obtenerListadoDetalleTarea("inscripciones", datos.inscripciones);
-        const entregas = obtenerListadoDetalleTarea("entregas", datos.entregas);
-        const adjuntos = obtenerListadoDetalleTarea("adjuntos", datos.adjuntos);
-
-        tareaDetalleActual = contenidos.find((contenido) =>
-            Number(contenido?.id) === idTarea &&
-            normalizarDetalleTarea(contenido.tipo) === "tarea"
-        );
-
-        if (!tareaDetalleActual) {
-            throw new Error("No se encontró la tarea solicitada.");
-        }
-
-        if (!alumnoEstaInscriptoDetalleTarea(
-            alumnoIdDetalleTarea,
-            tareaDetalleActual.tallerId,
-            inscripciones
-        )) {
-            throw new Error("Esta tarea no pertenece a uno de tus talleres inscriptos.");
-        }
-
-        const taller = talleres.find((elemento) =>
-            Number(elemento.id) === Number(tareaDetalleActual.tallerId)
-        );
-
-        if (!taller) {
-            throw new Error("No se encontró el taller asociado a esta tarea.");
-        }
-
-        entregaDetalleActual = obtenerEntregaDetalleTarea(
-            tareaDetalleActual.id,
-            alumnoIdDetalleTarea,
-            entregas
-        );
-
-        mostrarInformacionTareaDetalle(tareaDetalleActual, taller);
-        mostrarEntregaExistenteDetalle(entregaDetalleActual, adjuntos);
-        mostrarCorreccionDetalle(entregaDetalleActual);
-        configurarFormularioEntregaDetalle();
         ocultarAlertaDetalleTarea();
 
-    } catch (error) {
-        console.error("Error al cargar el detalle de la tarea:", error);
-        mostrarErrorDetalleTarea(
-            error.message || "No se pudo cargar la información de esta tarea."
+        const idTarea = obtenerIdTareaDesdeURL();
+
+        // Obtener la tarea real desde la API.
+        const tarea = await consultarDetalleTareaAPI(
+            `/contenidos/${idTarea}`
         );
+
+        if (!tarea || normalizarDetalleTarea(tarea.tipo) !== "tarea") {
+            throw new Error("No se encontró una tarea válida.");
+        }
+
+        // Obtener el taller al que pertenece la tarea.
+        const tallerId = Number(tarea.taller_id);
+
+        if (!Number.isInteger(tallerId) || tallerId <= 0) {
+            throw new Error("La tarea no tiene un taller válido.");
+        }
+
+        const taller = await consultarDetalleTareaAPI(
+            `/talleres/${tallerId}`
+        );
+
+        // Consultar exclusivamente la entrega del alumno autenticado.
+        const entrega = await consultarDetalleTareaAPI(
+            `/contenidos/${idTarea}/mi-entrega`
+        );
+
+        // Consultar los adjuntos solamente si existe una entrega.
+        const adjuntos = entrega
+            ? await consultarDetalleTareaAPI(
+                `/entregas/${entrega.id}/adjuntos`
+            )
+            : [];
+
+        if (!Array.isArray(adjuntos)) {
+            throw new Error("La lista de adjuntos no es válida.");
+        }
+
+        // Adaptar los nombres de campos de MySQL al frontend existente.
+        tareaDetalleActual = {
+            ...tarea,
+            tallerId: tarea.taller_id,
+            fechaPublicacion: tarea.fecha_publicacion,
+            fechaLimite: tarea.fecha_limite
+        };
+
+        entregaDetalleActual = entrega
+            ? {
+                ...entrega,
+                contenidoId: entrega.contenido_id,
+                alumnoId: entrega.alumno_id,
+                fechaEntrega: entrega.fecha_entrega
+            }
+            : null;
+
+        alumnoIdDetalleTarea = entregaDetalleActual
+            ? Number(entregaDetalleActual.alumnoId)
+            : null;
+
+        const adjuntosAdaptados = adjuntos.map(archivo => ({
+            ...archivo,
+            entregaId: archivo.entrega_id,
+            nombreOriginal: archivo.nombre_original,
+            tamanoBytes: archivo.tamano_bytes
+        }));
+
+        adjuntosDetalleActual = adjuntosAdaptados;
+
+        // Reutilizar las funciones originales de presentación.
+        mostrarInformacionTareaDetalle(
+            tareaDetalleActual,
+            taller
+        );
+
+        mostrarEntregaExistenteDetalle(
+            entregaDetalleActual,
+            adjuntosAdaptados
+        );
+
+        mostrarCorreccionDetalle(entregaDetalleActual);
+
+        // Configurar el formulario con los datos reales.
+        configurarFormularioEntregaDetalle();
+
+        const entregaConArchivo = adjuntosDetalleActual.length > 0;
+
+        const formulario = document.getElementById("form-entrega");
+
+        if (formulario) {
+            formulario.querySelectorAll("input, textarea, button").forEach(control => {
+                control.disabled = entregaConArchivo;
+            });
+        }
+
+    } catch (error) {
+        console.error(
+            "Error al cargar el detalle de la tarea:",
+            error
+        );
+
+        mostrarErrorDetalleTarea(
+            error.message ||
+            "No se pudo cargar la información de esta tarea."
+        );
+
         bloquearFormularioEntregaDetalle();
     }
+}
+
+
+async function consultarDetalleTareaAPI(ruta) {
+    const respuesta = await fetch(
+        `http://localhost:8002${ruta}`,
+        {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store"
+        }
+    );
+
+    const resultado = await respuesta.json();
+
+    if (!respuesta.ok || resultado.ok === false) {
+        throw new Error(
+            resultado.mensaje ||
+            `No se pudo completar la consulta (${respuesta.status}).`
+        );
+    }
+
+    return resultado.datos;
 }
 
 
@@ -241,12 +312,32 @@ function mostrarEntregaExistenteDetalle(entrega, adjuntos) {
 
     if (!contenedor) return;
 
+
     if (!entrega) {
         contenedor.classList.add("d-none");
         colocarTextoDetalleTarea("nombre-archivo-entregado", "-");
         colocarTextoDetalleTarea("fecha-entrega-realizada", "-");
+
+        const botonDescarga = document.getElementById(
+            "btn-descargar-entrega"
+        );
+
+        if (botonDescarga) {
+            botonDescarga.classList.add("d-none");
+            botonDescarga.onclick = null;
+        }
+
+        const bloqueComentario = document.getElementById(
+            "comentario-alumno-actual"
+        );
+
+        if (bloqueComentario) {
+            bloqueComentario.classList.add("d-none");
+        }
+
         return;
     }
+
 
     const adjunto = adjuntos.find((archivo) =>
         Number(archivo?.entregaId) === Number(entrega.id)
@@ -254,14 +345,123 @@ function mostrarEntregaExistenteDetalle(entrega, adjuntos) {
 
     const nombreArchivo = entrega.archivoNombre || adjunto?.nombreOriginal || "Archivo registrado";
 
+
+    // Configurar el botón de descarga del archivo entregado.
+    const botonDescarga = document.getElementById(
+        "btn-descargar-entrega"
+    );
+
+    if (botonDescarga) {
+        botonDescarga.classList.toggle("d-none", !adjunto);
+
+        if (adjunto) {
+            botonDescarga.onclick = async () => {
+                botonDescarga.disabled = true;
+
+                try {
+                    await descargarArchivoEntregaDetalle(adjunto);
+                } catch (error) {
+                    console.error("Error al descargar la entrega:", error);
+
+                    mostrarAlertaEntregaDetalle(
+                        error.message ||
+                        "No se pudo descargar el archivo.",
+                        "danger"
+                    );
+                } finally {
+                    botonDescarga.disabled = false;
+                }
+            };
+        } else {
+            botonDescarga.onclick = null;
+        }
+    }
+
+
     colocarTextoDetalleTarea("nombre-archivo-entregado", nombreArchivo);
     colocarTextoDetalleTarea(
         "fecha-entrega-realizada",
         entrega.fechaEntrega ? formatearFechaDetalleTarea(entrega.fechaEntrega) : "Fecha no registrada"
     );
 
+
+    // Mostrar el comentario del alumno guardado en MySQL.
+    const bloqueComentario = document.getElementById(
+        "comentario-alumno-actual"
+    );
+
+    const comentarioAlumno = entrega.comentario_alumno;
+
+    if (bloqueComentario) {
+        const tieneComentario =
+            typeof comentarioAlumno === "string" &&
+            comentarioAlumno.trim() !== "";
+
+        bloqueComentario.classList.toggle(
+            "d-none",
+            !tieneComentario
+        );
+
+        colocarTextoDetalleTarea(
+            "texto-comentario-alumno",
+            tieneComentario ? comentarioAlumno : ""
+        );
+    }
+
     contenedor.classList.remove("d-none");
 }
+
+
+async function descargarArchivoEntregaDetalle(adjunto) {
+    const id = Number(adjunto.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+        throw new Error("El identificador del archivo no es válido.");
+    }
+
+    const respuesta = await fetch(
+        `http://localhost:8002/adjuntos/${id}/archivo`,
+        {
+            method: "GET",
+            credentials: "include"
+        }
+    );
+
+    if (!respuesta.ok) {
+        if (respuesta.status === 404) {
+            throw new Error(
+                "Este archivo todavía no está disponible en el servidor."
+            );
+        }
+
+        if (respuesta.status === 403) {
+            throw new Error(
+                "No tenés permisos para descargar este archivo."
+            );
+        }
+
+        throw new Error("No se pudo descargar el archivo.");
+    }
+
+    const blob = await respuesta.blob();
+    const urlTemporal = URL.createObjectURL(blob);
+
+    const enlace = document.createElement("a");
+    enlace.href = urlTemporal;
+    enlace.download =
+        adjunto.nombreOriginal ||
+        adjunto.nombre_original ||
+        "archivo";
+
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+
+    setTimeout(() => {
+        URL.revokeObjectURL(urlTemporal);
+    }, 1000);
+}
+
 
 function mostrarCorreccionDetalle(entrega) {
     const sinNota = document.getElementById("sin-nota");
@@ -287,6 +487,17 @@ function mostrarCorreccionDetalle(entrega) {
         entrega.fechaCorreccion ? formatearFechaDetalleTarea(entrega.fechaCorreccion) : "No registrada"
     );
 
+    const bloqueFechaCorreccion = document.getElementById(
+        "bloque-fecha-correccion"
+    );
+
+    if (bloqueFechaCorreccion) {
+        bloqueFechaCorreccion.classList.toggle(
+            "d-none",
+            !entrega.fechaCorreccion
+        );
+    }
+
     colocarTextoDetalleTarea(
         "comentario-nota",
         entrega.comentario || "No hay comentarios de corrección registrados."
@@ -304,7 +515,7 @@ function configurarFormularioEntregaDetalle() {
 
     if (!formulario || !inputArchivo) return;
 
-    inputArchivo.setAttribute("accept", ".pdf,.jpg,.jpeg,.html,.css,.js");
+    inputArchivo.setAttribute("accept", ".pdf,.jpg,.jpeg");
     inputArchivo.required = true;
 
     if (inputArchivo.dataset.validacionConfigurada !== "true") {
@@ -314,7 +525,7 @@ function configurarFormularioEntregaDetalle() {
 
     if (formulario.dataset.entregaConfigurada !== "true") {
         formulario.dataset.entregaConfigurada = "true";
-        formulario.addEventListener("submit", enviarEntregaSimuladaDetalle);
+        formulario.addEventListener("submit", enviarEntregaRealDetalle);
     }
 }
 
@@ -358,11 +569,146 @@ function validarArchivoDetalleTarea(archivo) {
     const extension = punto >= 0 ? nombre.slice(punto + 1).toLowerCase() : "";
 
     if (!EXTENSIONES_ENTREGA_PERMITIDAS.includes(extension)) {
-        return "Formato no permitido. Elegí un archivo PDF, JPG, HTML, CSS o JS.";
+        return "Formato no permitido. Elegí un archivo PDF o JPG.";
     }
 
     return null;
 }
+
+
+async function enviarEntregaRealDetalle(evento) {
+    evento.preventDefault();
+    ocultarAlertaEntregaDetalle();
+
+    const inputArchivo = document.getElementById("archivo-tarea");
+    const inputComentario = document.getElementById("comentario-entrega");
+    const boton = document.getElementById("btn-entregar");
+
+    const archivo = inputArchivo?.files?.[0];
+    const errorArchivo = validarArchivoDetalleTarea(archivo);
+
+    if (errorArchivo) {
+        mostrarAlertaEntregaDetalle(errorArchivo, "danger");
+        return;
+    }
+
+    const comentarioAlumno = inputComentario?.value?.trim() || "";
+
+    if (comentarioAlumno.length > 2000) {
+        mostrarAlertaEntregaDetalle(
+            "El comentario no puede superar los 2000 caracteres.",
+            "danger"
+        );
+        return;
+    }
+
+    if (!tareaDetalleActual) {
+        mostrarAlertaEntregaDetalle(
+            "No se pudo identificar la tarea.",
+            "danger"
+        );
+        return;
+    }
+
+    boton.disabled = true;
+    boton.textContent = "Enviando...";
+
+    try {
+        let entrega = entregaDetalleActual;
+
+        // Crear la entrega solamente si todavía no existe.
+        if (!entrega) {
+            const respuesta = await fetch(
+                `http://localhost:8002/contenidos/${tareaDetalleActual.id}/entregas`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        comentario_alumno: comentarioAlumno || null
+                    })
+                }
+            );
+
+            const resultado = await respuesta.json();
+
+            if (!respuesta.ok || resultado.ok === false) {
+                throw new Error(
+                    resultado.mensaje ||
+                    "No se pudo crear la entrega."
+                );
+            }
+
+            entrega = resultado.datos;
+            entregaDetalleActual = entrega;
+        }
+
+        // Si la entrega ya tiene adjuntos, impedir duplicados.
+        const adjuntos = await consultarDetalleTareaAPI(
+            `/entregas/${entrega.id}/adjuntos`
+        );
+
+        if (!Array.isArray(adjuntos)) {
+            throw new Error("No se pudieron comprobar los adjuntos.");
+        }
+
+        if (adjuntos.length > 0) {
+            throw new Error(
+                "Esta entrega ya tiene un archivo adjunto."
+            );
+        }
+
+        // Subir el archivo real.
+        const formulario = new FormData();
+        formulario.append("archivo", archivo);
+
+        const respuestaArchivo = await fetch(
+            `http://localhost:8002/entregas/${entrega.id}/adjuntos`,
+            {
+                method: "POST",
+                credentials: "include",
+                body: formulario
+            }
+        );
+
+        const resultadoArchivo = await respuestaArchivo.json();
+
+        if (!respuestaArchivo.ok || resultadoArchivo.ok === false) {
+            throw new Error(
+                resultadoArchivo.mensaje ||
+                "No se pudo subir el archivo."
+            );
+        }
+
+        inputArchivo.value = "";
+        if (inputComentario) inputComentario.value = "";
+
+        // Actualizar la información desde MySQL.
+        await inicializarDetalleTarea();
+
+        mostrarAlertaEntregaDetalle(
+            "La entrega y el archivo se guardaron correctamente.",
+            "success"
+        );
+
+    } catch (error) {
+        console.error("Error al enviar la entrega:", error);
+
+        mostrarAlertaEntregaDetalle(
+            error.message ||
+            "No se pudo completar la entrega.",
+            "danger"
+        );
+    } finally {
+        const yaTieneArchivo = adjuntosDetalleActual.length > 0;
+
+        boton.disabled = yaTieneArchivo;
+        boton.textContent = "Enviar entrega";
+    }
+}
+
 
 function enviarEntregaSimuladaDetalle(evento) {
     evento.preventDefault();

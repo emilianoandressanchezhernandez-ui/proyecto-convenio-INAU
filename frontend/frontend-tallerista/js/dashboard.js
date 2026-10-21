@@ -1,47 +1,185 @@
+
 /*
-    DASHBOARD.JS
+    DASHBOARD.JS - FRONTEND TALLERISTA
+
+    Integración con la API real.
+
     Responsabilidades:
     - Mostrar un saludo personalizado.
     - Contar los talleres asignados.
-    - Contar los alumnos únicos.
-    - Contar los alumnos presentes durante el día.
+    - Contar los alumnos activos sin duplicados.
+    - Contar los registros "Presente" del día.
+
+    Los datos se obtienen desde PHP y MySQL.
+    No utiliza DATOS_SIMULADOS ni localStorage.
 */
 
+
+// ======================================
 // INICIALIZACIÓN
+// ======================================
 
-function inicializarDashboard() {
+async function inicializarDashboard() {
+    const usuario = obtenerUsuarioActual();
+
+    if (!usuario) {
+        mostrarErrorDashboard(
+            "No se pudo identificar al tallerista."
+        );
+        return;
+    }
+
+    mostrarSaludo(usuario);
+
+    colocarTextoDashboard(
+        "cantidad-talleres-dashboard",
+        "--"
+    );
+
+    colocarTextoDashboard(
+        "cantidad-alumnos-dashboard",
+        "--"
+    );
+
+    colocarTextoDashboard(
+        "presentes-hoy-dashboard",
+        "--"
+    );
+
     try {
-        validarDatosDashboard();
+        // La API identifica al tallerista mediante su sesión.
+        const talleres = await solicitarDashboardAPI(
+            "/mis-talleres"
+        );
 
-        const usuarioActual =
-            window.DATOS_SIMULADOS.usuarioActual;
-
-        const talleresAsignados =
-            obtenerTalleresAsignados(
-                usuarioActual.id
+        if (!Array.isArray(talleres)) {
+            throw new Error(
+                "La API no devolvió una lista de talleres."
             );
-
-        const alumnosUnicos =
-            obtenerAlumnosUnicos(
-                talleresAsignados
-            );
-
-        const presentesHoy =
-            contarPresentesDelDia(
-                talleresAsignados
-            );
-
-        mostrarSaludo(usuarioActual);
+        }
 
         colocarTextoDashboard(
             "cantidad-talleres-dashboard",
-            talleresAsignados.length
+            talleres.length
         );
+
+        // Si no tiene talleres asignados.
+        if (talleres.length === 0) {
+            colocarTextoDashboard(
+                "cantidad-alumnos-dashboard",
+                0
+            );
+
+            colocarTextoDashboard(
+                "presentes-hoy-dashboard",
+                0
+            );
+
+            return;
+        }
+
+
+        // ======================================
+        // ALUMNOS ÚNICOS
+        // ======================================
+
+        const listasAlumnos = await Promise.all(
+            talleres.map(taller =>
+                solicitarDashboardAPI(
+                    `/talleres/${Number(taller.id)}/alumnos`
+                )
+            )
+        );
+
+        const idsAlumnos = new Set();
+
+        listasAlumnos.forEach(lista => {
+            if (!Array.isArray(lista)) {
+                return;
+            }
+
+            lista.forEach(alumno => {
+                /*
+                    IMPORTANTE:
+
+                    El backend devuelve alumno_id,
+                    no alumno.id.
+
+                    Se cuentan únicamente alumnos activos
+                    y se evita duplicarlos entre talleres.
+                */
+
+                if (
+                    alumno.alumno_id !== undefined &&
+                    alumno.alumno_id !== null &&
+                    alumno.estado === "Activo"
+                ) {
+                    idsAlumnos.add(
+                        Number(alumno.alumno_id)
+                    );
+                }
+            });
+        });
 
         colocarTextoDashboard(
             "cantidad-alumnos-dashboard",
-            alumnosUnicos.length
+            idsAlumnos.size
         );
+
+
+        // ======================================
+        // ASISTENCIAS DEL DÍA
+        // ======================================
+
+        const listasJornadas = await Promise.all(
+            talleres.map(taller =>
+                solicitarDashboardAPI(
+                    `/talleres/${Number(taller.id)}/asistencias`
+                )
+            )
+        );
+
+        const fechaHoy = obtenerFechaActualDashboard();
+
+        const jornadasHoy = listasJornadas
+            .flatMap(lista =>
+                Array.isArray(lista) ? lista : []
+            )
+            .filter(jornada =>
+                String(jornada.fecha).slice(0, 10) === fechaHoy
+            );
+
+        // Si hoy no hay jornadas registradas,
+        // el contador de presentes debe ser 0.
+        if (jornadasHoy.length === 0) {
+            colocarTextoDashboard(
+                "presentes-hoy-dashboard",
+                0
+            );
+
+            return;
+        }
+
+        // Obtener los registros de cada jornada de hoy.
+        const detalles = await Promise.all(
+            jornadasHoy.map(jornada =>
+                solicitarDashboardAPI(
+                    `/asistencias/${Number(jornada.id)}`
+                )
+            )
+        );
+
+        let presentesHoy = 0;
+
+        detalles.forEach(detalle => {
+            const registros = Array.isArray(detalle.registros)
+                ? detalle.registros
+                : [];
+
+            presentesHoy += registros.filter(
+                registro => registro.estado === "Presente"
+            ).length;
+        });
 
         colocarTextoDashboard(
             "presentes-hoy-dashboard",
@@ -50,51 +188,50 @@ function inicializarDashboard() {
 
     } catch (error) {
         console.error(
-            "Error al inicializar el dashboard:",
+            "Error al cargar el Dashboard del tallerista:",
             error
         );
 
         mostrarErrorDashboard(
-            "No se pudieron cargar los datos del dashboard."
+            "No se pudieron cargar los datos reales del Dashboard. " +
+            error.message
         );
     }
 }
 
-//VALIDACIÓN
 
-function validarDatosDashboard() {
-    if (!window.DATOS_SIMULADOS) {
+// ======================================
+// PETICIONES A LA API
+// ======================================
+
+async function solicitarDashboardAPI(ruta) {
+    const respuesta = await fetch(
+        `${TALLERISTA_API_URL}${ruta}`,
+        {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                Accept: "application/json"
+            }
+        }
+    );
+
+    const resultado = await respuesta.json();
+
+    if (!respuesta.ok || resultado.ok === false) {
         throw new Error(
-            "No se encontraron los datos simulados."
+            resultado.mensaje ||
+            `No se pudo consultar ${ruta}`
         );
     }
 
-    if (!window.DATOS_SIMULADOS.usuarioActual) {
-        throw new Error(
-            "No se encontró el usuario actual."
-        );
-    }
-
-    if (!Array.isArray(window.DATOS_SIMULADOS.talleres)) {
-        throw new Error(
-            "La lista de talleres no está disponible."
-        );
-    }
-
-    if (!Array.isArray(window.DATOS_SIMULADOS.alumnos)) {
-        throw new Error(
-            "La lista de alumnos no está disponible."
-        );
-    }
-
-    if (!Array.isArray(window.DATOS_SIMULADOS.inscripciones)) {
-        throw new Error(
-            "La lista de inscripciones no está disponible."
-        );
-    }
+    return resultado.datos;
 }
 
-//SALUDO
+
+// ======================================
+// SALUDO PERSONALIZADO
+// ======================================
 
 function mostrarSaludo(usuario) {
     const nombre = usuario.nombre || "Tallerista";
@@ -105,144 +242,15 @@ function mostrarSaludo(usuario) {
     );
 }
 
-// TALLERES
 
-function obtenerTalleresAsignados(talleristaId) {
-    return window.DATOS_SIMULADOS.talleres.filter(
-        (taller) => {
-            return taller.talleristaId === talleristaId;
-        }
-    );
-}
-
-
-// ALUMNOS ÚNICOS 
-function obtenerAlumnosUnicos(talleres) {
-    const idsTalleres = new Set(
-        talleres.map((taller) => taller.id)
-    );
-
-    // Buscamos las inscripciones correspondientes a los talleres del usuario
-
-    const inscripcionesDelTallerista =
-        window.DATOS_SIMULADOS.inscripciones.filter(
-            (inscripcion) => {
-                return idsTalleres.has(
-                    inscripcion.tallerId
-                );
-            }
-        );
-
-    // Un alumno puede estar inscrito en más de un taller, usamos Set para no contarlo varias veces
-
-    const idsAlumnosUnicos = new Set();
-
-    inscripcionesDelTallerista.forEach(
-        (inscripcion) => {
-            inscripcion.alumnoIds.forEach(
-                (alumnoId) => {
-                    idsAlumnosUnicos.add(alumnoId);
-                }
-            );
-        }
-    );
-
-    return window.DATOS_SIMULADOS.alumnos.filter(
-        (alumno) => {
-            return (
-                idsAlumnosUnicos.has(alumno.id) &&
-                alumno.estado === "Activo"
-            );
-        }
-    );
-}
-
-// ASISTENCIAS DEL DÍA
-
-function contarPresentesDelDia(talleres) {
-    const asistenciasGuardadas =
-        leerAsistenciasDashboard();
-
-    const fechaActual =
-        obtenerFechaActualDashboard();
-
-    const idsTalleres = new Set(
-        talleres.map((taller) => taller.id)
-    );
-
-    // Filtramos únicamente los registros:
-    // - de la fecha actual;
-    // - pertenecientes a talleres del usuario.
-
-    const asistenciasDelDia =
-        asistenciasGuardadas.filter(
-            (asistencia) => {
-                return (
-                    asistencia.fecha === fechaActual &&
-                    idsTalleres.has(
-                        asistencia.tallerId
-                    )
-                );
-            }
-        );
-
-    // Sumamos todos los alumnos marcados con estado "Presente"
-
-    return asistenciasDelDia.reduce(
-        (totalPresentes, asistencia) => {
-            if (!Array.isArray(asistencia.registros)) {
-                return totalPresentes;
-            }
-
-            const presentesDelTaller =
-                asistencia.registros.filter(
-                    (registro) => {
-                        return registro.estado === "Presente";
-                    }
-                ).length;
-
-            return (
-                totalPresentes +
-                presentesDelTaller
-            );
-        },
-        0
-    );
-}
-
-function leerAsistenciasDashboard() {
-    const contenidoGuardado =
-        localStorage.getItem(
-            "asistenciasSimuladas"
-        );
-
-    if (!contenidoGuardado) {
-        return [];
-    }
-
-    try {
-        const asistencias =
-            JSON.parse(contenidoGuardado);
-
-        return Array.isArray(asistencias)
-            ? asistencias
-            : [];
-
-    } catch (error) {
-        console.warn(
-            "No se pudieron leer las asistencias:",
-            error
-        );
-
-        return [];
-    }
-}
+// ======================================
+// FECHA ACTUAL LOCAL
+// ======================================
 
 function obtenerFechaActualDashboard() {
     const fechaActual = new Date();
 
-    const anio =
-        fechaActual.getFullYear();
+    const anio = fechaActual.getFullYear();
 
     const mes = String(
         fechaActual.getMonth() + 1
@@ -256,28 +264,27 @@ function obtenerFechaActualDashboard() {
 }
 
 
-// FUNCIÓN AUXILIAR
+// ======================================
+// MOSTRAR VALORES
+// ======================================
 
-function colocarTextoDashboard(
-    elementoId,
-    contenido
-) {
-    const elemento =
-        document.getElementById(elementoId);
+function colocarTextoDashboard(elementoId, contenido) {
+    const elemento = document.getElementById(elementoId);
 
     if (!elemento) {
         console.warn(
             `No se encontró el elemento: ${elementoId}`
         );
-
         return;
     }
 
-    elemento.textContent =
-        contenido ?? "-";
+    elemento.textContent = contenido ?? "-";
 }
 
-// ERROR
+
+// ======================================
+// MOSTRAR ERRORES
+// ======================================
 
 function mostrarErrorDashboard(mensaje) {
     const alerta = document.getElementById(

@@ -1,0 +1,6 @@
+PASO 2.4 - Login INAU
+Copiar contenido de frontend/ a la carpeta frontend/ del proyecto SIN borrar los otros archivos.
+Abrir http://localhost:8000/ con Python y Docker iniciados.
+Este primer paquete conecta la pantalla de login con POST /login y permite redirigir según rol.
+NO protege aun los dashboards existentes: el siguiente cambio es verificar /perfil en cada panel y reemplazar los logout simulados.
+NO elimina mock-data.js ni conecta formularios y tablas al backend.

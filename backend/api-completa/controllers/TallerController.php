@@ -54,9 +54,73 @@ class TallerController extends Controller
         }
     }
 
+
+
     public function show(int $id): void
     {
         try {
+            $usuario = AuthMiddleware::user();
+
+            if (!$usuario) {
+                Response::error(
+                    'No se pudo identificar al usuario autenticado.',
+                    401
+                );
+                return;
+            }
+
+            $rol = $usuario['rol'] ?? null;
+
+            /*
+         * El administrador puede consultar cualquier taller.
+         *
+         * Los talleristas solamente pueden consultar
+         * sus talleres asignados.
+         *
+         * Los alumnos solamente pueden consultar
+         * los talleres donde están inscriptos.
+         */
+
+            if ($rol !== 'admin') {
+
+                if (!in_array(
+                    $rol,
+                    ['tallerista', 'alumno'],
+                    true
+                )) {
+                    Response::error(
+                        'No tenés permisos para consultar este taller.',
+                        403
+                    );
+                    return;
+                }
+
+                // Consultar los talleres del usuario autenticado.
+                $misTalleres = $this->service->getMisTalleres(
+                    $usuario
+                );
+
+                $tieneAcceso = false;
+
+                foreach ($misTalleres as $tallerAsignado) {
+
+                    if ((int) $tallerAsignado['id'] === $id) {
+                        $tieneAcceso = true;
+                        break;
+                    }
+                }
+
+                if (!$tieneAcceso) {
+                    Response::error(
+                        'No tenés permisos para consultar este taller.',
+                        403
+                    );
+                    return;
+                }
+            }
+
+            // Consultar el detalle real del taller.
+            // Este método también devuelve los horarios.
             $taller = $this->service->getById($id);
 
             Response::success(
@@ -64,12 +128,15 @@ class TallerController extends Controller
                 'Taller obtenido correctamente.'
             );
         } catch (Exception $e) {
+
             Response::error(
                 $e->getMessage(),
                 404
             );
         }
     }
+
+
 
     public function store(): void
     {

@@ -101,6 +101,10 @@ require_once __DIR__ . '/validators/TalleristaValidator.php';
 require_once __DIR__ . '/validators/TallerValidator.php';
 require_once __DIR__ . '/validators/AsignacionValidator.php';
 require_once __DIR__ . '/validators/AsistenciaValidator.php';
+
+// NUEVO: validador de reportes.
+require_once __DIR__ . '/validators/ReporteValidator.php';
+
 require_once __DIR__ . '/validators/ContenidoValidator.php';
 require_once __DIR__ . '/validators/EntregaValidator.php';
 require_once __DIR__ . '/validators/AdjuntoValidator.php';
@@ -130,6 +134,10 @@ require_once __DIR__ . '/repositories/TalleristaRepository.php';
 require_once __DIR__ . '/repositories/TallerRepository.php';
 require_once __DIR__ . '/repositories/AsignacionRepository.php';
 require_once __DIR__ . '/repositories/AsistenciaRepository.php';
+
+// NUEVO: repositorio de reportes.
+require_once __DIR__ . '/repositories/ReporteRepository.php';
+
 require_once __DIR__ . '/repositories/ContenidoRepository.php';
 require_once __DIR__ . '/repositories/EntregaRepository.php';
 require_once __DIR__ . '/repositories/AdjuntoRepository.php';
@@ -144,6 +152,10 @@ require_once __DIR__ . '/services/TalleristaService.php';
 require_once __DIR__ . '/services/TallerService.php';
 require_once __DIR__ . '/services/AsignacionService.php';
 require_once __DIR__ . '/services/AsistenciaService.php';
+
+// NUEVO: servicio de reportes.
+require_once __DIR__ . '/services/ReporteService.php';
+
 require_once __DIR__ . '/services/ContenidoService.php';
 require_once __DIR__ . '/services/EntregaService.php';
 require_once __DIR__ . '/services/AdjuntoService.php';
@@ -160,6 +172,10 @@ require_once __DIR__ . '/controllers/TalleristaController.php';
 require_once __DIR__ . '/controllers/TallerController.php';
 require_once __DIR__ . '/controllers/AsignacionController.php';
 require_once __DIR__ . '/controllers/AsistenciaController.php';
+
+// NUEVO: controlador de reportes.
+require_once __DIR__ . '/controllers/ReporteController.php';
+
 require_once __DIR__ . '/controllers/ContenidoController.php';
 require_once __DIR__ . '/controllers/EntregaController.php';
 require_once __DIR__ . '/controllers/AdjuntoController.php';

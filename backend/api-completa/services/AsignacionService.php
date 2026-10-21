@@ -21,7 +21,9 @@ class AsignacionService
 
     public function getTalleristas(int $tallerId): array
     {
-        $this->getActiveTaller($tallerId);
+        // Permite consultar asignaciones tanto de talleres
+        // activos como de talleres finalizados.
+        $this->getTaller($tallerId);
 
         return $this->repository->getTalleristasByTaller($tallerId);
     }
@@ -36,11 +38,14 @@ class AsignacionService
             );
         }
 
+        // Solo se permite asignar talleristas a talleres activos.
         $this->getActiveTaller($tallerId);
 
         $talleristaId = (int) $data['tallerista_id'];
 
-        $tallerista = $this->talleristaRepository->findById($talleristaId);
+        $tallerista = $this->talleristaRepository->findById(
+            $talleristaId
+        );
 
         if (!$tallerista) {
             throw new Exception('Tallerista no encontrado.');
@@ -83,7 +88,9 @@ class AsignacionService
         int $tallerId,
         int $talleristaId
     ): void {
-        $this->getTaller($tallerId);
+        // Impide modificar las asignaciones históricas
+        // de un taller finalizado.
+        $this->getActiveTaller($tallerId);
 
         $existing = $this->repository->findTalleristaAssignment(
             $tallerId,
@@ -101,7 +108,6 @@ class AsignacionService
             $talleristaId
         );
     }
-
 
     // --------------------------------------------------------------
     // Alumnos
@@ -152,7 +158,9 @@ class AsignacionService
 
         $alumnoId = (int) $data['alumno_id'];
 
-        $alumno = $this->alumnoRepository->obtenerPorId($alumnoId);
+        $alumno = $this->alumnoRepository->obtenerPorId(
+            $alumnoId
+        );
 
         if (!$alumno) {
             throw new Exception('Alumno no encontrado.');
@@ -210,14 +218,15 @@ class AsignacionService
         );
     }
 
-
     // --------------------------------------------------------------
     // Taller
     // --------------------------------------------------------------
 
     private function getTaller(int $tallerId): array
     {
-        $taller = $this->tallerRepository->findById($tallerId);
+        $taller = $this->tallerRepository->findById(
+            $tallerId
+        );
 
         if (!$taller) {
             throw new Exception('Taller no encontrado.');

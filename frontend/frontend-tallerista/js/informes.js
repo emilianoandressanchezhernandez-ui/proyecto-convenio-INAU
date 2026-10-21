@@ -1,52 +1,111 @@
-/*
-    INFORMES.JS
-    Responsabilidades:
-    - Obtener los informes del tallerista.
-    - Filtrar opcionalmente por taller.
-    - Mostrar las estadísticas generales.
-    - Filtrar por fecha y texto.
-    - Crear las filas de la tabla.
-    - Preparar los enlaces al detalle.
-*/
 
-// VARIABLES
+/*
+    INFORMES.JS - FRONTEND TALLERISTA
+
+    Integrado con PHP + MySQL.
+
+    GET /mis-talleres
+    GET /mis-reportes
+
+    Muestra informes reales, estadísticas y filtros.
+    No utiliza datos simulados.
+*/
 
 let informesDisponibles = [];
 let tallerFiltrado = null;
+let talleresInformes = new Map();
 
+
+// ========================================
 // INICIALIZACIÓN
+// ========================================
 
-function inicializarInformes() {
+async function inicializarInformes() {
+    configurarFiltrosInformes();
+
+    mostrarAlertaInformes(
+        "Cargando informes desde la base de datos...",
+        "info"
+    );
+
     try {
-        validarDatosInformes();
+        const tallerId = obtenerTallerIdInformes();
 
-        const usuarioActual =
-            window.DATOS_SIMULADOS.usuarioActual;
+        const [talleres, reportes] = await Promise.all([
+            solicitarInformesAPI("/mis-talleres"),
+            solicitarInformesAPI("/mis-reportes")
+        ]);
 
-        const tallerId =
-            obtenerTallerIdOpcional();
-
-        if (tallerId !== null) {
-            tallerFiltrado = buscarTallerAsignado(
-                tallerId,
-                usuarioActual.id
+        if (!Array.isArray(talleres)) {
+            throw new Error(
+                "No se pudo obtener la lista de talleres."
             );
         }
 
-        informesDisponibles =
-            obtenerInformesDelTallerista(
-                usuarioActual.id,
+        if (!Array.isArray(reportes)) {
+            throw new Error(
+                "La API no devolvió una lista de reportes."
+            );
+        }
+
+        talleresInformes = new Map(
+            talleres.map(taller => [
+                Number(taller.id),
+                taller
+            ])
+        );
+
+        if (tallerId !== null) {
+            tallerFiltrado = talleresInformes.get(
                 tallerId
             );
 
-        configurarContextoPagina();
+            if (!tallerFiltrado) {
+                throw new Error(
+                    "El taller solicitado no está asignado a tu usuario."
+                );
+            }
+        }
+
+        informesDisponibles = reportes
+            .filter(reporte => {
+                const id = Number(reporte.taller_id);
+
+                // El tallerista solo visualiza reportes
+                // correspondientes a sus talleres.
+                return talleresInformes.has(id);
+            })
+            .filter(reporte => {
+                if (tallerId === null) {
+                    return true;
+                }
+
+                return Number(reporte.taller_id) === tallerId;
+            })
+            .sort((a, b) => {
+                const fechaA = String(
+                    a.fecha_generacion || ""
+                );
+
+                const fechaB = String(
+                    b.fecha_generacion || ""
+                );
+
+                return fechaB.localeCompare(fechaA) ||
+                    Number(b.id) - Number(a.id);
+            });
+
+        configurarContextoInformes();
+
         actualizarResumenInformes();
-        configurarFiltros();
-        aplicarFiltros();
+
+        aplicarFiltrosInformes();
+
+        ocultarAlertaInformes();
 
     } catch (error) {
         console.error(
-            "Error al cargar los informes:",
+            "Error al cargar informes:",
             error
         );
 
@@ -62,122 +121,82 @@ function inicializarInformes() {
     }
 }
 
-// VALIDACIÓN 
 
-function validarDatosInformes() {
-    if (!window.DATOS_SIMULADOS) {
+// ========================================
+// API
+// ========================================
+
+async function solicitarInformesAPI(ruta) {
+    const respuesta = await fetch(
+        `${TALLERISTA_API_URL}${ruta}`,
+        {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                Accept: "application/json"
+            }
+        }
+    );
+
+    let resultado;
+
+    try {
+        resultado = await respuesta.json();
+    } catch {
         throw new Error(
-            "No se pudieron cargar los datos simulados."
+            `La API devolvió una respuesta inválida en ${ruta}.`
         );
     }
 
-    if (!window.DATOS_SIMULADOS.usuarioActual) {
+    if (!respuesta.ok || resultado.ok === false) {
         throw new Error(
-            "No se encontró el usuario actual."
+            resultado.mensaje ||
+            `Error HTTP ${respuesta.status} al consultar ${ruta}.`
         );
     }
 
-    if (!Array.isArray(window.DATOS_SIMULADOS.talleres)) {
-        throw new Error(
-            "La lista de talleres no está disponible."
-        );
-    }
-
-    if (!Array.isArray(window.DATOS_SIMULADOS.informes)) {
-        throw new Error(
-            "La lista de informes no está disponible."
-        );
-    }
+    return resultado.datos;
 }
 
-// PARÁMETROS DE LA URL
 
-function obtenerTallerIdOpcional() {
-    const parametrosURL = new URLSearchParams(
+// ========================================
+// PARÁMETRO OPCIONAL DEL TALLER
+// ========================================
+
+function obtenerTallerIdInformes() {
+    const parametros = new URLSearchParams(
         window.location.search
     );
 
-    const idRecibido =
-        parametrosURL.get("tallerId");
+    const valor = parametros.get("tallerId");
 
-    /*
-        En esta pantalla el tallerId es opcional.
-        Sin tallerId:
-        informes.html
-        Con tallerId:
-        informes.html?tallerId=1
-    */
-
-    if (!idRecibido) {
+    if (valor === null || valor === "") {
         return null;
     }
 
-    const tallerId = Number(idRecibido);
-
-    if (!Number.isInteger(tallerId) || tallerId <= 0) {
+    if (!/^[1-9]\d*$/.test(valor)) {
         throw new Error(
             "El identificador del taller no es válido."
         );
     }
 
-    return tallerId;
-}
+    const id = Number(valor);
 
-function buscarTallerAsignado(
-    tallerId,
-    talleristaId
-) {
-    const taller = window.DATOS_SIMULADOS.talleres.find(
-        (registro) => {
-            return (
-                registro.id === tallerId &&
-                registro.talleristaId === talleristaId
-            );
-        }
-    );
-
-    if (!taller) {
+    if (!Number.isSafeInteger(id)) {
         throw new Error(
-            "El taller solicitado no existe o no está asignado al usuario."
+            "El identificador del taller no es válido."
         );
     }
 
-    return taller;
+    return id;
 }
 
-// OBTENER INFORMES
 
-function obtenerInformesDelTallerista(
-    talleristaId,
-    tallerId
-) {
-    let informes =
-        window.DATOS_SIMULADOS.informes.filter(
-            (informe) => {
-                return informe.talleristaId === talleristaId;
-            }
-        );
-
-    if (tallerId !== null) {
-        informes = informes.filter(
-            (informe) => {
-                return informe.tallerId === tallerId;
-            }
-        );
-    }
-
-    // Ordenamos desde el informe más reciente al más antiguo
-
-    return informes.sort((informeA, informeB) => {
-        return informeB.fecha.localeCompare(
-            informeA.fecha
-        );
-    });
-}
-
+// ========================================
 // CONTEXTO DE LA PÁGINA
+// ========================================
 
-function configurarContextoPagina() {
+function configurarContextoInformes() {
     const titulo = document.getElementById(
         "titulo-pagina-informes"
     );
@@ -191,10 +210,20 @@ function configurarContextoPagina() {
     );
 
     if (!tallerFiltrado) {
+        if (titulo) {
+            titulo.textContent = "Informes";
+        }
+
+        if (descripcion) {
+            descripcion.textContent =
+                "Consulta los informes reales de tus talleres.";
+        }
+
         if (enlaceVolver) {
             enlaceVolver.href = "dashboard.html";
         }
 
+        document.title = "INAU - Informes";
         return;
     }
 
@@ -210,119 +239,113 @@ function configurarContextoPagina() {
 
     if (enlaceVolver) {
         enlaceVolver.href =
-            `detalle-taller.html?id=${encodeURIComponent(tallerFiltrado.id)}`;
+            `detalle-taller.html?id=${Number(tallerFiltrado.id)}`;
     }
 
     document.title =
         `INAU - Informes - ${tallerFiltrado.nombre}`;
 }
 
-// RESUMEN
+
+// ========================================
+// ESTADÍSTICAS
+// ========================================
 
 function actualizarResumenInformes() {
-    colocarTexto(
+    colocarTextoInformes(
         "total-informes",
         informesDisponibles.length
     );
 
-    colocarTexto(
+    colocarTextoInformes(
         "informes-mes",
-        contarInformesDelMesActual()
+        contarInformesMesActual()
     );
 
-    colocarTexto(
+    colocarTextoInformes(
         "ultima-actualizacion-informes",
-        obtenerUltimaActualizacion()
+        obtenerUltimaActualizacionInformes()
     );
 }
 
-function contarInformesDelMesActual() {
-    const fechaActual = new Date();
 
-    const anioActual =
-        fechaActual.getFullYear();
+function contarInformesMesActual() {
+    const hoy = new Date();
 
-    const mesActual =
-        fechaActual.getMonth() + 1;
+    const anio = hoy.getFullYear();
 
-    return informesDisponibles.filter(
-        (informe) => {
-            const [anio, mes] = informe.fecha
-                .split("-")
-                .map(Number);
+    const mes = String(
+        hoy.getMonth() + 1
+    ).padStart(2, "0");
 
-            return (
-                anio === anioActual &&
-                mes === mesActual
-            );
-        }
+    const prefijo = `${anio}-${mes}-`;
+
+    return informesDisponibles.filter(reporte =>
+        String(
+            reporte.fecha_generacion || ""
+        ).startsWith(prefijo)
     ).length;
 }
 
-function obtenerUltimaActualizacion() {
+
+function obtenerUltimaActualizacionInformes() {
     if (informesDisponibles.length === 0) {
         return "Sin registros";
     }
 
-    const informeMasReciente =
-        [...informesDisponibles].sort(
-            (informeA, informeB) => {
-                return new Date(
-                    informeB.ultimaActualizacion
-                ) - new Date(
-                    informeA.ultimaActualizacion
-                );
-            }
-        )[0];
+    const fechas = informesDisponibles
+        .map(reporte => reporte.fecha_generacion)
+        .filter(Boolean)
+        .sort((a, b) =>
+            String(b).localeCompare(String(a))
+        );
 
-    return formatearFechaHora(
-        informeMasReciente.ultimaActualizacion
-    );
+    if (fechas.length === 0) {
+        return "Sin información";
+    }
+
+    return formatearFechaHoraInformes(fechas[0]);
 }
 
-// FILTROS
 
-function configurarFiltros() {
+// ========================================
+// FILTROS
+// ========================================
+
+function configurarFiltrosInformes() {
+    document.getElementById("fecha-desde")
+        ?.addEventListener(
+            "change",
+            aplicarFiltrosInformes
+        );
+
+    document.getElementById("fecha-hasta")
+        ?.addEventListener(
+            "change",
+            aplicarFiltrosInformes
+        );
+
+    document.getElementById("buscar-informe")
+        ?.addEventListener(
+            "input",
+            aplicarFiltrosInformes
+        );
+}
+
+
+function aplicarFiltrosInformes() {
     const fechaDesde = document.getElementById(
         "fecha-desde"
-    );
+    )?.value || "";
 
     const fechaHasta = document.getElementById(
         "fecha-hasta"
-    );
+    )?.value || "";
 
-    const buscador = document.getElementById(
-        "buscar-informe"
-    );
-
-    fechaDesde?.addEventListener(
-        "change",
-        aplicarFiltros
-    );
-
-    fechaHasta?.addEventListener(
-        "change",
-        aplicarFiltros
-    );
-
-    buscador?.addEventListener(
-        "input",
-        aplicarFiltros
-    );
-}
-
-function aplicarFiltros() {
-    const fechaDesde =
-        document.getElementById("fecha-desde")
-            ?.value || "";
-
-    const fechaHasta =
-        document.getElementById("fecha-hasta")
-            ?.value || "";
-
-    const textoBuscado = normalizarTexto(
-        document.getElementById("buscar-informe")
-            ?.value || ""
+    const busqueda = normalizarTextoInformes(
+        document.getElementById(
+            "buscar-informe"
+        )?.value || ""
     );
 
     if (
@@ -337,7 +360,7 @@ function aplicarFiltros() {
 
         renderizarInformes(
             [],
-            "Corrige el rango de fechas para continuar."
+            "Corregí el rango de fechas."
         );
 
         return;
@@ -345,201 +368,221 @@ function aplicarFiltros() {
 
     ocultarAlertaInformes();
 
-    const resultados =
-        informesDisponibles.filter(
-            (informe) => {
-                const cumpleFechaDesde =
-                    !fechaDesde ||
-                    informe.fecha >= fechaDesde;
+    const resultados = informesDisponibles.filter(
+        reporte => {
+            const fecha = String(
+                reporte.fecha_generacion || ""
+            ).slice(0, 10);
 
-                const cumpleFechaHasta =
-                    !fechaHasta ||
-                    informe.fecha <= fechaHasta;
+            const cumpleDesde =
+                !fechaDesde || fecha >= fechaDesde;
 
-                const nombreTaller =
-                    obtenerNombreTaller(
-                        informe.tallerId
-                    );
+            const cumpleHasta =
+                !fechaHasta || fecha <= fechaHasta;
 
-                const camposBuscables = [
-                    informe.titulo,
-                    informe.tipo,
-                    informe.estado,
-                    nombreTaller
-                ];
+            const nombreTaller =
+                obtenerNombreTallerInformes(reporte);
 
-                const cumpleBusqueda =
-                    textoBuscado === "" ||
-                    camposBuscables.some(
-                        (campo) => {
-                            return normalizarTexto(
-                                campo
-                            ).includes(
-                                textoBuscado
-                            );
-                        }
-                    );
+            const campos = [
+                reporte.nombre,
+                reporte.tipo,
+                reporte.estado,
+                nombreTaller
+            ];
 
-                return (
-                    cumpleFechaDesde &&
-                    cumpleFechaHasta &&
-                    cumpleBusqueda
+            const cumpleTexto =
+                !busqueda ||
+                campos.some(campo =>
+                    normalizarTextoInformes(
+                        campo
+                    ).includes(busqueda)
                 );
-            }
-        );
+
+            return cumpleDesde &&
+                cumpleHasta &&
+                cumpleTexto;
+        }
+    );
 
     renderizarInformes(resultados);
 }
 
+
+// ========================================
 // TABLA
+// ========================================
 
 function renderizarInformes(
     informes,
     mensajeVacio = "No se encontraron informes con los filtros seleccionados."
 ) {
-    const cuerpoTabla = document.getElementById(
+    const tabla = document.getElementById(
         "tabla-informes"
     );
 
-    if (!cuerpoTabla) {
+    if (!tabla) {
         return;
     }
 
-    cuerpoTabla.innerHTML = "";
+    tabla.replaceChildren();
 
     if (informes.length === 0) {
-        cuerpoTabla.innerHTML = `
-            <tr>
-                <td
-                    colspan="6"
-                    class="text-center text-muted py-5"
-                >
-                    ${escaparHTML(mensajeVacio)}
-                </td>
-            </tr>
-        `;
+        const fila = document.createElement("tr");
+
+        const celda = document.createElement("td");
+
+        celda.colSpan = 6;
+        celda.className =
+            "text-center text-muted py-5";
+
+        celda.textContent = mensajeVacio;
+
+        fila.appendChild(celda);
+        tabla.appendChild(fila);
 
         return;
     }
 
-    informes.forEach((informe) => {
-        cuerpoTabla.insertAdjacentHTML(
-            "beforeend",
-            crearFilaInforme(informe)
+    informes.forEach(reporte => {
+        tabla.appendChild(
+            crearFilaInformeReal(reporte)
         );
     });
 }
 
 
-function crearFilaInforme(informe) {
-    const nombreTaller =
-        obtenerNombreTaller(informe.tallerId);
+function crearFilaInformeReal(reporte) {
+    const fila = document.createElement("tr");
 
-    const claseEstado =
-        obtenerClaseEstadoInforme(
-            informe.estado
-        );
+    const fecha = crearCeldaInformes(
+        formatearFechaInformes(
+            reporte.fecha_generacion
+        )
+    );
 
-    const urlDetalle =
-        `detalle-informe.html?id=${encodeURIComponent(informe.id)}`;
+    const nombre = crearCeldaInformes(
+        reporte.nombre || "Sin nombre"
+    );
 
-    return `
-        <tr>
-            <td>
-                ${escaparHTML(
-                    formatearFecha(informe.fecha)
-                )}
-            </td>
+    nombre.classList.add("fw-semibold");
 
-            <td class="fw-semibold">
-                ${escaparHTML(informe.titulo)}
-            </td>
+    const taller = crearCeldaInformes(
+        obtenerNombreTallerInformes(reporte)
+    );
 
-            <td>
-                ${escaparHTML(nombreTaller)}
-            </td>
+    const tipo = crearCeldaInformes(
+        reporte.tipo || "-"
+    );
 
-            <td>
-                ${escaparHTML(informe.tipo)}
-            </td>
+    const estado = document.createElement("td");
 
-            <td>
-                <span class="badge ${claseEstado}">
-                    ${escaparHTML(informe.estado)}
-                </span>
-            </td>
+    const etiqueta = document.createElement("span");
 
-            <td>
-                <a
-                    href="${urlDetalle}"
-                    class="btn btn-outline-primary btn-sm"
-                >
-                    <i class="bi bi-eye me-1"></i>
-                    Ver
-                </a>
-            </td>
-        </tr>
-    `;
+    etiqueta.className =
+        `badge ${obtenerClaseEstadoInformes(reporte.estado)}`;
+
+    etiqueta.textContent = reporte.estado || "-";
+
+    estado.appendChild(etiqueta);
+
+    const accion = document.createElement("td");
+
+    const enlace = document.createElement("a");
+
+    enlace.className =
+        "btn btn-outline-primary btn-sm";
+
+    enlace.href =
+        `detalle-informe.html?id=${encodeURIComponent(reporte.id)}`;
+
+    enlace.textContent = "Ver";
+
+    accion.appendChild(enlace);
+
+    fila.appendChild(fecha);
+    fila.appendChild(nombre);
+    fila.appendChild(taller);
+    fila.appendChild(tipo);
+    fila.appendChild(estado);
+    fila.appendChild(accion);
+
+    return fila;
 }
 
+
+function crearCeldaInformes(valor) {
+    const celda = document.createElement("td");
+
+    celda.textContent = valor ?? "-";
+
+    return celda;
+}
+
+
+// ========================================
 // FUNCIONES AUXILIARES
+// ========================================
 
-function obtenerNombreTaller(tallerId) {
-    const taller =
-        window.DATOS_SIMULADOS.talleres.find(
-            (registro) => {
-                return registro.id === tallerId;
-            }
-        );
+function obtenerNombreTallerInformes(reporte) {
+    if (reporte.taller_nombre) {
+        return reporte.taller_nombre;
+    }
 
-    return taller
-        ? taller.nombre
-        : "Taller no disponible";
+    const taller = talleresInformes.get(
+        Number(reporte.taller_id)
+    );
+
+    return taller?.nombre || "Taller no disponible";
 }
 
-function obtenerClaseEstadoInforme(estado) {
+
+function obtenerClaseEstadoInformes(estado) {
     const clases = {
-        Finalizado: "text-bg-success",
+        "Generado": "text-bg-success",
+        "Finalizado": "text-bg-success",
         "En revisión": "text-bg-info",
-        Pendiente: "text-bg-warning",
-        Borrador: "text-bg-secondary"
+        "Pendiente": "text-bg-warning",
+        "Borrador": "text-bg-secondary"
     };
 
     return clases[estado] || "text-bg-secondary";
 }
 
-function formatearFecha(fechaISO) {
-    const partes = fechaISO.split("-");
 
-    if (partes.length !== 3) {
-        return fechaISO;
+function formatearFechaInformes(valor) {
+    if (!valor) {
+        return "-";
     }
 
-    const [anio, mes, dia] = partes;
+    const fecha = String(valor).slice(0, 10);
+    const partes = fecha.split("-");
 
-    return `${dia}/${mes}/${anio}`;
+    if (partes.length !== 3) {
+        return String(valor);
+    }
+
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
-function formatearFechaHora(fechaHoraISO) {
-    const fecha = new Date(fechaHoraISO);
 
-    if (Number.isNaN(fecha.getTime())) {
+function formatearFechaHoraInformes(valor) {
+    if (!valor) {
         return "Sin información";
     }
 
-    return fecha.toLocaleString(
-        "es-UY",
-        {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    );
+    const texto = String(valor);
+
+    const fecha = formatearFechaInformes(texto);
+
+    const hora = texto.length >= 16
+        ? texto.slice(11, 16)
+        : "";
+
+    return hora ? `${fecha} ${hora}` : fecha;
 }
 
-function normalizarTexto(valor) {
+
+function normalizarTextoInformes(valor) {
     return String(valor ?? "")
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
@@ -547,34 +590,19 @@ function normalizarTexto(valor) {
         .trim();
 }
 
-function colocarTexto(elementoId, contenido) {
-    const elemento = document.getElementById(
-        elementoId
-    );
 
-    if (!elemento) {
-        return;
+function colocarTextoInformes(id, valor) {
+    const elemento = document.getElementById(id);
+
+    if (elemento) {
+        elemento.textContent = valor ?? "-";
     }
-
-    elemento.textContent = contenido ?? "-";
 }
 
-function escaparHTML(valor) {
-    const caracteres = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
-    };
 
-    return String(valor ?? "").replace(
-        /[&<>"']/g,
-        (caracter) => caracteres[caracter]
-    );
-}
-
+// ========================================
 // ALERTAS
+// ========================================
 
 function mostrarAlertaInformes(
     mensaje,
@@ -588,20 +616,10 @@ function mostrarAlertaInformes(
         return;
     }
 
-    alerta.classList.remove(
-        "d-none",
-        "alert-success",
-        "alert-danger",
-        "alert-warning",
-        "alert-info"
-    );
-
-    alerta.classList.add(
-        `alert-${tipo}`
-    );
-
+    alerta.className = `alert alert-${tipo}`;
     alerta.textContent = mensaje;
 }
+
 
 function ocultarAlertaInformes() {
     const alerta = document.getElementById(
@@ -612,13 +630,6 @@ function ocultarAlertaInformes() {
         return;
     }
 
+    alerta.className = "alert d-none";
     alerta.textContent = "";
-    alerta.classList.add("d-none");
-
-    alerta.classList.remove(
-        "alert-success",
-        "alert-danger",
-        "alert-warning",
-        "alert-info"
-    );
 }

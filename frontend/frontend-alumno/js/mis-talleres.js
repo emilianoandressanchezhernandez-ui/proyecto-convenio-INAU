@@ -3,13 +3,17 @@
     MIS-TALLERES.JS - FRONTEND ALUMNO
 
     Responsabilidades:
-    - Mostrar únicamente los talleres en los que está inscripto el alumno.
+    - Consultar los talleres del alumno autenticado.
+    - Mostrar únicamente sus talleres inscriptos.
     - Permitir buscar por nombre o estado.
-    - Renderizar tarjetas con información útil y un acceso al detalle.
-    - Mostrar el estado vacío o una alerta si ocurre un error.
+    - Renderizar tarjetas con información real.
+    - Permitir acceder al detalle del taller.
+    - Mostrar estados vacíos y errores.
 
-    Los datos se leen de DATOS_SIMULADOS y de localStorage mediante obtenerListado.
-    Esta versión todavía no consulta la API del backend.
+    API:
+    GET /mis-talleres
+
+    No utiliza datos simulados ni localStorage.
 */
 
 "use strict";
@@ -17,205 +21,167 @@
 let talleresDelAlumnoActuales = [];
 
 
-// ==============================
+// =====================================
 // INICIALIZACIÓN
-// ==============================
+// =====================================
 
-function inicializarMisTalleres() {
-    const contenedor = document.getElementById("contenedor-talleres");
+async function inicializarMisTalleres() {
 
-    // Evita ejecutar este módulo si se cargó por error en otra página.
+    const contenedor = document.getElementById(
+        "contenedor-talleres"
+    );
+
     if (!contenedor) {
         return;
     }
 
+    configurarBuscadorMisTalleres();
+
     try {
-        validarDatosMisTalleres();
-
-        const datos = window.DATOS_SIMULADOS;
-        const usuario = typeof obtenerUsuarioActual === "function"
-            ? obtenerUsuarioActual()
-            : datos.usuarioActual;
-        const alumnoId = obtenerIdAlumnoMisTalleres(usuario);
-
-        if (!Number.isFinite(alumnoId)) {
-            throw new Error("No se pudo identificar al alumno actual.");
-        }
-
-        const talleres = obtenerListadoMisTalleres("talleres", datos.talleres);
-        const inscripciones = obtenerListadoMisTalleres("inscripciones", datos.inscripciones);
-
-        talleresDelAlumnoActuales = obtenerTalleresDelAlumno(
-            alumnoId,
-            talleres,
-            inscripciones
-        );
-
-        configurarBuscadorMisTalleres();
-        renderizarTalleresMisTalleres(talleresDelAlumnoActuales);
         ocultarErrorMisTalleres();
-    } catch (error) {
-        console.error("Error al cargar los talleres del alumno:", error);
-        mostrarErrorMisTalleres(
-            "No se pudieron cargar tus talleres. Recargá la página e intentá nuevamente."
+
+        const respuesta = await fetch(
+            `${ALUMNO_API_URL}/mis-talleres`,
+            {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    Accept: "application/json"
+                },
+                cache: "no-store"
+            }
         );
-    }
-}
 
-function validarDatosMisTalleres() {
-    const datos = window.DATOS_SIMULADOS;
-
-    if (!datos || typeof datos !== "object") {
-        throw new Error("No se encontró DATOS_SIMULADOS.");
-    }
-
-    if (!datos.usuarioActual || typeof datos.usuarioActual !== "object") {
-        throw new Error("No se encontró el usuario de demostración.");
-    }
-
-    if (!Array.isArray(datos.talleres)) {
-        throw new Error("La lista de talleres no es válida.");
-    }
-
-    if (!Array.isArray(datos.inscripciones)) {
-        throw new Error("La lista de inscripciones no es válida.");
-    }
-}
-
-function obtenerIdAlumnoMisTalleres(usuario) {
-    const idAlumno = usuario?.alumnoId ?? usuario?.id;
-    const idNumerico = Number(idAlumno);
-    return Number.isFinite(idNumerico) ? idNumerico : NaN;
-}
-
-function obtenerListadoMisTalleres(clave, listaOriginal) {
-    if (typeof obtenerListado === "function") {
-        const resultado = obtenerListado(clave, listaOriginal);
-        return Array.isArray(resultado) ? resultado : listaOriginal;
-    }
-
-    // Respaldo por si en algún contexto no estuviera disponible utils.js.
-    try {
-        const datoGuardado = localStorage.getItem(clave);
-
-        if (datoGuardado !== null) {
-            const listado = JSON.parse(datoGuardado);
-            return Array.isArray(listado) ? listado : listaOriginal;
-        }
-    } catch (error) {
-        console.warn(
-            `No se pudo leer "${clave}" desde localStorage.`,
-            error
-        );
-    }
-
-    return listaOriginal;
-}
-
-
-// ==============================
-// OBTENCIÓN DE INSCRIPCIONES
-// ==============================
-
-function obtenerTalleresDelAlumno(alumnoId, talleres, inscripciones) {
-    const idsTalleresInscripto = new Set();
-
-    inscripciones.forEach((inscripcion) => {
-        if (!inscripcion || typeof inscripcion !== "object") {
+        // Sesión vencida o inexistente.
+        if (respuesta.status === 401) {
+            redirigirAlLogin();
             return;
         }
 
-        // Los datos simulados usan alumnoIds: [1].
-        // También se admite alumnoId singular por compatibilidad.
-        const idsAlumnos = Array.isArray(inscripcion.alumnoIds)
-            ? inscripcion.alumnoIds
-            : inscripcion.alumnoId !== undefined
-                ? [inscripcion.alumnoId]
-                : [];
+        if (!respuesta.ok) {
+            throw new Error(
+                `No se pudieron obtener los talleres (HTTP ${respuesta.status}).`
+            );
+        }
 
-        const estaInscripto = idsAlumnos.some(
-            (id) => Number(id) === alumnoId
+        const resultado = await respuesta.json();
+
+        if (
+            !resultado.ok ||
+            !Array.isArray(resultado.datos)
+        ) {
+            throw new Error(
+                resultado.mensaje ||
+                "La API no devolvió una lista válida de talleres."
+            );
+        }
+
+        talleresDelAlumnoActuales = resultado.datos;
+
+        buscarTalleresMisTalleres();
+
+    } catch (error) {
+
+        console.error(
+            "Error al cargar los talleres del alumno:",
+            error
         );
 
-        if (estaInscripto && inscripcion.tallerId !== undefined) {
-            idsTalleresInscripto.add(Number(inscripcion.tallerId));
-        }
-    });
+        talleresDelAlumnoActuales = [];
 
-    return talleres.filter((taller) =>
-        taller && idsTalleresInscripto.has(Number(taller.id))
-    );
+        renderizarTalleresMisTalleres([]);
+
+        mostrarErrorMisTalleres(
+            error.message ||
+            "No se pudieron cargar tus talleres."
+        );
+    }
 }
 
 
-// ==============================
+// =====================================
 // BUSCADOR
-// ==============================
+// =====================================
 
 function configurarBuscadorMisTalleres() {
-    const input = document.getElementById("buscador-talleres");
-    const boton = document.getElementById("btn-buscar");
+
+    const input = document.getElementById(
+        "buscador-talleres"
+    );
+
+    const boton = document.getElementById(
+        "btn-buscar"
+    );
 
     if (!input || !boton) {
         return;
     }
 
-    // Evita duplicar listeners si el inicializador se ejecuta otra vez.
-    if (boton.dataset.busquedaConfigurada === "true") {
+    // Evitar eventos duplicados.
+    if (
+        boton.dataset.busquedaConfigurada === "true"
+    ) {
         return;
     }
 
     boton.dataset.busquedaConfigurada = "true";
-    boton.addEventListener("click", buscarTalleresMisTalleres);
 
-    input.addEventListener("keydown", (evento) => {
+    boton.addEventListener(
+        "click",
+        buscarTalleresMisTalleres
+    );
+
+    input.addEventListener("keydown", evento => {
+
         if (evento.key === "Enter") {
             evento.preventDefault();
             buscarTalleresMisTalleres();
         }
     });
 
-    // Si se borra la búsqueda por completo, volvemos a mostrar todas las tarjetas.
-    input.addEventListener("input", () => {
-        if (input.value.trim() === "") {
-            renderizarTalleresMisTalleres(talleresDelAlumnoActuales);
-        }
-    });
+    // Actualizar resultados al escribir o borrar.
+    input.addEventListener(
+        "input",
+        buscarTalleresMisTalleres
+    );
 }
 
+
+// =====================================
+// FILTRAR TALLERES
+// =====================================
+
 function buscarTalleresMisTalleres() {
-    const input = document.getElementById("buscador-talleres");
 
-    if (!input) {
-        return;
-    }
+    const input = document.getElementById(
+        "buscador-talleres"
+    );
 
-    const texto = normalizarTextoMisTalleres(input.value);
+    const busqueda = normalizarTextoMisTalleres(
+        input?.value || ""
+    );
 
-    if (!texto) {
-        renderizarTalleresMisTalleres(talleresDelAlumnoActuales);
-        return;
-    }
+    const filtrados = talleresDelAlumnoActuales.filter(
+        taller => {
 
-    const resultados = talleresDelAlumnoActuales.filter((taller) => {
-        return [taller.nombre, taller.estado].some((campo) =>
-            normalizarTextoMisTalleres(campo).includes(texto)
-        );
-    });
+            return [
+                taller.nombre,
+                taller.estado
+            ].some(valor =>
 
-    renderizarTalleresMisTalleres(resultados);
+                normalizarTextoMisTalleres(valor)
+                    .includes(busqueda)
+
+            );
+        }
+    );
+
+    renderizarTalleresMisTalleres(filtrados);
 }
 
 function normalizarTextoMisTalleres(valor) {
-    if (typeof normalizarTexto === "function") {
-        return normalizarTexto(valor);
-    }
 
-    if (valor === null || valor === undefined) {
-        return "";
-    }
-
-    return String(valor)
+    return String(valor ?? "")
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
@@ -223,13 +189,19 @@ function normalizarTextoMisTalleres(valor) {
 }
 
 
-// ==============================
-// RENDERIZADO DE TARJETAS
-// ==============================
+// =====================================
+// MOSTRAR TARJETAS
+// =====================================
 
 function renderizarTalleresMisTalleres(talleres) {
-    const contenedor = document.getElementById("contenedor-talleres");
-    const estadoVacio = document.getElementById("estado-vacio");
+
+    const contenedor = document.getElementById(
+        "contenedor-talleres"
+    );
+
+    const estadoVacio = document.getElementById(
+        "estado-vacio"
+    );
 
     if (!contenedor || !estadoVacio) {
         return;
@@ -237,102 +209,200 @@ function renderizarTalleresMisTalleres(talleres) {
 
     contenedor.replaceChildren();
 
-    if (!Array.isArray(talleres) || talleres.length === 0) {
+    if (!Array.isArray(talleres) || !talleres.length) {
         estadoVacio.classList.remove("d-none");
         return;
     }
 
     estadoVacio.classList.add("d-none");
 
-    talleres.forEach((taller) => {
-        contenedor.appendChild(crearTarjetaTallerMisTalleres(taller));
+    talleres.forEach(taller => {
+
+        contenedor.appendChild(
+            crearTarjetaTallerMisTalleres(taller)
+        );
+
     });
 }
 
+
+// =====================================
+// CONSTRUIR TARJETA
+// =====================================
+
 function crearTarjetaTallerMisTalleres(taller) {
-    // Se construye la tarjeta con createElement/textContent para que nombres,
-    // descripciones y ubicación se traten como texto y no como HTML ejecutable.
+
     const columna = document.createElement("div");
+
     columna.className = "col-md-6 col-xl-4";
 
+
+    // Tarjeta principal.
     const tarjeta = document.createElement("article");
-    tarjeta.className = "card taller-card h-100 shadow-sm";
+
+    tarjeta.className =
+        "card taller-card h-100 shadow-sm";
+
 
     const cuerpo = document.createElement("div");
-    cuerpo.className = "card-body d-flex flex-column";
+
+    cuerpo.className =
+        "card-body d-flex flex-column";
+
+
+    // =================================
+    // ENCABEZADO
+    // =================================
 
     const encabezado = document.createElement("div");
-    encabezado.className = "d-flex align-items-start gap-3 mb-3";
+
+    encabezado.className =
+        "d-flex align-items-start gap-3 mb-3";
+
 
     const iconoContenedor = document.createElement("div");
-    iconoContenedor.className = "icono-acceso flex-shrink-0";
-    iconoContenedor.setAttribute("aria-hidden", "true");
 
+    iconoContenedor.className =
+        "icono-acceso flex-shrink-0";
+
+    iconoContenedor.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    // El icono se declara una sola vez.
     const icono = document.createElement("i");
+
     icono.className = "bi bi-journal-code";
+
     iconoContenedor.appendChild(icono);
 
+
     const tituloContenedor = document.createElement("div");
+
     tituloContenedor.className = "flex-grow-1";
 
+
     const titulo = document.createElement("h2");
+
     titulo.className = "h5 fw-bold mb-2";
-    titulo.textContent = taller.nombre || "Taller sin nombre";
+
+    titulo.textContent =
+        taller.nombre || "Taller sin nombre";
+
 
     const insignia = document.createElement("span");
-    insignia.className = `badge ${obtenerClaseEstadoTaller(taller.estado)}`;
-    insignia.textContent = taller.estado || "Sin estado";
 
-    tituloContenedor.append(titulo, insignia);
-    encabezado.append(iconoContenedor, tituloContenedor);
+    insignia.className =
+        `badge ${obtenerClaseEstadoTaller(taller.estado)}`;
+
+    insignia.textContent =
+        taller.estado || "Sin estado";
+
+
+    tituloContenedor.append(
+        titulo,
+        insignia
+    );
+
+    encabezado.append(
+        iconoContenedor,
+        tituloContenedor
+    );
+
     cuerpo.appendChild(encabezado);
 
+
+    // =================================
+    // TEMÁTICA
+    // =================================
+
     if (taller.tematica) {
+
         const tematica = document.createElement("p");
-        tematica.className = "small fw-semibold mb-2";
+
+        tematica.className =
+            "small fw-semibold mb-2";
+
         tematica.textContent = taller.tematica;
+
         cuerpo.appendChild(tematica);
     }
 
+
+    // =================================
+    // DESCRIPCIÓN
+    // =================================
+
     if (taller.descripcion) {
+
         const descripcion = document.createElement("p");
-        descripcion.className = "text-muted small mb-3";
+
+        descripcion.className =
+            "text-muted small mb-3";
+
         descripcion.textContent = taller.descripcion;
+
         cuerpo.appendChild(descripcion);
     }
 
-    const tallerista = obtenerTalleristaPrincipalMisTalleres(taller);
-    agregarLineaDetalleTaller(
-        cuerpo,
-        "bi-person-badge",
-        "Tallerista",
-        tallerista
-    );
 
-    const horarios = typeof formatearHorarios === "function"
-        ? formatearHorarios(taller.horarios)
-        : formatearHorariosMisTalleres(taller.horarios);
+    // =================================
+    // UBICACIÓN
+    // =================================
 
-    if (horarios !== "-") {
-        agregarLineaDetalleTaller(cuerpo, "bi-clock", "Horarios", horarios);
-    }
-
-    const ubicacion = formatearUbicacionMisTalleres(taller.ubicacion);
+    const ubicacion = [
+        taller.centro,
+        taller.salon,
+        taller.direccion
+    ]
+        .filter(Boolean)
+        .join(" · ");
 
     if (ubicacion) {
-        agregarLineaDetalleTaller(cuerpo, "bi-geo-alt", "Lugar", ubicacion);
+
+        agregarLineaDetalleTaller(
+            cuerpo,
+            "bi-geo-alt",
+            "Lugar",
+            ubicacion
+        );
     }
 
-    if (taller.fechaInicio || taller.fechaFin) {
-        const inicio = formatearFechaMisTalleres(taller.fechaInicio);
-        const fin = formatearFechaMisTalleres(taller.fechaFin);
+
+    // =================================
+    // PERÍODO DEL TALLER
+    // =================================
+
+    if (
+        taller.fecha_inicio ||
+        taller.fecha_fin
+    ) {
+
+        const inicio = formatearFechaMisTalleres(
+            taller.fecha_inicio
+        );
+
+        const fin = formatearFechaMisTalleres(
+            taller.fecha_fin
+        );
+
         let periodo = "";
 
-        if (taller.fechaInicio && taller.fechaFin) {
+        if (
+            taller.fecha_inicio &&
+            taller.fecha_fin
+        ) {
+
             periodo = `${inicio} al ${fin}`;
-        } else if (taller.fechaInicio) {
+
+        } else if (taller.fecha_inicio) {
+
             periodo = `Desde ${inicio}`;
+
         } else {
+
             periodo = `Hasta ${fin}`;
         }
 
@@ -344,98 +414,162 @@ function crearTarjetaTallerMisTalleres(taller) {
         );
     }
 
+
+    // =================================
+    // FECHA DE INSCRIPCIÓN
+    // =================================
+
+    if (taller.fecha_inscripcion) {
+
+        agregarLineaDetalleTaller(
+            cuerpo,
+            "bi-calendar-check",
+            "Inscripto desde",
+            formatearFechaMisTalleres(
+                taller.fecha_inscripcion
+            )
+        );
+    }
+
+
+    // =================================
+    // ENLACE AL DETALLE
+    // =================================
+
     const enlace = document.createElement("a");
-    enlace.className = "btn btn-primary w-100 mt-auto";
-    enlace.href = `detalle-taller.html?id=${encodeURIComponent(String(taller.id))}`;
-    enlace.innerHTML = '<i class="bi bi-eye me-1" aria-hidden="true"></i> Ver detalles';
+
+    enlace.className =
+        "btn btn-primary w-100 mt-auto";
+
+    enlace.href =
+        `detalle-taller.html?id=${encodeURIComponent(taller.id)}`;
+
     enlace.setAttribute(
         "aria-label",
         `Ver detalles de ${taller.nombre || "taller"}`
     );
 
+
+    const iconoEnlace = document.createElement("i");
+
+    iconoEnlace.className = "bi bi-eye me-1";
+
+    iconoEnlace.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    enlace.append(
+        iconoEnlace,
+        document.createTextNode("Ver detalles")
+    );
+
+
+    // Ensamblar tarjeta.
     cuerpo.appendChild(enlace);
+
     tarjeta.appendChild(cuerpo);
+
     columna.appendChild(tarjeta);
 
     return columna;
 }
 
-function agregarLineaDetalleTaller(contenedor, claseIcono, etiqueta, valor) {
-    if (!valor || valor === "-") {
+
+// =====================================
+// AUXILIARES PARA TARJETAS
+// =====================================
+
+function agregarLineaDetalleTaller(
+    contenedor,
+    claseIcono,
+    etiqueta,
+    valor
+) {
+
+    if (
+        valor === null ||
+        valor === undefined ||
+        valor === "" ||
+        valor === "-"
+    ) {
         return;
     }
 
     const linea = document.createElement("p");
-    linea.className = "small mb-2 d-flex align-items-start gap-2";
+
+    linea.className =
+        "small mb-2 d-flex align-items-start gap-2";
+
 
     const icono = document.createElement("i");
-    icono.className = `bi ${claseIcono} mt-1 flex-shrink-0`;
-    icono.setAttribute("aria-hidden", "true");
+
+    icono.className =
+        `bi ${claseIcono} mt-1 flex-shrink-0`;
+
+    icono.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
 
     const texto = document.createElement("span");
+
     const etiquetaFuerte = document.createElement("strong");
+
     etiquetaFuerte.textContent = `${etiqueta}: `;
-    texto.append(etiquetaFuerte, document.createTextNode(String(valor)));
+
+    texto.append(
+        etiquetaFuerte,
+        document.createTextNode(String(valor))
+    );
+
 
     linea.append(icono, texto);
+
     contenedor.appendChild(linea);
 }
 
-function obtenerTalleristaPrincipalMisTalleres(taller) {
-    const datos = window.DATOS_SIMULADOS;
-    const talleristasOriginales = Array.isArray(datos?.talleristas)
-        ? datos.talleristas
-        : [];
 
-    const talleristas = obtenerListadoMisTalleres(
-        "talleristas",
-        talleristasOriginales
-    );
-
-    const tallerista = talleristas.find((persona) =>
-        Number(persona.id) === Number(taller.talleristaId)
-    );
-
-    return tallerista
-        ? [tallerista.nombre, tallerista.apellido].filter(Boolean).join(" ")
-        : "Sin asignar";
-}
-
-function formatearUbicacionMisTalleres(ubicacion) {
-    if (!ubicacion || typeof ubicacion !== "object") {
-        return "";
-    }
-
-    return [ubicacion.centro, ubicacion.salon, ubicacion.direccion]
-        .filter(Boolean)
-        .join(" · ");
-}
+// =====================================
+// FORMATEAR FECHAS
+// =====================================
 
 function formatearFechaMisTalleres(fecha) {
+
     if (!fecha) {
         return "-";
     }
 
-    return typeof formatearFecha === "function"
-        ? formatearFecha(fecha)
-        : String(fecha);
-}
-
-function formatearHorariosMisTalleres(horarios) {
-    if (!Array.isArray(horarios) || horarios.length === 0) {
-        return "-";
+    // Usar la función existente de utils.js.
+    if (typeof formatearFecha === "function") {
+        return formatearFecha(fecha);
     }
 
-    return horarios
-        .filter((horario) => horario && horario.dia)
-        .map((horario) =>
-            `${horario.dia} ${horario.horaInicio || "--:--"}-${horario.horaFin || "--:--"}`
-        )
-        .join(", ") || "-";
+    const coincidencia =
+        /^(\d{4})-(\d{2})-(\d{2})/.exec(
+            String(fecha)
+        );
+
+    if (coincidencia) {
+
+        const anio = coincidencia[1];
+        const mes = coincidencia[2];
+        const dia = coincidencia[3];
+
+        return `${dia}/${mes}/${anio}`;
+    }
+
+    return String(fecha);
 }
 
+
+// =====================================
+// ESTADO DEL TALLER
+// =====================================
+
 function obtenerClaseEstadoTaller(estado) {
-    const estadoNormalizado = normalizarTextoMisTalleres(estado);
 
     const clases = {
         activo: "text-bg-success",
@@ -444,16 +578,23 @@ function obtenerClaseEstadoTaller(estado) {
         suspendido: "text-bg-warning"
     };
 
-    return clases[estadoNormalizado] || "text-bg-secondary";
+    const estadoNormalizado =
+        normalizarTextoMisTalleres(estado);
+
+    return clases[estadoNormalizado] ||
+        "text-bg-secondary";
 }
 
 
-// ==============================
-// ESTADOS Y ERRORES
-// ==============================
+// =====================================
+// MENSAJES DE ERROR
+// =====================================
 
 function mostrarErrorMisTalleres(mensaje) {
-    const alerta = document.getElementById("alerta-talleres");
+
+    const alerta = document.getElementById(
+        "alerta-talleres"
+    );
 
     if (!alerta) {
         return;
@@ -464,7 +605,10 @@ function mostrarErrorMisTalleres(mensaje) {
 }
 
 function ocultarErrorMisTalleres() {
-    const alerta = document.getElementById("alerta-talleres");
+
+    const alerta = document.getElementById(
+        "alerta-talleres"
+    );
 
     if (!alerta) {
         return;

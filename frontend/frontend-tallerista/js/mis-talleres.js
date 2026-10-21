@@ -1,102 +1,141 @@
+
 /*
-    MIS-TALLERES.JS
-    Este archivo se encarga de:
-    - Obtener los talleres del usuario actual.
+    MIS-TALLERES.JS - FRONTEND TALLERISTA
+
+    Integración con la API real.
+
+    Responsabilidades:
+    - Obtener los talleres del tallerista autenticado.
     - Mostrar las tarjetas dinámicamente.
-    - Buscar talleres.
-    - Mostrar el estado vacío.
-    - Mostrar posibles errores.
+    - Buscar por nombre y estado.
+    - Mostrar estado vacío.
+    - Mostrar indicador de carga y errores.
+
+    No utiliza DATOS_SIMULADOS ni localStorage.
 */
 
+
+// ======================================
 // VARIABLES
-
-/*
-    Aquí guardaremos los talleres asignados al usuario.
-    Esta variable permitirá buscar sobre los talleres originales sin modificar los datos de mock-data.js.
-*/
+// ======================================
 
 let talleresAsignados = [];
 
+
+// ======================================
 // INICIALIZACIÓN
+// ======================================
 
-function inicializarMisTalleres() {
-
+async function inicializarMisTalleres() {
     const contenedor = document.getElementById(
         "contenedor-talleres"
     );
-
-    /*
-        Si el contenedor no existe, detenemos la función.
-        Esto evita errores si el archivo se carga accidentalmente en otra página.
-    */
 
     if (!contenedor) {
         return;
     }
 
+    configurarBuscador();
+
+    mostrarCargaTalleres(true);
+    ocultarErrorTalleres();
+
     try {
-        validarDatosSimulados();
+        // El backend identifica al tallerista
+        // por su sesión autenticada.
+        const talleres = await solicitarMisTalleresAPI(
+            "/mis-talleres"
+        );
 
-        talleresAsignados = obtenerTalleresDelUsuario();
+        if (!Array.isArray(talleres)) {
+            throw new Error(
+                "La API no devolvió una lista de talleres."
+            );
+        }
 
-        configurarBuscador();
+        talleresAsignados = talleres;
+
         renderizarTalleres(talleresAsignados);
 
     } catch (error) {
-
         console.error(
-            "Error al cargar los talleres:",
+            "Error al cargar Mis Talleres:",
             error
         );
 
-        mostrarError(
-            "No se pudieron cargar los talleres."
+        talleresAsignados = [];
+
+        contenedor.innerHTML = "";
+
+        const estadoVacio = document.getElementById(
+            "estado-vacio"
         );
+
+        if (estadoVacio) {
+            estadoVacio.classList.add("d-none");
+        }
+
+        mostrarErrorTalleres(
+            "No se pudieron cargar los talleres reales. " +
+            error.message
+        );
+
+    } finally {
+        mostrarCargaTalleres(false);
     }
 }
 
-// OBTENCIÓN DE DATOS
 
-function validarDatosSimulados() {
+// ======================================
+// CONSULTA A LA API
+// ======================================
 
-    if (!window.DATOS_SIMULADOS) {
+async function solicitarMisTalleresAPI(ruta) {
+    const respuesta = await fetch(
+        `${TALLERISTA_API_URL}${ruta}`,
+        {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                Accept: "application/json"
+            }
+        }
+    );
+
+    if (!respuesta.ok) {
+        let mensaje = `Error HTTP ${respuesta.status}`;
+
+        try {
+            const errorAPI = await respuesta.json();
+
+            if (errorAPI.mensaje) {
+                mensaje = errorAPI.mensaje;
+            }
+        } catch (error) {
+            // La API no devolvió un error en JSON.
+        }
+
+        throw new Error(mensaje);
+    }
+
+    const resultado = await respuesta.json();
+
+    if (resultado.ok === false) {
         throw new Error(
-            "No se encontró DATOS_SIMULADOS."
+            resultado.mensaje ||
+            "La API no pudo obtener los talleres."
         );
     }
 
-    if (!Array.isArray(window.DATOS_SIMULADOS.talleres)) {
-        throw new Error(
-            "La propiedad talleres no es un array."
-        );
-    }
-
-    if (!window.DATOS_SIMULADOS.usuarioActual) {
-        throw new Error(
-            "No se encontró el usuario actual."
-        );
-    }
+    return resultado.datos;
 }
 
-function obtenerTalleresDelUsuario() {
 
-    const usuarioActual =
-        window.DATOS_SIMULADOS.usuarioActual;
-
-    const talleres =
-        window.DATOS_SIMULADOS.talleres;
-
-    // filter() devuelve solamente los talleres cuyo talleristaId coincide con el ID del usuario actual
-
-    return talleres.filter((taller) => {
-        return taller.talleristaId === usuarioActual.id;
-    });
-}
-
+// ======================================
 // BUSCADOR
+// ======================================
 
 function configurarBuscador() {
-
     const inputBuscador = document.getElementById(
         "buscador-talleres"
     );
@@ -114,33 +153,24 @@ function configurarBuscador() {
         buscarTalleres
     );
 
-    // También permitimos buscar al presionar Enter
-
     inputBuscador.addEventListener(
         "keydown",
-        (event) => {
-
+        event => {
             if (event.key === "Enter") {
                 buscarTalleres();
             }
         }
     );
 
-    // Si el usuario borra completamente el texto, volvemos a mostrar todos los talleres
-
+    // Actualizar resultados al escribir o borrar.
     inputBuscador.addEventListener(
         "input",
-        () => {
-
-            if (inputBuscador.value.trim() === "") {
-                renderizarTalleres(talleresAsignados);
-            }
-        }
+        buscarTalleres
     );
 }
 
-function buscarTalleres() {
 
+function buscarTalleres() {
     const inputBuscador = document.getElementById(
         "buscador-talleres"
     );
@@ -151,45 +181,37 @@ function buscarTalleres() {
 
     const textoBuscado = inputBuscador.value
         .trim()
-        .toLowerCase();
+        .toLocaleLowerCase("es");
 
     if (textoBuscado === "") {
         renderizarTalleres(talleresAsignados);
         return;
     }
 
-    /*
-        Buscamos coincidencias en:
-        - Nombre.
-        - Descripción.
-        - Centro.
-        - Salón.
-        - Estado.
-    */
-
     const resultados = talleresAsignados.filter(
-        (taller) => {
-
+        taller => {
             const camposBuscables = [
                 taller.nombre,
                 taller.estado
             ];
 
-            return camposBuscables.some((campo) => {
-                return campo
-                    ?.toLowerCase()
-                    .includes(textoBuscado);
-            });
+            return camposBuscables.some(campo =>
+                String(campo ?? "")
+                    .toLocaleLowerCase("es")
+                    .includes(textoBuscado)
+            );
         }
     );
 
     renderizarTalleres(resultados);
 }
 
+
+// ======================================
 // RENDERIZADO
+// ======================================
 
 function renderizarTalleres(talleres) {
-
     const contenedor = document.getElementById(
         "contenedor-talleres"
     );
@@ -202,11 +224,7 @@ function renderizarTalleres(talleres) {
         return;
     }
 
-    // Limpiamos las tarjetas anteriores antes de insertar los resultados nuevos
-
     contenedor.innerHTML = "";
-
-    ocultarError();
 
     if (talleres.length === 0) {
         estadoVacio.classList.remove("d-none");
@@ -215,62 +233,93 @@ function renderizarTalleres(talleres) {
 
     estadoVacio.classList.add("d-none");
 
-    talleres.forEach((taller) => {
-
+    talleres.forEach(taller => {
         const tarjeta = crearTarjetaTaller(taller);
-
-        contenedor.insertAdjacentHTML(
-            "beforeend",
-            tarjeta
-        );
+        contenedor.appendChild(tarjeta);
     });
 }
 
+
+// ======================================
+// CREAR TARJETA
+// ======================================
+
 function crearTarjetaTaller(taller) {
-    const claseEstado = obtenerClaseEstado(
-        taller.estado
+    const columna = document.createElement("div");
+    columna.className = "col-md-6 col-xl-4";
+
+    const articulo = document.createElement("article");
+    articulo.className = "card h-100 shadow-sm";
+
+    const cuerpo = document.createElement("div");
+    cuerpo.className =
+        "card-body d-flex flex-column text-center";
+
+    const iconoContenedor = document.createElement("div");
+    iconoContenedor.className = "mb-3";
+
+    const icono = document.createElement("i");
+    icono.className =
+        "bi bi-journal-code display-4 text-primary";
+
+    iconoContenedor.appendChild(icono);
+
+    const titulo = document.createElement("h2");
+    titulo.className = "h4 fw-bold mb-3";
+    titulo.textContent = taller.nombre || "Sin nombre";
+
+    const estadoContenedor = document.createElement("div");
+    estadoContenedor.className = "mb-4";
+
+    const etiquetaEstado = document.createElement("span");
+    etiquetaEstado.className =
+        `badge ${obtenerClaseEstado(taller.estado)}`;
+
+    etiquetaEstado.textContent =
+        taller.estado || "Sin estado";
+
+    estadoContenedor.appendChild(etiquetaEstado);
+
+    const enlaceDetalle = document.createElement("a");
+    enlaceDetalle.className =
+        "btn btn-primary w-100 mt-auto";
+
+    const idTaller = Number(taller.id);
+
+    if (Number.isInteger(idTaller) && idTaller > 0) {
+        enlaceDetalle.href =
+            `detalle-taller.html?id=${encodeURIComponent(idTaller)}`;
+    } else {
+        enlaceDetalle.removeAttribute("href");
+        enlaceDetalle.classList.add("disabled");
+        enlaceDetalle.setAttribute("aria-disabled", "true");
+    }
+
+    const iconoDetalle = document.createElement("i");
+    iconoDetalle.className = "bi bi-eye me-1";
+
+    enlaceDetalle.appendChild(iconoDetalle);
+    enlaceDetalle.appendChild(
+        document.createTextNode(" Ver detalles")
     );
 
-    const urlDetalle =
-        `detalle-taller.html?id=${encodeURIComponent(taller.id)}`;
+    cuerpo.appendChild(iconoContenedor);
+    cuerpo.appendChild(titulo);
+    cuerpo.appendChild(estadoContenedor);
+    cuerpo.appendChild(enlaceDetalle);
 
-    return `
-        <div class="col-md-6 col-xl-4">
-            <article class="card h-100 shadow-sm">
-                <div class="card-body d-flex flex-column text-center">
+    articulo.appendChild(cuerpo);
+    columna.appendChild(articulo);
 
-                    <div class="mb-3">
-                        <i class="bi bi-journal-code display-4 text-primary"></i>
-                    </div>
-
-                    <h2 class="h4 fw-bold mb-3">
-                        ${taller.nombre}
-                    </h2>
-
-                    <div class="mb-4">
-                        <span class="badge ${claseEstado}">
-                            ${taller.estado}
-                        </span>
-                    </div>
-
-                    <a
-                        href="${urlDetalle}"
-                        class="btn btn-primary w-100 mt-auto"
-                    >
-                        <i class="bi bi-eye me-1"></i>
-                        Ver detalles
-                    </a>
-
-                </div>
-            </article>
-        </div>
-    `;
+    return columna;
 }
 
-// FUNCIONES AUXILIARES
+
+// ======================================
+// ESTADOS VISUALES
+// ======================================
 
 function obtenerClaseEstado(estado) {
-
     const clases = {
         Activo: "text-bg-success",
         Inactivo: "text-bg-secondary",
@@ -281,10 +330,29 @@ function obtenerClaseEstado(estado) {
     return clases[estado] || "text-bg-secondary";
 }
 
-// MENSAJES DE ERROR
 
-function mostrarError(mensaje) {
+// ======================================
+// INDICADOR DE CARGA
+// ======================================
 
+function mostrarCargaTalleres(mostrar) {
+    const spinner = document.getElementById(
+        "loading-spinner"
+    );
+
+    if (!spinner) {
+        return;
+    }
+
+    spinner.classList.toggle("d-none", !mostrar);
+}
+
+
+// ======================================
+// ERRORES
+// ======================================
+
+function mostrarErrorTalleres(mensaje) {
     const alerta = document.getElementById(
         "alerta-talleres"
     );
@@ -297,8 +365,8 @@ function mostrarError(mensaje) {
     alerta.classList.remove("d-none");
 }
 
-function ocultarError() {
 
+function ocultarErrorTalleres() {
     const alerta = document.getElementById(
         "alerta-talleres"
     );

@@ -1,320 +1,533 @@
+
 /*
-    ASISTENCIA.JS
-    Responsabilidades:
-    - Obtener el taller desde la URL.
-    - Cargar sus alumnos.
-    - Permitir registrar la asistencia.
-    - Actualizar el contador de presentes.
-    - Guardar temporalmente la información.
+    ASISTENCIA.JS - FRONTEND TALLERISTA
+
+    Integración con la API real de INAU.
+
+    - Comprueba la asignación del tallerista.
+    - Obtiene el taller y sus horarios.
+    - Carga los alumnos inscritos y activos.
+    - Consulta la jornada de asistencia de hoy.
+    - Recupera los registros anteriores.
+    - Crea la jornada cuando no existe.
+    - Guarda o actualiza registros en MySQL.
+
+    No utiliza DATOS_SIMULADOS ni localStorage.
 */
 
+
+// ======================================
 // VARIABLES
+// ======================================
 
-let tallerActual = null;
-let alumnosDelTaller = [];
-let fechaAsistenciaActual = "";
+let tallerActualAsistencia = null;
+let alumnosAsistencia = [];
+let fechaActualAsistencia = "";
+let jornadaActualAsistencia = null;
+let guardandoAsistencia = false;
 
+
+// ======================================
 // INICIALIZACIÓN
+// ======================================
 
-function inicializarAsistencia() {
+async function inicializarAsistencia() {
+    mostrarCargaAsistencia(true);
+    habilitarGuardadoAsistencia(false);
+    ocultarAlertaAsistencia();
+
+    configurarBotonGuardarAsistencia();
+
+    fechaActualAsistencia = obtenerFechaISOAsistencia();
+
+    colocarTextoAsistencia(
+        "info-fecha",
+        formatearFechaAsistencia(fechaActualAsistencia)
+    );
+
+    colocarTextoAsistencia(
+        "contador-presentes",
+        "0 de 0"
+    );
+
     try {
-        validarDatosAsistencia();
+        const tallerId = obtenerTallerIdAsistencia();
 
-        const tallerId = obtenerTallerIdDesdeURL();
+        // Verificar que el taller pertenezca al usuario.
+        const misTalleres = await solicitarAsistenciaAPI(
+            `/mis-talleres`
+        );
 
-        tallerActual = buscarTallerPorId(tallerId);
-        alumnosDelTaller = obtenerAlumnosDelTaller(tallerId);
-        fechaAsistenciaActual = obtenerFechaISO();
+        if (!Array.isArray(misTalleres)) {
+            throw new Error(
+                "No se pudo obtener la lista de talleres."
+            );
+        }
 
-        mostrarInformacionTaller();
-        configurarEnlaceVolver();
+        const asignado = misTalleres.some(
+            taller => Number(taller.id) === tallerId
+        );
 
-        renderizarTablaAlumnos();
-        configurarBotonGuardar();
+        if (!asignado) {
+            throw new Error(
+                "Este taller no está asignado a tu usuario."
+            );
+        }
 
-        cargarAsistenciaGuardada();
-        actualizarContadorPresentes();
+        // Obtener el detalle completo, incluidos horarios.
+        tallerActualAsistencia = await solicitarAsistenciaAPI(
+            `/talleres/${tallerId}`
+        );
+
+        if (!tallerActualAsistencia) {
+            throw new Error(
+                "No se pudieron obtener los datos del taller."
+            );
+        }
+
+        mostrarInformacionAsistencia();
+        configurarEnlaceVolverAsistencia(tallerId);
+
+        // Obtener los alumnos reales.
+        const alumnos = await solicitarAsistenciaAPI(
+            `/talleres/${tallerId}/alumnos`
+        );
+
+        if (!Array.isArray(alumnos)) {
+            throw new Error(
+                "La API no devolvió una lista de alumnos."
+            );
+        }
+
+        const alumnosUnicos = new Map();
+
+        alumnos.forEach(alumno => {
+            const id = Number(alumno.alumno_id);
+
+            if (
+                Number.isInteger(id) &&
+                id > 0 &&
+                alumno.estado === "Activo"
+            ) {
+                alumnosUnicos.set(id, alumno);
+            }
+        });
+
+        alumnosAsistencia = [...alumnosUnicos.values()];
+
+        renderizarTablaAsistencia();
+
+        // Buscar jornadas existentes.
+        const jornadas = await solicitarAsistenciaAPI(
+            `/talleres/${tallerId}/asistencias`
+        );
+
+        if (!Array.isArray(jornadas)) {
+            throw new Error(
+                "La API no devolvió una lista de jornadas."
+            );
+        }
+
+        jornadaActualAsistencia = jornadas.find(
+            jornada =>
+                String(jornada.fecha).slice(0, 10) ===
+                fechaActualAsistencia
+        ) || null;
+
+        if (jornadaActualAsistencia) {
+            const detalle = await solicitarAsistenciaAPI(
+                `/asistencias/${Number(jornadaActualAsistencia.id)}`
+            );
+
+            cargarRegistrosAsistencia(detalle);
+
+            mostrarAlertaAsistencia(
+                "Se recuperó la asistencia registrada para hoy. " +
+                "Podés revisar y corregir los estados.",
+                "info"
+            );
+        }
+
+        actualizarContadorAsistencia();
+
+        // Los talleres finalizados son de solo lectura.
+        if (tallerActualAsistencia.estado !== "Activo") {
+            deshabilitarSelectoresAsistencia();
+
+            mostrarAlertaAsistencia(
+                "Este taller no está activo. " +
+                "No se pueden guardar nuevas asistencias.",
+                "warning"
+            );
+
+            return;
+        }
+
+        habilitarGuardadoAsistencia(
+            alumnosAsistencia.length > 0
+        );
 
     } catch (error) {
         console.error(
-            "Error al inicializar la asistencia:",
+            "Error al inicializar asistencia:",
             error
         );
 
         mostrarAlertaAsistencia(
+            "No se pudo cargar la asistencia. " +
             error.message,
             "danger"
         );
 
-        deshabilitarGuardado();
+        habilitarGuardadoAsistencia(false);
+
+    } finally {
+        mostrarCargaAsistencia(false);
     }
 }
 
-// VALIDACIÓN DE DATOS
 
-function validarDatosAsistencia() {
-    if (!window.DATOS_SIMULADOS) {
+// ======================================
+// PETICIONES A LA API
+// ======================================
+
+async function solicitarAsistenciaAPI(
+    ruta,
+    metodo = "GET",
+    datos = null
+) {
+    const opciones = {
+        method: metodo,
+        credentials: "include",
+        headers: {
+            Accept: "application/json"
+        }
+    };
+
+    if (datos !== null) {
+        opciones.headers["Content-Type"] =
+            "application/json";
+
+        opciones.body = JSON.stringify(datos);
+    }
+
+    const respuesta = await fetch(
+        `${TALLERISTA_API_URL}${ruta}`,
+        opciones
+    );
+
+    let resultado;
+
+    try {
+        resultado = await respuesta.json();
+    } catch (error) {
         throw new Error(
-            "No se pudieron cargar los datos simulados."
+            `La API no devolvió JSON válido en ${ruta}.`
         );
     }
 
-    if (!Array.isArray(window.DATOS_SIMULADOS.talleres)) {
-        throw new Error(
-            "La lista de talleres no está disponible."
-        );
+    if (!respuesta.ok || resultado.ok === false) {
+        const detalles = resultado.errores;
+
+        let mensaje = resultado.mensaje ||
+            `Error HTTP ${respuesta.status}`;
+
+        if (
+            Array.isArray(detalles) &&
+            detalles.length > 0
+        ) {
+            mensaje += " " + detalles.join(" ");
+        } else if (
+            detalles &&
+            typeof detalles === "object"
+        ) {
+            mensaje += " " +
+                Object.values(detalles).join(" ");
+        }
+
+        throw new Error(mensaje);
     }
 
-    if (!Array.isArray(window.DATOS_SIMULADOS.alumnos)) {
-        throw new Error(
-            "La lista de alumnos no está disponible."
-        );
-    }
-
-    if (!Array.isArray(window.DATOS_SIMULADOS.inscripciones)) {
-        throw new Error(
-            "Las inscripciones no están disponibles."
-        );
-    }
+    return resultado.datos;
 }
 
-// OBTENER TALLER
 
-function obtenerTallerIdDesdeURL() {
-    const parametrosURL = new URLSearchParams(
+// ======================================
+// ID DEL TALLER
+// ======================================
+
+function obtenerTallerIdAsistencia() {
+    const parametros = new URLSearchParams(
         window.location.search
     );
 
-    const idRecibido = parametrosURL.get("tallerId");
+    const valor = parametros.get("tallerId");
 
-    if (!idRecibido) {
+    if (!valor || !/^[1-9]\d*$/.test(valor)) {
         throw new Error(
-            "No se indicó el taller para registrar asistencia."
+            "No se indicó un taller válido."
         );
     }
 
-    const tallerId = Number(idRecibido);
+    const id = Number(valor);
 
-    if (!Number.isInteger(tallerId) || tallerId <= 0) {
+    if (!Number.isSafeInteger(id)) {
         throw new Error(
-            "El identificador del taller no es válido."
+            "El ID del taller no es válido."
         );
     }
-    return tallerId;
+
+    return id;
 }
 
-function buscarTallerPorId(tallerId) {
-    const tallerEncontrado =
-        window.DATOS_SIMULADOS.talleres.find(
-            (taller) => taller.id === tallerId
-        );
 
-    if (!tallerEncontrado) {
-        throw new Error(
-            "El taller solicitado no existe."
-        );
-    }
+// ======================================
+// INFORMACIÓN DEL TALLER
+// ======================================
 
-    return tallerEncontrado;
-}
-
-// OBTENER ALUMNOS
-
-function obtenerAlumnosDelTaller(tallerId) {
-    const inscripcion =
-        window.DATOS_SIMULADOS.inscripciones.find(
-            (registro) => registro.tallerId === tallerId
-        );
-
-    if (!inscripcion) {
-        return [];
-    }
-
-    const idsAlumnos = new Set(
-        inscripcion.alumnoIds
-    );
-
-    // Se muestran solamente los alumnos relacionados con el taller y cuyo estado sea Activo
-
-    return window.DATOS_SIMULADOS.alumnos.filter(
-        (alumno) => {
-            return (
-                idsAlumnos.has(alumno.id) &&
-                alumno.estado === "Activo"
-            );
-        }
-    );
-}
-
-// INFORMACIÓN GENERAL
-
-function mostrarInformacionTaller() {
-    colocarTexto(
+function mostrarInformacionAsistencia() {
+    colocarTextoAsistencia(
         "nombre-taller",
-        tallerActual.nombre
+        tallerActualAsistencia.nombre || "Taller"
     );
 
-    colocarTexto(
-        "info-fecha",
-        formatearFechaParaMostrar(
-            fechaAsistenciaActual
-        )
-    );
-
-    colocarTexto(
+    colocarTextoAsistencia(
         "info-horario",
-        formatearHorarios(
-            tallerActual.horarios
+        formatearHorariosAsistencia(
+            tallerActualAsistencia.horarios
         )
     );
 
     document.title =
-        `INAU - Asistencia - ${tallerActual.nombre}`;
+        `INAU - Asistencia - ${tallerActualAsistencia.nombre}`;
 }
 
-function configurarEnlaceVolver() {
-    const enlaceVolver = document.getElementById(
+
+function configurarEnlaceVolverAsistencia(tallerId) {
+    const enlace = document.getElementById(
         "enlace-volver"
     );
 
-    if (!enlaceVolver || !tallerActual) {
-        return;
+    if (enlace) {
+        enlace.href =
+            `detalle-taller.html?id=${tallerId}`;
     }
-
-    enlaceVolver.href =
-        `detalle-taller.html?id=${encodeURIComponent(tallerActual.id)}`;
 }
 
-// RENDERIZAR TABLA
 
-function renderizarTablaAlumnos() {
-    const cuerpoTabla = document.getElementById(
+// ======================================
+// TABLA DE ALUMNOS
+// ======================================
+
+function renderizarTablaAsistencia() {
+    const cuerpo = document.getElementById(
         "tabla-alumnos"
     );
 
-    if (!cuerpoTabla) {
+    if (!cuerpo) {
         throw new Error(
             "No se encontró la tabla de alumnos."
         );
     }
 
-    cuerpoTabla.innerHTML = "";
+    cuerpo.replaceChildren();
 
-    if (alumnosDelTaller.length === 0) {
-        cuerpoTabla.innerHTML = `
-            <tr>
-                <td colspan="3" class="text-center text-muted py-4">
-                    No hay alumnos inscritos en este taller.
-                </td>
-            </tr>
-        `;
+    if (alumnosAsistencia.length === 0) {
+        const fila = document.createElement("tr");
+        const celda = document.createElement("td");
 
-        deshabilitarGuardado();
+        celda.colSpan = 3;
+        celda.className =
+            "text-center text-muted py-4";
+
+        celda.textContent =
+            "No hay alumnos activos inscritos en este taller.";
+
+        fila.appendChild(celda);
+        cuerpo.appendChild(fila);
+
         return;
     }
 
-    alumnosDelTaller.forEach((alumno) => {
-        const fila = crearFilaAlumno(alumno);
+    alumnosAsistencia.forEach(alumno => {
+        const fila = crearFilaAsistencia(alumno);
+        cuerpo.appendChild(fila);
+    });
+}
 
-        cuerpoTabla.insertAdjacentHTML(
-            "beforeend",
-            fila
-        );
+
+function crearFilaAsistencia(alumno) {
+    const fila = document.createElement("tr");
+
+    const celdaNombre = document.createElement("td");
+    celdaNombre.className = "fw-semibold";
+
+    const nombreCompleto = [
+        alumno.nombre,
+        alumno.apellido
+    ].filter(Boolean).join(" ");
+
+    celdaNombre.textContent =
+        nombreCompleto || "Sin nombre";
+
+    const celdaCedula = document.createElement("td");
+    celdaCedula.textContent =
+        alumno.cedula || "-";
+
+    const celdaEstado = document.createElement("td");
+
+    const selector = document.createElement("select");
+    selector.className =
+        "form-select form-select-sm estado-asistencia";
+
+    selector.dataset.alumnoId =
+        String(alumno.alumno_id);
+
+    selector.setAttribute(
+        "aria-label",
+        `Asistencia de ${nombreCompleto}`
+    );
+
+    // Ningún alumno aparece presente por defecto.
+    const opcionInicial = document.createElement("option");
+
+    opcionInicial.value = "";
+    opcionInicial.textContent = "Seleccionar estado";
+    opcionInicial.selected = true;
+
+    selector.appendChild(opcionInicial);
+
+    const estados = [
+        "Presente",
+        "Ausente",
+        "Justificado",
+        "Tardanza"
+    ];
+
+    estados.forEach(estado => {
+        const opcion = document.createElement("option");
+
+        opcion.value = estado;
+        opcion.textContent = estado;
+
+        selector.appendChild(opcion);
     });
 
-    configurarSelectoresAsistencia();
+    selector.addEventListener(
+        "change",
+        actualizarContadorAsistencia
+    );
+
+    celdaEstado.appendChild(selector);
+
+    fila.appendChild(celdaNombre);
+    fila.appendChild(celdaCedula);
+    fila.appendChild(celdaEstado);
+
+    return fila;
 }
 
-function crearFilaAlumno(alumno) {
-    const nombreCompleto =
-        `${alumno.nombre} ${alumno.apellido}`;
 
-    return `
-        <tr>
-            <td class="fw-semibold">
-                ${nombreCompleto}
-            </td>
+// ======================================
+// RECUPERAR ASISTENCIA EXISTENTE
+// ======================================
 
-            <td>
-                ${alumno.cedula}
-            </td>
+function cargarRegistrosAsistencia(detalle) {
+    const registros = Array.isArray(detalle?.registros)
+        ? detalle.registros
+        : [];
 
-            <td>
-                <select
-                    class="form-select form-select-sm estado-asistencia"
-                    data-alumno-id="${alumno.id}"
-                    aria-label="Asistencia de ${nombreCompleto}"
-                >
-
-                    <option value="Presente">
-                        Presente
-                    </option>
-
-                    <option value="Ausente">
-                        Ausente
-                    </option>
-
-                    <option value="Justificado">
-                        Justificado
-                    </option>
-                    
-                    <option value="Tardanza">
-                        Tardanza
-                    </option>
-                </select>
-            </td>
-        </tr>
-    `;
-}
-
-function configurarSelectoresAsistencia() {
     const selectores = document.querySelectorAll(
         ".estado-asistencia"
     );
 
-    selectores.forEach((selector) => {
-        selector.addEventListener(
-            "change",
-            actualizarContadorPresentes
+    const estadosPermitidos = [
+        "Presente",
+        "Ausente",
+        "Justificado",
+        "Tardanza"
+    ];
+
+    registros.forEach(registro => {
+        const alumnoId = Number(registro.alumno_id);
+
+        const selector = Array.from(selectores).find(
+            elemento =>
+                Number(elemento.dataset.alumnoId) ===
+                alumnoId
         );
+
+        if (
+            selector &&
+            estadosPermitidos.includes(registro.estado)
+        ) {
+            selector.value = registro.estado;
+        }
     });
 }
 
-// CONTADOR 
 
-function actualizarContadorPresentes() {
-    const selectores = document.querySelectorAll(
-        ".estado-asistencia"
+// ======================================
+// CONTADOR DE PRESENTES
+// ======================================
+
+function actualizarContadorAsistencia() {
+    const selectores = Array.from(
+        document.querySelectorAll(
+            ".estado-asistencia"
+        )
     );
 
-    const presentes = Array.from(selectores).filter(
-        (selector) => selector.value === "Presente"
+    const presentes = selectores.filter(
+        selector => selector.value === "Presente"
     ).length;
 
-    colocarTexto(
+    colocarTextoAsistencia(
         "contador-presentes",
-        `${presentes} de ${alumnosDelTaller.length}`
+        `${presentes} de ${alumnosAsistencia.length}`
     );
 }
 
-// GUARDAR ASISTENCIA
 
-function configurarBotonGuardar() {
-    const botonGuardar = document.getElementById(
+// ======================================
+// BOTÓN GUARDAR
+// ======================================
+
+function configurarBotonGuardarAsistencia() {
+    const boton = document.getElementById(
         "btn-guardar-asistencia"
     );
 
-    if (!botonGuardar) {
+    if (!boton) {
         return;
     }
 
-    botonGuardar.addEventListener(
-        "click",
-        guardarAsistencia
-    );
+    boton.onclick = guardarAsistenciaAPI;
 }
 
-function guardarAsistencia() {
+
+async function guardarAsistenciaAPI() {
+    if (guardandoAsistencia) {
+        return;
+    }
+
+    if (!tallerActualAsistencia) {
+        mostrarAlertaAsistencia(
+            "No se identificó el taller.",
+            "danger"
+        );
+        return;
+    }
+
+    if (tallerActualAsistencia.estado !== "Activo") {
+        mostrarAlertaAsistencia(
+            "No se puede registrar asistencia " +
+            "en un taller finalizado.",
+            "warning"
+        );
+        return;
+    }
+
     const selectores = Array.from(
         document.querySelectorAll(
             ".estado-asistencia"
@@ -326,177 +539,217 @@ function guardarAsistencia() {
             "No hay alumnos para registrar.",
             "warning"
         );
-
         return;
     }
 
-    const faltaSeleccionar = selectores.some(
-        (selector) => selector.value === ""
+    const sinSeleccionar = selectores.some(
+        selector => selector.value === ""
     );
 
-    if (faltaSeleccionar) {
+    if (sinSeleccionar) {
         mostrarAlertaAsistencia(
-            "Debes seleccionar la asistencia de todos los alumnos.",
+            "Debés seleccionar la asistencia " +
+            "de todos los alumnos antes de guardar.",
             "warning"
         );
-
         return;
     }
 
-    const registros = selectores.map((selector) => {
-        return {
-            alumnoId: Number(
-                selector.dataset.alumnoId
-            ),
-            estado: selector.value
-        };
-    });
+    const registros = selectores.map(selector => ({
+        alumno_id: Number(
+            selector.dataset.alumnoId
+        ),
+        estado: selector.value
+    }));
 
-    const nuevaAsistencia = {
-        id: `${tallerActual.id}-${fechaAsistenciaActual}`,
-        tallerId: tallerActual.id,
-        fecha: fechaAsistenciaActual,
-        registros: registros,
-        guardadoEn: new Date().toISOString()
-    };
+    guardandoAsistencia = true;
+    habilitarGuardadoAsistencia(false);
 
-    guardarEnLocalStorage(nuevaAsistencia);
-
-    mostrarAlertaAsistencia(
-        "La asistencia se guardó correctamente.",
-        "success"
-    );
-}
-
-// LOCAL STORAGE 
-
-function leerAsistenciasGuardadas() {
-    const contenidoGuardado = localStorage.getItem(
-        "asistenciasSimuladas"
+    const boton = document.getElementById(
+        "btn-guardar-asistencia"
     );
 
-    if (!contenidoGuardado) {
-        return [];
+    if (boton) {
+        boton.textContent = "Guardando...";
     }
 
+    let guardados = 0;
+
     try {
-        const asistencias = JSON.parse(
-            contenidoGuardado
+        const tallerId = Number(
+            tallerActualAsistencia.id
         );
 
-        return Array.isArray(asistencias)
-            ? asistencias
-            : [];
+        // Crear la jornada solo cuando todavía no existe.
+        if (!jornadaActualAsistencia) {
+            jornadaActualAsistencia =
+                await solicitarAsistenciaAPI(
+                    `/talleres/${tallerId}/asistencias`,
+                    "POST",
+                    {
+                        fecha: fechaActualAsistencia
+                    }
+                );
+        }
+
+        const jornadaId = Number(
+            jornadaActualAsistencia?.id
+        );
+
+        if (
+            !Number.isInteger(jornadaId) ||
+            jornadaId <= 0
+        ) {
+            throw new Error(
+                "La API no devolvió el ID de la jornada."
+            );
+        }
+
+        // Guardamos cada registro.
+        // Si existe, el backend lo actualiza.
+        for (const registro of registros) {
+            await solicitarAsistenciaAPI(
+                `/asistencias/${jornadaId}/registros`,
+                "POST",
+                registro
+            );
+
+            guardados++;
+        }
+
+        mostrarAlertaAsistencia(
+            `Asistencia guardada correctamente. ` +
+            `${guardados} registros guardados en MySQL.`,
+            "success"
+        );
 
     } catch (error) {
-        console.warn(
-            "No se pudieron leer las asistencias guardadas:",
+        console.error(
+            "Error al guardar asistencia:",
             error
         );
 
-        return [];
-    }
-}
+        mostrarAlertaAsistencia(
+            `No se pudo completar el guardado. ` +
+            `Se confirmaron ${guardados} de ` +
+            `${registros.length} registros. ` +
+            error.message +
+            " Podés volver a intentar guardar; " +
+            "los registros existentes se actualizan.",
+            "danger"
+        );
 
-function guardarEnLocalStorage(nuevaAsistencia) {
-    const asistencias = leerAsistenciasGuardadas();
+    } finally {
+        guardandoAsistencia = false;
 
-    // Eliminamos un posible registro anterior del mismo taller y la misma fecha para evitar duplicados 
+        habilitarGuardadoAsistencia(
+            alumnosAsistencia.length > 0 &&
+            tallerActualAsistencia?.estado === "Activo"
+        );
 
-    const asistenciasActualizadas =
-        asistencias.filter((asistencia) => {
-            return !(
-                asistencia.tallerId === nuevaAsistencia.tallerId &&
-                asistencia.fecha === nuevaAsistencia.fecha
-            );
-        });
-
-    asistenciasActualizadas.push(
-        nuevaAsistencia
-    );
-
-    localStorage.setItem(
-        "asistenciasSimuladas",
-        JSON.stringify(asistenciasActualizadas)
-    );
-}
-
-function cargarAsistenciaGuardada() {
-    const asistencias = leerAsistenciasGuardadas();
-
-    const asistenciaEncontrada =
-        asistencias.find((asistencia) => {
-            return (
-                asistencia.tallerId === tallerActual.id &&
-                asistencia.fecha === fechaAsistenciaActual
-            );
-        });
-
-    if (!asistenciaEncontrada) {
-        return;
-    }
-
-    asistenciaEncontrada.registros.forEach(
-        (registro) => {
-            const selector = document.querySelector(
-                `.estado-asistencia[data-alumno-id="${registro.alumnoId}"]`
-            );
-
-            if (selector) {
-                selector.value = registro.estado;
-            }
+        if (boton) {
+            boton.textContent = "Guardar asistencia";
         }
-    );
-
-    mostrarAlertaAsistencia(
-        "Se cargó la asistencia guardada anteriormente para esta fecha.",
-        "info"
-    );
+    }
 }
 
+
+// ======================================
 // FECHAS Y HORARIOS
+// ======================================
 
-function obtenerFechaISO() {
-    const fechaActual = new Date();
+function obtenerFechaISOAsistencia() {
+    const fecha = new Date();
 
-    const anio = fechaActual.getFullYear();
+    const anio = fecha.getFullYear();
 
     const mes = String(
-        fechaActual.getMonth() + 1
+        fecha.getMonth() + 1
     ).padStart(2, "0");
 
     const dia = String(
-        fechaActual.getDate()
+        fecha.getDate()
     ).padStart(2, "0");
 
     return `${anio}-${mes}-${dia}`;
 }
 
-function formatearFechaParaMostrar(fechaISO) {
+
+function formatearFechaAsistencia(fechaISO) {
     const partes = fechaISO.split("-");
 
     if (partes.length !== 3) {
         return fechaISO;
     }
 
-    const [anio, mes, dia] = partes;
-
-    return `${dia}/${mes}/${anio}`;
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
-function formatearHorarios(horarios) {
-    if (!Array.isArray(horarios) || horarios.length === 0) {
+
+function formatearHorariosAsistencia(horarios) {
+    if (
+        !Array.isArray(horarios) ||
+        horarios.length === 0
+    ) {
         return "Horario no disponible";
     }
 
-    return horarios
-        .map((horario) => {
-            return `${horario.dia} ${horario.horaInicio} a ${horario.horaFin}`;
-        })
-        .join(" | ");
+    return horarios.map(horario => {
+        const dia = horario.dia ??
+            horario.dia_semana ??
+            "";
+
+        const inicio = horario.hora_inicio ??
+            horario.horaInicio ??
+            "";
+
+        const fin = horario.hora_fin ??
+            horario.horaFin ??
+            "";
+
+        return `${dia}: ${inicio} a ${fin}`;
+    }).join(" | ");
 }
 
+
+// ======================================
+// ESTADO VISUAL
+// ======================================
+
+function mostrarCargaAsistencia(mostrar) {
+    const spinner = document.getElementById(
+        "loading-spinner"
+    );
+
+    if (spinner) {
+        spinner.classList.toggle("d-none", !mostrar);
+    }
+}
+
+
+function habilitarGuardadoAsistencia(habilitar) {
+    const boton = document.getElementById(
+        "btn-guardar-asistencia"
+    );
+
+    if (boton) {
+        boton.disabled = !habilitar;
+    }
+}
+
+
+function deshabilitarSelectoresAsistencia() {
+    document.querySelectorAll(
+        ".estado-asistencia"
+    ).forEach(selector => {
+        selector.disabled = true;
+    });
+}
+
+
+// ======================================
 // ALERTAS
+// ======================================
 
 function mostrarAlertaAsistencia(
     mensaje,
@@ -518,33 +771,33 @@ function mostrarAlertaAsistencia(
         "alert-info"
     );
 
-    alerta.classList.add(
-        `alert-${tipo}`
-    );
-
+    alerta.classList.add(`alert-${tipo}`);
     alerta.textContent = mensaje;
 }
 
-function deshabilitarGuardado() {
-    const botonGuardar = document.getElementById(
-        "btn-guardar-asistencia"
+
+function ocultarAlertaAsistencia() {
+    const alerta = document.getElementById(
+        "alerta-asistencia"
     );
 
-    if (botonGuardar) {
-        botonGuardar.disabled = true;
-    }
-}
-
-// FUNCIÓN AUXILIAR
-
-function colocarTexto(elementoId, contenido) {
-    const elemento = document.getElementById(
-        elementoId
-    );
-
-    if (!elemento) {
+    if (!alerta) {
         return;
     }
 
-    elemento.textContent = contenido ?? "-";
+    alerta.textContent = "";
+    alerta.classList.add("d-none");
+}
+
+
+// ======================================
+// FUNCIÓN AUXILIAR
+// ======================================
+
+function colocarTextoAsistencia(id, contenido) {
+    const elemento = document.getElementById(id);
+
+    if (elemento) {
+        elemento.textContent = contenido ?? "-";
+    }
 }
