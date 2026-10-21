@@ -763,4 +763,4 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 
 ---
 
-## 25. Conclucion.
+## 25. Conclusión.

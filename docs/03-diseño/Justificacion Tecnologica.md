@@ -1,7 +1,6 @@
 # Justificación Tecnológica y Arquitectura - Sistema de Gestión de Talleres en Convenio con INAU
 
 <br>
-<br>
 
 ## 1. Stack tecnológico
 
@@ -16,22 +15,25 @@
 | **Bootstrap 5.3** | Diseño responsive y componentes | La propuesta del proyecto admitía Tailwind o Bootstrap; se optó por Bootstrap por su curva de aprendizaje más accesible y su sistema de componentes predefinidos, que reduce el tiempo de desarrollo — factor crítico dado el plazo de 12 semanas. Resuelve directamente NRF01. |
 | **Bootstrap Icons** | Iconografía | Consistencia visual sin necesidad de gestionar íconos sueltos, integrado con el mismo framework. |
 | **JavaScript Vanilla** | Comportamiento dinámico | Establecido en la propuesta original del proyecto. Evita la curva de aprendizaje de un framework, priorizando que el equipo comprenda y mantenga su propio código. |
-| **localStorage** | Persistencia temporal | Solución provisional para la demostración mientras no existe backend (ver sección 3). |
-| **Mock data** | Simulación de datos | Datos simulados que permiten construir y validar la lógica de las tres interfaces sin depender del backend (ver sección 3). |
+| **localStorage** | Persistencia temporal | Usado durante la etapa inicial para la demostración sin backend. Tras la integración con la API quedó solo como resto puntual (ver sección 7). |
+| **Mock data** | Simulación de datos | Permitió construir y validar las tres interfaces antes de contar con la API. Fue reemplazado por llamadas reales, salvo un resto en la asistencia del alumno (ver sección 7). |
 
 <br>
 
-### 1.2 Backend (previsto)
+### 1.2 Backend
 
 | Tecnología | Uso | Justificación |
 |---|---|---|
-| **PHP** | Lógica del servidor | Establecido en la propuesta original del proyecto. Compatible con el entorno de desarrollo utilizado (XAMPP) y con amplia documentación disponible. |
+| **PHP 8.3** | Lógica del servidor | Establecido en la propuesta original del proyecto. Se utiliza orientado a objetos y sin framework, organizado en capas (Router → Middleware → Controller → Service → Repository), lo que mantiene el código comprensible para el equipo. |
 | **MySQL** | Base de datos | Establecido en la propuesta original. El modelo de datos requiere relaciones N:M, lo que justifica un motor relacional. Cumple NRF09. |
+| **PDO (pdo_mysql)** | Acceso a la base de datos | Consultas preparadas en todos los accesos, lo que previene la inyección SQL. Contribuye a NRF08. |
+| **Composer + firebase/php-jwt** | Autenticación | Gestión de dependencias y emisión de tokens JWT para la autenticación, sin implementar criptografía propia. |
+| **Symfony Rate Limiter** | Limitación de intentos | Restringe los intentos repetidos de inicio de sesión, como defensa ante ataques de fuerza bruta. |
 | **API REST** | Comunicación frontend-backend | Requisito explícito de la propuesta original ("organización del sistema bajo arquitectura de endpoints REST"). Permite mantener las capas desacopladas (NRF06). |
 | **Fetch API** | Consumo de la API desde el cliente | API nativa del navegador, sin necesidad de librerías externas, coherente con la decisión de dependencias mínimas. |
-| **Filesystem del servidor** | Almacenamiento de adjuntos | Establecido en la propuesta original. Evita la complejidad de un servicio de almacenamiento externo para una primera versión. |
+| **Filesystem del servidor** | Almacenamiento de adjuntos | Establecido en la propuesta original. Los archivos se guardan en un volumen de Docker (`uploads`), sin depender de un servicio de almacenamiento externo. |
 
-> **Nota:** la propuesta original del proyecto presenta una ambigüedad entre PHP puro, indicado en su stack tecnológico, y Laravel, mencionado en su plantilla de README. Esta definición se encuentra pendiente de resolución con el docente y el equipo.
+> **Nota:** la propuesta original del proyecto presentaba una ambigüedad entre PHP puro, indicado en su stack tecnológico, y Laravel, mencionado en su plantilla de README. Se resolvió utilizar PHP sin framework.
 
 <br>
 
@@ -41,7 +43,7 @@
 |---|---|
 | **Git / GitHub** | Requisito obligatorio del proyecto. Permite trazabilidad de cambios y trabajo simultáneo del equipo. Cumple NRF15 y NRF16. |
 | **Visual Studio Code** | Entorno gratuito, liviano y ampliamente documentado, adecuado para un equipo en formación. |
-| **XAMPP / servidor local** | Simula un entorno PHP + MySQL en el equipo de cada integrante durante el desarrollo, sin requerir hosting hasta el despliegue. |
+| **Docker Desktop / Docker Compose** | Levanta la API y la base de datos en contenedores, de modo que todo el equipo trabaja con el mismo entorno y el proyecto queda preparado para su despliegue (ver los documentos de reconstrucción en `docs/04-implementacion/`). |
 
 ---
 
@@ -88,12 +90,14 @@ La estructura completa del repositorio —el árbol de carpetas y la justificaci
 
 ### 2.3 Organización del código JavaScript
 
-Cada panel replica la misma estructura modular:
+Cada panel replica la misma estructura modular, y comparte con los demás una carpeta común:
 
 | Archivo | Responsabilidad |
 |---|---|
-| `main.js` | Punto de entrada común: detecta la página actual mediante `data-page`, gestiona navbar y cierre de sesión, e invoca el inicializador correspondiente. |
-| `mock-data.js` | Datos simulados que reemplazan temporalmente a la base de datos. No manipula el DOM. |
+| `frontend/js/api.js` | Cliente común para las llamadas a la API. |
+| `frontend/js/auth.js` | Inicio de sesión y redirección al panel correspondiente según el rol. |
+| `main.js` | Punto de entrada de cada panel: detecta la página actual mediante `data-page`, gestiona navbar y cierre de sesión, e invoca el inicializador correspondiente. |
+| `mock-data.js` | Datos simulados de la etapa inicial; hoy solo quedan restos. No manipula el DOM. |
 | `utils.js` | Funciones genéricas reutilizables (lectura de parámetros de URL, formateo, etc.), sin conocimiento de ninguna pantalla concreta. |
 | `<pantalla>.js` | Un archivo por vista, con responsabilidad única sobre esa pantalla. |
 
@@ -105,15 +109,15 @@ Esta organización cumple NRF13 y permite que distintos integrantes trabajen en 
 
 ## 3. Decisiones arquitectónicas
 
-**Login único con redirección por rol.** En lugar de tres pantallas de acceso independientes, existe un único `index.html`. El backend identificará el rol del usuario autenticado y lo redirigirá al panel correspondiente. Reduce duplicación de código y cumple RF01.
+**Login único con redirección por rol.** En lugar de tres pantallas de acceso independientes, existe un único `frontend/index.html`, donde el usuario ingresa con correo y contraseña. La API valida las credenciales y el frontend lo redirige al panel que corresponde a su rol. Reduce duplicación de código y cumple RF01.
 
 **Paneles independientes por rol.** Se optó por tres interfaces separadas en lugar de una sola con visibilidad condicional. Para un equipo en formación, mantener paneles separados reduce el riesgo de errores de permisos frente a gestionar condicionales dentro de una única base de código.
 
-**Frontend primero, con datos simulados.** El desarrollo avanza sobre mock data antes de implementar el backend, lo que permite validar flujos y experiencia de usuario sin bloquear el trabajo a la espera de la API. La estructura de los datos simulados replica la del modelo de datos, facilitando la sustitución posterior por llamadas reales.
+**Frontend primero, con datos simulados.** El desarrollo avanzó sobre mock data antes de implementar el backend, lo que permitió validar flujos y experiencia de usuario sin bloquear el trabajo a la espera de la API. La estructura de los datos simulados replicaba la del modelo de datos, lo que facilitó su sustitución por llamadas reales.
 
-**Navegación mediante parámetros de URL.** Las pantallas de detalle reciben identificadores por URL (`detalle-taller.html?id=1`, `asistencia.html?tallerId=1`), imitando el comportamiento de una aplicación conectada a endpoints REST y facilitando la migración futura.
+**Navegación mediante parámetros de URL.** Las pantallas de detalle reciben identificadores por URL (`detalle-taller.html?id=1`, `asistencia.html?tallerId=1`), imitando desde el inicio el comportamiento de una aplicación conectada a endpoints REST, lo que simplificó la migración a la API.
 
-**Persistencia local estrictamente provisional.** `localStorage` se utiliza únicamente para demostración durante el desarrollo. No sustituye a MySQL, no ofrece garantías de seguridad y no almacena credenciales.
+**Persistencia local estrictamente provisional.** `localStorage` se utilizó únicamente para demostración durante el desarrollo. No sustituye a MySQL, no ofrece garantías de seguridad y no almacena credenciales.
 
 ---
 
@@ -160,13 +164,13 @@ La composición del equipo y la asignación de roles se detallan en el Project C
 | NRF01 — Diseño responsive | Bootstrap 5.3 |
 | NRF05 — Validación frontend y backend | Validación en JavaScript + validación en PHP |
 | NRF06 — Separación frontend/backend | Arquitectura de API REST |
-| NRF07 — Control de acceso por rol | Autenticación con sesión en backend + paneles separados |
+| NRF07 — Control de acceso por rol | Autenticación con token JWT en cookie HttpOnly y verificación de rol en cada ruta, más paneles separados |
 | NRF08 — Protección de datos personales | Hash de contraseñas, consultas preparadas, control de permisos por endpoint |
 | NRF09 — Persistencia relacional | MySQL |
 | NRF10 — Trazabilidad | Tabla `trazabilidad`, más el registro del usuario responsable en `registros_asistencia` y de la fecha de carga en `adjuntos` |
 | NRF11 — Restricción de formatos | Validación de extensión y MIME type (PDF, JPG, documentos de oficina) |
 | NRF12 — Restricción de tamaño | Límite configurado en PHP (`upload_max_filesize`) y validado en el endpoint |
-| NRF13 — Código organizado | Estructura modular por pantalla |
+| NRF13 — Código organizado | Estructura modular por pantalla en el frontend y arquitectura en capas en el backend |
 | NRF14 — Documentación técnica | Carpeta `docs/` versionada |
 | NRF15 — Uso de Git | Repositorio GitHub con historial de commits |
 | NRF16 — Pull Requests | Flujo de ramas con revisión previa al merge |
@@ -179,14 +183,12 @@ La composición del equipo y la asignación de roles se detallan en el Project C
 
 | Componente | Estado |
 |---|---|
-| Panel administrador | HTML, CSS y JavaScript completos, con mock data funcional |
-| Panel tallerista | HTML, CSS y JavaScript completos, con mock data funcional. Incluye la gestión de material y tareas y la corrección de entregas |
-| Panel alumno | Estructura HTML y CSS lista; lógica JavaScript pendiente |
-| Login (`index.html`) | Interfaz terminada; autenticación pendiente (`auth.js` sin implementar) |
-| Base de datos | Script definido en `backend/DataBase/inau_talleres.sql`, con las trece tablas y datos de prueba. Pendiente de ejecución en el servidor |
-| Backend | Desarrollo iniciado; sin avances incorporados al repositorio a la fecha |
+| Panel administrador | Completo y conectado a la API |
+| Panel tallerista | Completo y conectado a la API. Incluye la gestión de material y tareas y la corrección de entregas |
+| Panel alumno | Completo y conectado a la API, salvo la asistencia, que conserva datos simulados |
+| Login (`frontend/index.html`) | Acceso por correo y contraseña, autenticación contra la API y redirección por rol |
+| Base de datos | Script con las trece tablas y datos de prueba en `backend/api-completa/DataBase/inau_talleres.sql`, ejecutado en el entorno Docker |
+| Backend | Implementado: API REST con 53 rutas, organizada en capas, con autenticación JWT y control de acceso por rol |
 | Documentación técnica | Análisis, diseño y modelado completos. `api.md` y `testing.md` pendientes de contenido |
 
-Esta justificación tecnológica seguirá vigente durante el desarrollo del backend, momento en el que se evaluará si las herramientas previstas (PHP, MySQL) siguen siendo las más adecuadas según los avances del equipo.
-
->Pendiente: Revisar por Diego.
+El backend se desarrolló con las herramientas previstas, por lo que las decisiones de esta justificación se mantienen.

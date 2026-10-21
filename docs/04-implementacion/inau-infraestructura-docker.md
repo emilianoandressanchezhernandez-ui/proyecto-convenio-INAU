@@ -1,157 +1,84 @@
-# TheNewfutures — Entorno Docker (PHP + HTML/CSS + MySQL)
+# TheNewfutures — Entorno Docker (PHP + MySQL)
 
 ### Plataforma de gestión de talleres | Convenio con INAU
 
 ---
 
-> Este documento define el entorno de desarrollo/despliegue en contenedores para **TheNewfutures** (frontend HTML + CSS + JS, backend PHP y base de datos MySQL). Se resuelve con `docker compose` para reemplazar el uso actual de **XAMPP o servidor local** (mencionado como entorno de ejecución en `docs/03-diseño/Justificacion Tecnologica.md`, sección 1.3), de forma que el equipo trabaje con el mismo entorno sin instalar XAMPP cada uno por su cuenta, y el proyecto quede listo para moverse a un hosting externo cuando INAU lo requiera.
+> Este documento describe el entorno en contenedores de **TheNewfutures**. El entorno vive en `backend/api-completa/` y levanta **la API PHP y la base de datos MySQL** con `docker compose`. El frontend (HTML + CSS + JS) no forma parte de estos contenedores: es un sitio estático que se sirve aparte y consume la API. Docker reemplaza el uso de **XAMPP o servidor local** (mencionado en `docs/03-diseño/Justificacion Tecnologica.md`, sección 1.3), de modo que el equipo trabaje con el mismo entorno y el proyecto pueda trasladarse a un servidor externo cuando INAU lo requiera.
 
 ---
 
 ## 1. Justificación de la arquitectura elegida
 
-Las decisiones de stack (PHP como backend, frontend sin framework, login único) ya están justificadas en `docs/03-diseño/Justificacion Tecnologica.md`. Esta sección justifica únicamente su **contenedorización**.
+Las decisiones de stack (PHP como backend, frontend sin framework, login único) están justificadas en `docs/03-diseño/Justificacion Tecnologica.md`. Esta sección justifica únicamente su **contenedorización**.
 
 | Decisión | Justificación |
 |---|---|
-| MySQL en contenedor separado con volumen persistente | NRF09 "garantizar la persistencia confiable de los datos en una base de datos relacional". Aísla los datos del ciclo de vida del contenedor de aplicación. |
-| phpMyAdmin como servicio opcional | Facilita al equipo de desarrollo inspeccionar datos durante la etapa de pruebas, sin instalar un cliente MySQL aparte. |
-| Variables sensibles vía `.env` (no hardcodeadas) | NRF08 "proteger los datos personales de los usuarios" — las credenciales de base de datos no deben quedar en el repositorio ni en la imagen. |
-| Backend separado del frontend a nivel de código (carpeta `backend/`) | NRF06 "arquitectura separada entre frontend y backend". El frontend es HTML/JS estático que consume los endpoints PHP de `backend/api/`. |
+| MySQL en contenedor separado con volumen persistente (`mysql_data`) | NRF09 "garantizar la persistencia confiable de los datos en una base de datos relacional". Los datos sobreviven aunque se detengan o se vuelvan a crear los contenedores. |
+| Código de la API copiado dentro de la imagen | La API queda autocontenida: la imagen se construye desde `backend/api-completa/` e instala sus dependencias con Composer a partir de `composer.lock`, sin depender de la computadora de cada integrante. |
+| Archivos subidos en un volumen propio (`uploads_data`) | Los adjuntos de material y entregas persisten de forma independiente del contenedor de la API (NRF09). |
+| Variables configurables mediante `.env` | NRF08 "proteger los datos personales de los usuarios". El `compose` trae valores por defecto pensados solo para desarrollo, de modo que funciona sin `.env`; en producción esos valores (clave secreta y contraseñas) deben reemplazarse obligatoriamente. |
+| Frontend separado de la API | NRF06 "arquitectura separada entre frontend y backend". El frontend es estático y se comunica con la API por HTTP; la API solo acepta solicitudes con credenciales desde el origen autorizado en `FRONTEND_ORIGIN` (CORS). |
 
 ---
 
-## 2. Archivos que agrega el entorno Docker
+## 2. Archivos del entorno Docker
 
-La estructura completa del repositorio se documenta en `docs/Estructura del Repositorio.md`. Este entorno **agrega únicamente** los archivos necesarios para levantar el stack; el backend PHP se sirve tal como está versionado en `main`, sin que este documento defina su estructura interna.
+La estructura completa del repositorio se documenta en `docs/Estructura del Repositorio.md`. Los archivos que definen el entorno son:
 
 ```
-proyecto-convenio-INAU/
-├── docker-compose.yml          # (nuevo) orquestación de servicios
-├── .env                        # (nuevo) NO se commitea (ver .gitignore)
-├── .env.example                # (nuevo) plantilla versionada
-└── php/
-    ├── Dockerfile              # (nuevo) imagen PHP + Apache
-    └── php.ini                 # (nuevo) límites y configuración
+backend/api-completa/
+├── compose.yaml                 # orquestación de los servicios api y database
+├── .env.docker.example          # plantilla opcional de variables (se copia como .env)
+├── DataBase/
+│   └── inau_talleres.sql        # esquema y datos de prueba, ejecutado al crear la base
+└── docker/php-apache/
+    ├── Dockerfile               # imagen PHP 8.3 + Apache con la API y sus dependencias
+    ├── app.conf                 # configuración de Apache (AllowOverride, sin listado de carpetas)
+    ├── uploads.ini              # límites de tamaño de archivos subidos
+    └── entrypoint.sh            # prepara la carpeta de archivos subidos al iniciar
 ```
 
-El contenedor `web` sirve la raíz del proyecto (`index.html`, `frontend/` y el backend PHP de `main`), y el contenedor `db` inicializa el esquema desde `backend/DataBase/inau_talleres.sql`.
+El contenedor `api` sirve **solo la API**. El contenedor `database` crea la base a partir de `DataBase/inau_talleres.sql`.
 
 ---
 
-## 3. `docker-compose.yml`
+## 3. Servicios (`compose.yaml`)
 
-```yaml
-services:
-  web:
-    build:
-      context: ./php
-      dockerfile: Dockerfile
-    container_name: inau_talleres_web
-    restart: unless-stopped
-    ports:
-      - "${APP_PORT:-8080}:80"
-    volumes:
-      - ./:/var/www/html
-    environment:
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_NAME: ${MYSQL_DATABASE}
-      DB_USER: ${MYSQL_APP_USER}
-      DB_PASSWORD: ${MYSQL_APP_PASSWORD}
-      APP_TIMEZONE: America/Montevideo
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - talleres_net
+El archivo completo está en `backend/api-completa/compose.yaml`. Define dos servicios y dos volúmenes:
 
-  db:
-    image: mysql:8.0
-    container_name: inau_talleres_db
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_APP_USER}
-      MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD}
-      TZ: America/Montevideo
-    command: >
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_unicode_ci
-      --default-time-zone=-03:00
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./backend/DataBase:/docker-entrypoint-initdb.d:ro
-    ports:
-      - "127.0.0.1:3306:3306"   # expuesto solo en localhost, no hacia afuera (NRF08)
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    networks:
-      - talleres_net
+| Elemento | Configuración | Justificación |
+|---|---|---|
+| Servicio `database` | Imagen `mysql:8.4`, base `inau_talleres`, usuario `utu_user` | El script del proyecto usa restricciones `CHECK`, que requieren MySQL 8.0 o superior. |
+| Inicialización de la base | Monta `./DataBase/inau_talleres.sql` como `/docker-entrypoint-initdb.d/01-database.sql` | MySQL ejecuta el script automáticamente, pero **solo la primera vez que se crea el volumen**. |
+| `healthcheck` en `database` + `depends_on: service_healthy` en `api` | `mysqladmin ping` cada 5 s | La API no arranca hasta que MySQL está listo, evitando errores de conexión en el primer inicio. |
+| Servicio `api` | Se construye con `docker/php-apache/Dockerfile` | Contiene el código de la API y sus dependencias. |
+| Puerto de la API | `${API_PORT:-8002}:80` | La API queda disponible en `http://localhost:8002`. |
+| Puerto de MySQL | `${MYSQL_PORT:-3308}:3306` | Permite inspeccionar la base desde la computadora durante el desarrollo. **Queda expuesto en todas las interfaces**: en un servidor debe restringirse (ver sección 9). |
+| Volumen `mysql_data` | Datos de MySQL | Persisten con `docker compose down`; solo se borran con `docker compose down -v` (NRF09). |
+| Volumen `uploads_data` | `/var/www/html/uploads` | Persistencia de los archivos adjuntos. |
 
-  phpmyadmin:
-    image: phpmyadmin:5
-    container_name: inau_talleres_phpmyadmin
-    restart: unless-stopped
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      UPLOAD_LIMIT: 50M
-    ports:
-      - "${PMA_PORT:-8081}:80"
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - talleres_net
-    profiles:
-      - herramientas   # se levanta solo con: docker compose --profile herramientas up
-
-networks:
-  talleres_net:
-    driver: bridge
-
-volumes:
-  db_data:
-    driver: local
-```
-
-**Justificación de decisiones del compose:**
-
-| Elemento | Justificación |
-|---|---|
-| `web` monta la raíz del proyecto (`./:/var/www/html`) | El document root necesita servir `index.html` y `frontend/` como estático, y `backend/api/*.php` como endpoints, tal como ya está organizado el repositorio — no hace falta mover archivos a una carpeta `public/` nueva. |
-| `db` monta `./backend/DataBase` como directorio de inicialización | MySQL ejecuta automáticamente los scripts `.sql` de esa carpeta en el primer arranque, de modo que el esquema real del proyecto se aplica sin mantener una copia paralela. |
-| `db` con `ports: 127.0.0.1:3306:3306` | El puerto de MySQL solo se expone en la máquina local del desarrollador (para administración/debug con un cliente MySQL propio), nunca hacia la red externa — NRF08. |
-| `healthcheck` en `db` + `depends_on: condition: service_healthy` en `web` | Evita que Apache/PHP arranque antes de que MySQL esté listo, reduciendo errores intermitentes de conexión desde el primer arranque. |
-| `phpmyadmin` bajo `profiles: [herramientas]` | No se levanta por defecto (reduce superficie de ataque); el equipo lo activa solo cuando necesita inspeccionar datos. |
-| `db_data` como volumen nombrado | Persiste los datos aunque se recree el contenedor `db` (`docker compose down` sin `-v`) — NRF09. |
-| Variables vía `${...}` desde `.env` | Ninguna credencial queda escrita en el archivo versionado — NRF08. |
-
-> **Nota:** la consigna de este proyecto no exige explícitamente un servicio de respaldo automático diario. Si el equipo lo considera necesario para reforzar NRF09, se puede agregar un servicio `db-backup` (mismo patrón: `mysqldump` programado + volumen `./backup`), pero no se incluye acá por no estar entre los requerimientos relevados.
+> **Nota:** la consigna del proyecto no exige un servicio de respaldo automático. Si el equipo lo considera necesario para reforzar NRF09, puede agregarse un servicio que ejecute `mysqldump` de forma programada, pero no se incluye por no estar entre los requerimientos relevados.
 
 ---
 
 ## 4. Variables de entorno
 
-### 4.1 `.env.example` (versionado en git)
+El `compose` funciona sin archivo `.env`, con valores por defecto de desarrollo. Para cambiarlos, se copia `.env.docker.example` como `.env` en la misma carpeta y se completan los valores:
 
-```dotenv
-# Copiar este archivo a .env y completar antes de levantar el stack
-APP_PORT=8080
-PMA_PORT=8081
+| Variable | Uso | Valor por defecto |
+|---|---|---|
+| `SECRET_KEY` | Clave con la que la API firma los tokens de sesión | Clave de demostración incluida en `compose.yaml` |
+| `APP_ENV` | `development` o `production` | `development` |
+| `TOKEN_LIFETIME` | Duración del token, en segundos | `3600` |
+| `FRONTEND_ORIGIN` | Origen del frontend autorizado por CORS | `http://localhost:8000` |
+| `DB_PASSWORD` | Contraseña del usuario `utu_user` | `utu_password` |
+| `MYSQL_ROOT_PASSWORD` | Contraseña de root de MySQL | `root_password` |
+| `API_PORT` / `MYSQL_PORT` | Puertos publicados en la computadora | `8002` / `3308` |
 
-MYSQL_ROOT_PASSWORD=CAMBIAR_ESTA_CLAVE_ROOT
-MYSQL_DATABASE=inau_talleres
-MYSQL_APP_USER=talleres_app
-MYSQL_APP_PASSWORD=CAMBIAR_ESTA_CLAVE_APP
-```
+> La `SECRET_KEY` por defecto está publicada en el repositorio, por lo que **solo sirve para desarrollo**. Fuera de la máquina local debe generarse una nueva (por ejemplo, con `php -r "echo bin2hex(random_bytes(32));"`).
 
-### 4.2 `.gitignore` (agregar a lo que ya exista)
+El archivo `.env` no debe versionarse. El repositorio todavía no cuenta con un `.gitignore`; al crearlo debe incluir:
 
 ```gitignore
 .env
@@ -159,118 +86,54 @@ MYSQL_APP_PASSWORD=CAMBIAR_ESTA_CLAVE_APP
 
 ---
 
-## 5. `php/Dockerfile`
+## 5. Imagen de la API (`Dockerfile`)
 
-```dockerfile
-FROM php:8.2-apache
+El archivo está en `backend/api-completa/docker/php-apache/Dockerfile`. Sus decisiones principales:
 
-# Extensiones necesarias para MySQL (mysqli/PDO) y para RF13 (exportar PDF/Excel)
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+| Decisión | Justificación |
+|---|---|
+| Base `php:8.3-apache` | PHP y servidor web en una sola imagen. |
+| Extensión `pdo_mysql` | Conexión de la API a MySQL mediante PDO. |
+| Módulo `rewrite` + `app.conf` con `AllowOverride All` | Permite que Apache envíe todas las rutas de la API a `index.php` mediante `.htaccess`. `app.conf` desactiva además el listado de carpetas (`Options -Indexes`). |
+| Composer en una etapa previa de construcción | Las dependencias se instalan desde `composer.lock` (`--no-dev`), sin copiar la carpeta `vendor` desde la computadora de cada integrante. |
+| `uploads.ini` | NRF12: limita el tamaño de los archivos subidos (`upload_max_filesize = 10M`, `post_max_size = 12M`). El tipo de archivo se valida en la propia API (NRF11). |
+| `entrypoint.sh` | Crea la carpeta `uploads` y le asigna los permisos del usuario de Apache al iniciar el contenedor. |
 
-# Configuración propia de PHP (uploads, límites, zona horaria)
-COPY php.ini /usr/local/etc/php/conf.d/talleres.ini
-
-# Apache: permitir .htaccess y activar mod_rewrite
-RUN a2enmod rewrite
-RUN sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
-
-WORKDIR /var/www/html
-```
-
-### `php/php.ini`
-
-```ini
-date.timezone = America/Montevideo
-
-; NRF11/NRF12: adjuntos de tareas/material restringidos a PDF, imágenes JPG
-; y documentos de oficina (DOCX, XLSX, PPTX), con tamaño máximo acotado.
-; El límite del servidor es la primera barrera; el tipo de archivo igual debe
-; validarse explícitamente en PHP (extensión + tipo MIME real), nunca confiar
-; solo en esta configuración.
-upload_max_filesize = 10M
-post_max_size = 12M
-
-memory_limit = 128M
-display_errors = Off
-log_errors = On
-error_log = /var/log/apache2/php_errors.log
-```
-
-> `display_errors = Off` + `log_errors = On`: NRF08 exige proteger datos personales de alumnos y talleristas; los errores de PHP no deben mostrarse al usuario final (podrían filtrar rutas o consultas), pero sí quedar registrados para diagnóstico — esto también es la base técnica de NRF10 (trazabilidad).
+El manejo de errores no se configura en la imagen sino en la aplicación: según `APP_ENV`, y mediante el manejador de `index.php`, que registra el detalle en el log y responde al cliente con un mensaje genérico.
 
 ---
 
-## 6. Conexión PHP → MySQL vía variables de entorno
+## 6. Conexión de la API con MySQL
 
-El backend se conecta a MySQL leyendo las credenciales desde las variables de entorno que define el compose (sección 3), de modo que ninguna contraseña queda escrita en el código (NRF08).
+La conexión está implementada en `backend/api-completa/core/Database.php` mediante **PDO**, con `charset=utf8mb4` y modo de errores por excepción. Las credenciales (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`) se leen en `config.php` desde las variables de entorno que define el `compose`, de modo que ninguna contraseña queda escrita en el código (NRF08). Dentro de Docker, la API se conecta al host `database`, que es el nombre del servicio de MySQL.
 
-```php
-<?php
-declare(strict_types=1);
-
-function obtenerConexion(): mysqli
-{
-    $host     = getenv('DB_HOST')     ?: 'db';
-    $puerto   = (int) (getenv('DB_PORT') ?: 3306);
-    $base     = getenv('DB_NAME')     ?: 'inau_talleres';
-    $usuario  = getenv('DB_USER')     ?: 'talleres_app';
-    $password = getenv('DB_PASSWORD') ?: '';
-
-    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-    $conexion = new mysqli($host, $usuario, $password, $base, $puerto);
-    $conexion->set_charset('utf8mb4');
-
-    return $conexion;
-}
-```
-
-> El control de acceso por rol, la autenticación y los endpoints son responsabilidad del backend versionado en `main`; este documento de infraestructura no los define, solo provee el entorno en que se ejecutan.
+> El control de acceso por rol, la autenticación y los endpoints son responsabilidad de la API; este documento solo describe el entorno en que se ejecutan.
 
 ---
 
 ## 7. Puesta en marcha
 
-```bash
-# 1. Ubicarse en la raíz del repositorio y preparar variables de entorno
-cp .env.example .env
-# editar .env y completar contraseñas reales
+Los comandos se ejecutan desde `backend/api-completa/`. El procedimiento completo —prueba limpia, operación, logs y verificación de la base— está en `docs/04-implementacion/Documento de Reconstruccion - Doker desktop.md`. Para un servidor nuevo, ver `docs/04-implementacion/Documento de Reconstruccion - Servidor.md`.
 
-# 2. Levantar el stack base (web + db)
-docker compose up -d --build
+Accesos por defecto en desarrollo:
 
-# 3. (Opcional) levantar también phpMyAdmin para administración
-docker compose --profile herramientas up -d
-
-# 4. Ver logs de la aplicación
-docker compose logs -f web
-
-# 5. Apagar el stack (los datos persisten en el volumen db_data)
-docker compose down
-
-# 6. Apagar y BORRAR también los datos (usar con cuidado)
-docker compose down -v
-```
-
-Accesos por defecto:
-
-| Servicio | URL |
+| Servicio | Dirección |
 |---|---|
-| Login del sistema (`index.html`) | http://localhost:8080 |
-| phpMyAdmin (perfil `herramientas`) | http://localhost:8081 |
+| API | http://localhost:8002 |
+| MySQL (cliente externo) | localhost:3308 |
+| Frontend (servido aparte) | http://localhost:8000 |
 
 ---
 
 ## 8. Inicialización de la base de datos
 
-El esquema está definido en `backend/DataBase/inau_talleres.sql` (su derivación y el detalle de tablas se documentan en `docs/03-diseño/Modelado/`). El contenedor `db` ejecuta ese script automáticamente en el primer arranque, mediante el montaje de la carpeta en `/docker-entrypoint-initdb.d`. No se define un esquema propio para el entorno Docker: mantener un segundo script produciría dos versiones divergentes de la misma estructura.
+El esquema está definido en `backend/api-completa/DataBase/inau_talleres.sql` (su derivación y el detalle de tablas se documentan en `docs/03-diseño/Modelado/`). El contenedor `database` lo ejecuta automáticamente la primera vez que se crea el volumen `mysql_data`; para volver a cargarlo hay que borrar el volumen con `docker compose down -v`.
 
 **Consideraciones para el entorno en contenedor:**
 
 - El script comienza con `DROP DATABASE IF EXISTS`, apropiado para desarrollo pero que debe retirarse antes de cualquier despliegue con datos reales.
-- Los datos de prueba incluidos utilizan hashes de contraseña reales, válidos para probar el inicio de sesión pero que no deben conservarse en un entorno con datos de INAU.
-- El script requiere MySQL 8.0 o superior por el uso de restricciones `CHECK`. La imagen `mysql:8.0` del compose cumple ese requisito.
-- La base se llama `inau_talleres`, valor que debe coincidir con `MYSQL_DATABASE` en el archivo `.env`.
+- Los datos de prueba incluyen hashes de contraseña válidos para probar el inicio de sesión, que no deben conservarse en un entorno con datos de INAU.
+- El nombre de la base (`inau_talleres`) está fijado en `compose.yaml`.
 
 ---
 
@@ -278,9 +141,12 @@ El esquema está definido en `backend/DataBase/inau_talleres.sql` (su derivació
 
 Antes de conectar este entorno a datos reales de INAU deben verificarse:
 
+- `SECRET_KEY` nueva y contraseñas propias definidas en `.env`, reemplazando los valores por defecto del `compose`.
+- `APP_ENV=production`.
+- Puerto de MySQL no expuesto fuera del servidor.
+- `.env` fuera del control de versiones.
 - Contraseñas almacenadas mediante hash seguro.
 - Conexión bajo HTTPS.
-- Verificación de permisos por rol en cada endpoint del backend (NRF07 y NRF08).
-- El puerto de MySQL no expuesto fuera de `localhost`, y el `.env` nunca versionado.
+- Verificación de permisos por rol en cada endpoint (NRF07 y NRF08).
 
 >Pendiente: Revisar con Diego.
