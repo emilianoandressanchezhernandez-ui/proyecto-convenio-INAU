@@ -129,7 +129,7 @@
 
 # Cosas pendientes:
    1. - Entrevista con cliente, ajustar documento despues de la entrevista(Todos los documentos relacionados).
-   2. - Hacer documento de control de cambios(Hugente).
+   2. - Hacer documento de control de cambios(Hurgente).
    3. - Manual de Usuaro(Leguaje simple).
    4. - Backup completo del proyecto funcionando (docker + datos).
    5. - Acta de Cierre.
