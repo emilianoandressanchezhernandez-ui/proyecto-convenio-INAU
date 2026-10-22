@@ -1,7 +1,7 @@
 # Revisión integral de coherencia — Proyecto TheNewfutures / INAU
 
-**Fecha de revisión:** 15 de octubre de 2026
-**Fuente:** estado consolidado del proyecto — documentación de la rama `cambios-frontend` (última versión) integrada con el código (frontend y backend) presente en `main`, previo a su unificación.
+**Fecha de revisión:** 21 de octubre de 2026
+**Fuente:** rama `cambios-frontend` del repositorio `proyecto-convenio-INAU`.
 **Alcance:** documentación, estructura de repositorio, HTML, CSS, JavaScript, PHP y SQL presentes en el repositorio.
 
 > Esta revisión distingue entre lo que está realmente presente en el repositorio, lo que la documentación declara y lo que todavía está planificado. No se considera una implementación como terminada solo porque esté descrita en un documento.
@@ -10,90 +10,38 @@
 
 ## 1. Diagnóstico general
 
-El proyecto tiene una **arquitectura general coherente** y una separación clara entre frontend, backend y documentación. El cambio más importante respecto de revisiones anteriores es que **el backend dejó de ser una previsión**: `main` incorpora una API REST en PHP con 47 rutas, organizada en capas, con autenticación por token y control de acceso por rol.
+El proyecto tiene una **arquitectura general coherente** y una separación clara entre frontend, backend y documentación. Desde la revisión anterior el cambio más importante es que **el frontend quedó integrado con la API**: los tres paneles consumen la API REST en PHP, que ahora expone 53 rutas, y el inicio de sesión se resuelve por correo y contraseña con redirección según el rol.
 
-Los tres frontends tienen ya su lógica JavaScript: el del tallerista sigue siendo el más maduro, el del administrador tiene todas sus pantallas con lógica, y **el del alumno —que antes solo tenía HTML y CSS— ya incorpora su carpeta `js/` con los módulos por pantalla**. La documentación está reorganizada por etapa y casi completa.
+Los paneles del administrador y del tallerista están completos y conectados a la API; el del alumno también, salvo la asistencia, que conserva datos simulados. El entorno se levanta con Docker y su puesta en marcha quedó documentada y probada. La documentación está organizada por etapa y casi completa.
 
-Los problemas pendientes se concentran en tres frentes: **dos esquemas SQL divergentes conviviendo en el repositorio**, **dos claves secretas publicadas en el código de la API**, y la falta de integración entre el frontend y la API.
+Los problemas pendientes se concentran en tres frentes: **la API expone detalles de la base de datos ante un error**, **el `compose` todavía provee una clave secreta por defecto**, y **la documentación técnica de la API, las pruebas y el cierre siguen vacíos**.
 
 ### Estado general
 
 | Área | Estado | Observación |
 |---|---|---|
-| Análisis del problema | Completo | Entrevista (reconstrucción y anotaciones), análisis, requerimientos, historias de usuario y backlog. |
+| Análisis del problema | Completo | Entrevista, análisis, requerimientos, historias de usuario y backlog. |
 | Alcance | Definido | Alcance incluido, excluido y ajuste por plazo documentados de forma coherente. |
-| Frontend tallerista | Avanzado | Nueve páginas con lógica completa y datos simulados, incluida la gestión de material y la corrección de entregas. |
-| Frontend administrador | Avanzado | Once páginas y quince módulos de JavaScript funcionales con datos simulados. |
-| Frontend alumno | Avanzado | Siete páginas HTML con su carpeta `js/` (diez módulos) y datos simulados. |
-| Login | Pendiente de integración | La API resuelve la autenticación; el frontend todavía no la consume. |
-| Backend PHP | Implementado | 47 rutas en arquitectura por capas, con autenticación JWT y verificación de rol por ruta. |
-| Base de datos | Completa como diseño | Trece tablas con claves, restricciones, índices y datos de prueba. Conviven dos scripts divergentes (ver 4.1). |
+| Frontend tallerista | Completo | Nueve páginas conectadas a la API, incluida la gestión de material y tareas y la corrección de entregas. |
+| Frontend administrador | Completo | Once páginas conectadas a la API, incluida la generación de reportes. |
+| Frontend alumno | Avanzado | Siete páginas conectadas a la API, salvo la asistencia, que conserva datos simulados. |
+| Login | Completo | Acceso por correo y contraseña en `frontend/index.html`, autenticación contra la API y redirección por rol. |
+| Backend PHP | Implementado | 53 rutas en arquitectura por capas, con autenticación JWT y verificación de rol por ruta. |
+| Base de datos | Completa | Trece tablas con claves, restricciones, índices y datos de prueba. Un único esquema, con una copia duplicada pendiente de eliminar (ver 4.1). |
 | API REST | Implementada | Sin documentar: `docs/04-implementacion/api.md` está vacío. |
-| Modelo de datos documental | Completo | Modelo de clases, MER, anexo de derivación y análisis del modelo. |
-| Planificación documental | Integrada en Doc.md | El backlog priorizado de los seis sprints está en `Doc.md` (§20). El archivo `planificacion.md` fue eliminado por redundante (ver 4.10). |
-| Seguridad | Mixta | El control de acceso de la API es sólido; hay dos claves secretas publicadas en el repositorio (ver 4.2). |
-| Infraestructura | Definida como propuesta | Documentación de entorno Docker; el stack todavía no está reflejado en el repositorio. |
+| Modelo de datos documental | Completo | Modelo de clases, MER, anexo de derivación y análisis del modelo, alineados con el SQL actual. |
+| Planificación documental | Resuelto | El backlog priorizado de los seis sprints está en `Doc.md`; `planificacion.md` fue eliminado. |
+| Seguridad | Mixta | El control de acceso de la API es sólido; quedan una clave por defecto en el `compose` (ver 4.2) y la filtración de errores (ver 4.7). |
+| Infraestructura | Implementada | Entorno Docker en `backend/api-completa`, con su puesta en marcha probada en Docker Desktop y documentada para un servidor. |
 | Identidad visual | Definida | Documentación completa y hojas de estilo por panel. |
 | Uso ético de IA | Documentado | Declaración con registro de herramientas utilizadas y firmas. |
+| Gestión | Avanzada | Actas de reuniones R-01 a R-12 y actas de Sprint Review; el Acta de cierre está sin contenido. |
 
 ---
 
 ## 2. Estructura actual real del repositorio
 
-```text
-proyecto-convenio-INAU/
-│
-├── index.html
-├── README.md
-│
-├── backend/
-│   ├── .md
-│   ├── DataBase/
-│   │   └── inau_talleres.sql        → esquema definitivo del proyecto
-│   └── api/                         → API REST en PHP (47 rutas)
-│       ├── index.php  routes.php  config.php
-│       ├── core/                    → Router, AuthMiddleware, Token, Database
-│       ├── controllers/  services/  repositories/
-│       ├── validators/  dtos/  models/
-│       ├── docker/  compose.yaml
-│       └── database.sql             → segundo esquema, divergente (ver 4.1)
-│
-├── docs/
-│   ├── Estructura del Repositorio.md
-│   │
-│   ├── 01-gestion/
-│   │   ├── Acta de Reuniones.md
-│   │   ├── Charter.md
-│   │   ├── Declaración de Etica en el uso de IA.md
-│   │   └── Revision_Coherencia_INAU.md
-│   │
-│   ├── 02-analisis/
-│   │   ├── Doc.md
-│   │   ├── Entrevista.md
-│   │   └── requerimientos.md
-│   │
-│   ├── 03-diseño/
-│   │   ├── Identidad Visual.md
-│   │   ├── Justificacion Tecnologica.md
-│   │   └── Modelado/
-│   │       ├── Análisis del Modelo.md
-│   │       ├── anexo-derivacion-uml.md
-│   │       └── modelo-clases-uml-mer.md
-│   │
-│   ├── 04-implementacion/
-│   │   ├── PrimeraVista.md
-│   │   ├── api.md
-│   │   ├── inau-infraestructura-docker.md
-│   │   └── testing.md
-│   │
-│   └── ciberseguridad/
-│       └── Identificación de amenazas.md
-│
-└── frontend/
-    ├── frontend-admin/
-    ├── frontend-alumno/
-    └── frontend-tallerista/
-```
+La estructura completa del repositorio, con su árbol y el resumen por carpeta, se documenta en `docs/Estructura del Repositorio.md`. Esta revisión no la reproduce para no duplicarla; solo registra el conteo que sirve de base a los apartados siguientes.
 
 ### Conteo real
 
@@ -102,12 +50,10 @@ proyecto-convenio-INAU/
 | Administrador | 11 | 15 | 1 |
 | Tallerista | 9 | 12 | 1 |
 | Alumno | 7 | 10 | 1 |
-| Login (raíz) | 1 | 0 | usa CSS del panel tallerista |
-| Backend (PHP) | — | — | 56 archivos |
+| Login y scripts compartidos (`frontend/`) | 1 | 2 | usa CSS del panel tallerista |
+| Backend (`backend/api-completa`) | — | — | 74 archivos en total |
 
-**Total: más de 160 archivos en el repositorio consolidado.**
-
-El README todavía describe un estado anterior y debe actualizarse.
+**Total: 172 archivos en el repositorio.**
 
 ---
 
@@ -117,130 +63,150 @@ El README todavía describe un estado anterior y debe actualizarse.
 
 Dispone de pantallas para dashboard, talleristas, detalle de tallerista, alumnos, detalle de alumno, talleres, detalle de taller, asistencias, reportes, detalle de reporte y perfil.
 
-Las pantallas cargan módulos específicos junto con `mock-data.js`. El JavaScript actual permite trabajar de forma simulada con listados, búsquedas, detalles, estadísticas y formularios con ventanas modales.
+Las pantallas obtienen y modifican los datos a través de la API: listados, búsquedas, detalles, estadísticas, formularios con ventanas modales y generación de reportes.
 
-**Conclusión:** frontend administrativo avanzado, pendiente de la migración a la API.
+**Conclusión:** frontend administrativo completo y conectado a la API.
 
 ### Tallerista
 
 Dispone de dashboard, perfil, mis talleres, detalle del taller, asistencia, informes, detalle de informe, material y corrección de tareas.
 
-Existe una arquitectura modular por pantalla y datos simulados más completos que los del resto de los paneles.
+Mantiene la arquitectura modular por pantalla, ahora alimentada por la API: solo accede a los talleres que tiene asignados.
 
-**Conclusión:** es la parte más madura del frontend.
+**Conclusión:** frontend completo y conectado a la API.
 
 ### Alumno
 
-Hay siete páginas: dashboard, mis talleres, detalle del taller, tareas, detalle de tarea, asistencia y perfil, y **ya cuentan con su carpeta `js/`** (diez módulos: `mock-data.js`, `utils.js`, `main.js` y un archivo por pantalla), siguiendo la misma estructura modular de los otros dos paneles.
+Hay siete páginas: dashboard, mis talleres, detalle del taller, tareas, detalle de tarea, asistencia y perfil, con su carpeta `js/` de diez módulos.
 
-**Conclusión:** el panel del alumno dejó de ser solo maqueta: funciona con datos simulados, pendiente de la migración a la API.
+Las páginas consultan sus talleres, material y tareas, y envían entregas a través de la API. La excepción es la asistencia, que todavía se calcula a partir de `mock-data.js`.
+
+**Conclusión:** panel funcional y conectado a la API, con la asistencia pendiente de integración.
 
 ### API
 
-Expone 47 rutas que cubren autenticación y perfil, alumnos, talleristas, talleres, asignaciones e inscripciones, asistencias, contenidos, entregas y adjuntos. Cada ruta declara qué rol puede usarla, y la verificación se aplica tanto por rol como por pertenencia: un tallerista solo accede a los talleres que tiene asignados.
+Expone 53 rutas que cubren autenticación y perfil, alumnos, talleristas, talleres, asignaciones e inscripciones, asistencias, reportes, contenidos, entregas y adjuntos. Cada ruta declara qué rol puede usarla, y la verificación se aplica tanto por rol como por pertenencia: un tallerista solo accede a los talleres que tiene asignados. Los reportes los genera el administrador (tipos General y Asistencia) y el tallerista consulta los de sus talleres.
 
-**Conclusión:** la cobertura funcional es amplia y el control de acceso está correctamente implementado. Lo pendiente es su documentación y la integración con el frontend.
+**Conclusión:** la cobertura funcional es amplia, el control de acceso está correctamente implementado y el frontend ya la consume. Lo pendiente es su documentación.
 
 ---
 
 ## 4. Principales incoherencias detectadas
 
-### 4.1 Conviven dos esquemas SQL distintos
+### 4.1 Script de base de datos duplicado
 
-El repositorio contiene dos scripts de base de datos con contenidos divergentes:
+El segundo esquema divergente que señalaba la revisión anterior (`backend/api/database.sql`) ya no existe, y la API trabaja contra el esquema definitivo. El script incluye además `SET NAMES utf8mb4;` al inicio, lo que evita que una importación por consola corrompa tildes y eñes.
+
+Lo que queda es una duplicación: el mismo script figura en dos ubicaciones, con contenido idéntico salvo espacios en blanco.
 
 | Archivo | Estado |
 |---|---|
-| `backend/DataBase/inau_talleres.sql` | Esquema definitivo, derivado del modelo de clases |
-| `backend/api/database.sql` | Versión anterior: usa `usuario_registro_id` en lugar de `usuario_registro`, `fecha_registro` en lugar de `fecha_ingreso`, y conserva adjuntos de tipo `text/html` que contradicen NRF11 |
+| `backend/api-completa/DataBase/inau_talleres.sql` | Script en uso: es el que carga el entorno Docker |
+| `backend/DataBase/inau_talleres.sql` | Copia sin uso |
 
-Ambos crean la base `inau_talleres` y ambos comienzan con `DROP DATABASE IF EXISTS`, de modo que ejecutar el equivocado destruye la estructura correcta sin aviso. El segundo se encuentra junto al código PHP, que es donde lo buscaría quien trabaje en el backend, y es además el que monta el entorno Docker de la API.
+Ambos comienzan con `DROP DATABASE IF EXISTS`, y mantener dos copias abre la puerta a que vuelvan a divergir.
 
-La divergencia tiene consecuencia directa: el código de la API está escrito contra el segundo esquema, por lo que **no funciona contra el esquema definitivo del proyecto**. Los endpoints afectados son los de alumnos y los de registro de asistencia, y por arrastre, todo el acceso del alumno a los contenidos de su taller (RF07), dado que esas rutas resuelven primero la ficha del alumno.
+**Acción recomendada:** eliminar `backend/DataBase/` y conservar únicamente el script de `backend/api-completa/DataBase/`.
 
-**Acción recomendada:** conservar un único script. Si se prefiere mantenerlo junto al código de la API, reemplazar el contenido de `backend/api/database.sql` por el del esquema definitivo y eliminar el duplicado. Además, el script carece de `SET NAMES utf8mb4;` al inicio, por lo que una importación por consola corrompe tildes y eñes.
+### 4.2 Clave secreta por defecto en el `compose`
 
-### 4.2 Dos claves secretas publicadas en el repositorio
-
-La API firma sus tokens de sesión con una clave que debe permanecer secreta. Hay dos caminos por los que esa clave llega publicada al repositorio:
+La API firma sus tokens de sesión con una clave que debe permanecer secreta. De los dos caminos por los que esa clave llegaba publicada, uno está resuelto:
 
 | Archivo | Situación |
 |---|---|
-| `backend/api/.env.example` | Contiene una clave real de 64 caracteres, no un marcador |
-| `backend/api/compose.yaml` | Define una clave por defecto, de modo que `docker compose up` arranca sin pedir configuración |
+| `backend/api-completa/.env.example` | **Resuelto:** `SECRET_KEY` queda vacía, y `config.php` impide arrancar sin configurarla |
+| `backend/api-completa/compose.yaml` | **Pendiente:** define `SECRET_KEY:-f6e5…`, una clave por defecto, de modo que `docker compose up` arranca sin pedir configuración |
 
-`config.php` incluye una comprobación que impide arrancar con la clave de ejemplo, pero esa comprobación busca el texto `cambiame-por-una-clave-generada-al-azar`, que no es el valor que trae el archivo. La protección existe y no se activa.
+El valor por defecto del `compose` evita que actúe la comprobación de `config.php`: el contenedor siempre recibe una clave, y esa clave es pública. Cualquiera con acceso al repositorio puede generar un token de administrador válido para un entorno levantado así **sin conocer ninguna contraseña**.
 
-El efecto es que cualquiera con acceso al repositorio puede generar un token de administrador válido **sin conocer ninguna contraseña**, y con él leer y modificar datos del sistema.
+**Acción recomendada:** hacer que `compose.yaml` exija la variable en lugar de proveer un valor por defecto. Dado que la clave ya figura en el historial de Git, ningún entorno debe seguir usándola.
 
-**Acción recomendada:** sustituir el valor de `.env.example` por el marcador que espera `config.php`, y hacer que `compose.yaml` exija la variable en lugar de proveer un valor por defecto. Dado que ambas claves ya figuran en el historial de Git, ningún entorno debe seguir usándolas: corresponde generar claves nuevas.
+### 4.3 Datos simulados residuales en el frontend
 
-### 4.3 Los identificadores del mock data no coinciden con los del SQL
+La divergencia de identificadores entre `mock-data.js` y el SQL que señalaba la revisión anterior dejó de tener efecto, porque los paneles obtienen sus datos de la API. Sin embargo, las 27 páginas de los tres paneles siguen cargando `mock-data.js`, cuando el único módulo que todavía lo usa es la asistencia del alumno. El encabezado de `frontend-admin/js/mock-data.js` sigue afirmando que no existe conexión con PHP ni MySQL.
 
-En `frontend-admin/js/mock-data.js` el tallerista Martín Rodríguez tiene `id: 5`, y los talleres apuntan a `talleristaId: 5`. En los datos de prueba del SQL, ese mismo tallerista tiene `id: 3`.
+**Acción recomendada:** retirar la carga de `mock-data.js` de las páginas que ya no lo usan y eliminar esos archivos al integrar la asistencia del alumno.
 
-Esto no afecta el funcionamiento actual, dado que ambas fuentes son independientes, pero producirá inconsistencias al sustituir los datos simulados por llamadas a la API. La divergencia verificada corresponde al tallerista principal; no se descarta que existan otras en alumnos, talleres o contenidos.
+### 4.4 El panel del alumno referencia archivos inexistentes — **Resuelto**
 
-**Acción recomendada:** dejar constancia de la divergencia como comentario al inicio de cada `mock-data.js`, de modo que el aviso aparezca frente a quien realice la migración a la API.
+La carpeta `frontend-alumno/js/` existe con diez módulos y las páginas consumen la API. Queda pendiente únicamente la asistencia, tratada en 4.3.
 
-### 4.4 Panel del alumno — resuelto
+### 4.5 El login del frontend no consume la API — **Resuelto**
 
-En revisiones anteriores, las siete páginas del panel del alumno referenciaban archivos JavaScript (`js/mock-data.js`, `js/utils.js`, `js/main.js` y su módulo propio) que no existían, por lo que ninguna página funcionaba.
+`frontend/index.html` procesa el formulario con `js/api.js` y `js/auth.js`, autentica contra la API y redirige según el rol. El criterio de acceso quedó unificado por **correo electrónico**, y la documentación de identidad visual ya lo refleja.
 
-**Estado actual:** resuelto. El panel ya cuenta con su carpeta `js/` completa (diez módulos), por lo que las páginas funcionan con datos simulados, igual que los otros dos paneles. Resta la migración a la API.
+Queda un residuo: `frontend-admin/js/auth.js` es un archivo vacío (0 bytes) que corresponde eliminar.
 
-### 4.5 El login del frontend no consume la API
+### 4.6 El login depende de la hoja de estilos de otro panel
 
-`index.html` existe con el diseño terminado, pero no hay ningún archivo JavaScript que procese el formulario: el `auth.js` del panel del administrador está vacío. La API, en cambio, ya resuelve el inicio de sesión, el cierre de sesión y la validación del token.
+`frontend/index.html` carga sus estilos desde `frontend-tallerista/css/styles.css`. La ruta ya es relativa, por lo que se resolvió el problema de funcionamiento según dónde se sirva el sitio; lo que persiste es que la pantalla de acceso —que no pertenece a ningún rol— depende de la hoja de estilos de un panel específico.
 
-Queda pendiente conectar ambos extremos para completar RF01.
-
-**Nota sobre el mecanismo:** la API autentica por **correo electrónico**, mientras que la pantalla de acceso y la documentación de identidad visual plantean el ingreso por **cédula**. Conviene unificar el criterio antes de implementar la integración.
-
-### 4.6 El login utiliza una ruta absoluta hacia el CSS de otro panel
-
-`index.html` carga sus estilos desde `/frontend/frontend-tallerista/css/styles.css`. Presenta dos inconvenientes: la ruta absoluta solo funciona si el sitio se sirve desde la raíz del dominio, y la pantalla de acceso —que no pertenece a ningún rol— depende de la hoja de estilos de un panel específico.
-
-**Acción recomendada:** crear una hoja de estilos propia para el login, en una carpeta común, con ruta relativa.
+**Acción recomendada:** crear una hoja de estilos propia para el login, en una carpeta común.
 
 ### 4.7 La API expone detalles de la base de datos ante un error
 
-Los controladores capturan las excepciones con `catch (Exception $e)`, que también alcanza a las de base de datos, y devuelven el mensaje original al cliente. El resultado es que un fallo interno envía al navegador el error de MySQL completo, con nombres de tablas y columnas, y además lo informa con un código engañoso: 404 o 400 en lugar de 500.
+Los controladores capturan las excepciones con `catch (Exception $e)` —49 bloques en total—, que también alcanza a las de base de datos, y devuelven el mensaje original al cliente. El resultado es que un fallo interno envía al navegador el error de MySQL completo, con nombres de tablas y columnas, y además lo informa con un código engañoso: 404 o 400 en lugar de 500.
 
 `index.php` ya contiene el manejo correcto —registra el detalle en el log y responde con un mensaje genérico—, pero nunca llega a ejecutarse porque los controladores atrapan la excepción antes.
 
-**Acción recomendada:** hacer que los controladores dejen pasar las excepciones de base de datos hacia el manejador de `index.php`.
+**Acción recomendada:** hacer que los controladores dejen pasar las excepciones de base de datos (`PDOException`) hacia el manejador de `index.php`.
 
 ### 4.8 El README de la API documenta usuarios de prueba inexistentes
 
-La tabla de credenciales de `backend/api/README.md` proviene de la plantilla original del curso: propone `admin@utu.edu.uy` y `alumno@utu.edu.uy`, con un rol `usuario` que no existe en el modelo. Los datos de prueba reales del proyecto son otros.
+La tabla de credenciales de `backend/api-completa/README.md` proviene de la plantilla original del curso: propone `admin@utu.edu.uy` y `alumno@utu.edu.uy`, con un rol `usuario` que no existe en el modelo. Los datos de prueba reales del proyecto son otros.
 
-### 4.9 El README del proyecto no refleja el estado actual
+### 4.9 El README del proyecto no refleja el estado actual — **Resuelto**
 
-Describe un estado anterior: indica menos archivos de los existentes, sigue referenciando `planificacion.md` (que ya no existe), no refleja las páginas incorporadas al panel del tallerista ni el JavaScript del panel del alumno, y no menciona la API.
+El README se actualizó con la estructura real del repositorio, las tecnologías utilizadas y el estado del desarrollo.
 
 ### 4.10 Documentación técnica pendiente
 
-Dos documentos permanecen vacíos:
+Tres documentos permanecen sin contenido:
 
 ```text
 docs/04-implementacion/api.md
 docs/04-implementacion/testing.md
+docs/01-gestion/Acta de cierre.md
 ```
 
-`api.md` y `testing.md` corresponden a fases posteriores, aunque `api.md` ya cuenta con material disponible: la API está implementada con 47 rutas.
+`api.md` ya cuenta con material disponible: la API está implementada con 53 rutas. El Acta de cierre solo contiene su título.
 
-El archivo `planificacion.md` **ya fue eliminado**: su contenido real —el backlog priorizado de los seis sprints— está en `Doc.md` (§20), y lo que alojaba era un resumen general redundante. Resta únicamente **retirar su referencia del README y de la estructura documental**, que todavía lo mencionan.
+El caso de `planificacion.md` está **resuelto**: el archivo se eliminó, dado que la planificación real —el backlog priorizado de los seis sprints— está en `Doc.md`.
 
-### 4.11 Archivos con nomenclatura irregular o ausentes
+### 4.11 Archivos con nomenclatura irregular
 
 - `backend/.md` es un archivo cuyo nombre consiste únicamente en la extensión. Si su función es preservar la carpeta en el control de versiones, corresponde renombrarlo a `.gitkeep`.
-- `docs/seguridad.md` existía con contenido antes de la reorganización de carpetas y no aparece en la estructura actual. Corresponde recuperarlo y ubicarlo en `04-implementacion/`.
+- `Documento de Reconstruccion - Doker desktop.md` tiene un error de escritura en el nombre ("Doker" por "Docker"). Corregirlo exige actualizar las referencias en los documentos que lo citan.
 - La carpeta `03-diseño` contiene un carácter acentuado, a diferencia de las demás. Los nombres de ruta con tildes pueden generar inconvenientes en enlaces y en determinados entornos.
+- **Resuelto:** `docs/seguridad.md` no se había perdido. En la reorganización de carpetas se renombró a `Identificación de amenazas.md`, hoy en `05-Ciberseguridad/`, con el mismo contenido.
 
 ### 4.12 Ausencia de `.gitignore` y `LICENSE`
 
-Ambos archivos están contemplados en la plantilla original del proyecto y no se encuentran en el repositorio. El `.gitignore` resulta especialmente relevante ahora que la API existe: sin él, nada impide que el archivo `.env` con la clave secreta y las credenciales de base de datos termine versionado.
+Ambos archivos están contemplados en la plantilla original del proyecto y no se encuentran en la raíz del repositorio; solo existe un `.gitignore` dentro de `backend/api-completa/storage/`. El `.gitignore` resulta especialmente relevante: sin él, nada impide que el archivo `.env` con la clave secreta y las credenciales de base de datos termine versionado.
+
+### 4.13 La API no admite todos los formatos que exige NRF11
+
+NRF11 establece como formatos permitidos PDF, imágenes JPG y documentos de oficina (DOCX, XLSX, PPTX). El validador de adjuntos de la API acepta únicamente PDF y JPG. Los propios datos de prueba del SQL incluyen una entrega en formato `.docx`, que la API rechazaría si se subiera por la interfaz.
+
+**Acción recomendada:** incorporar los tipos de documentos de oficina al validador de adjuntos, o bien ajustar NRF11 si se decide restringir los formatos en la primera versión.
+
+### 4.14 El esfuerzo del Charter no coincide con la planificación
+
+El Charter declara un esfuerzo de 76 puntos. `Doc.md` explica que esa estimación se afinó a 63 puntos al desglosar las historias de usuario, y que la planificación de los seis sprints se hace con los 63.
+
+**Acción recomendada:** actualizar el Charter a 63 puntos, o aclarar en él que la cifra corresponde a la estimación previa al desglose.
+
+### 4.15 El administrador puede modificar la cédula del alumno
+
+En la entrevista con el cliente se estableció que la cédula del alumno no debe modificarse. Sin embargo, el formulario de edición del panel del administrador (`editar-alumno-cedula`, en `detalle-alumno.html`) permite cambiarla.
+
+**Acción recomendada:** dejar el campo como solo lectura y rechazar el cambio también en la API.
+
+### 4.16 La dirección de la API está escrita en el código
+
+La dirección `http://localhost:8002` figura en 12 archivos del frontend, con cuatro constantes distintas (`INAU_API_URL`, `TALLERISTA_API_URL`, `ALUMNO_API_URL` y `REPORTES_API_URL`). Desplegar en otro entorno exige reemplazarla archivo por archivo.
+
+**Acción recomendada:** que todos los módulos usen la constante de `frontend/js/api.js`, de modo que la dirección se defina en un solo lugar.
 
 ---
 
@@ -252,28 +218,28 @@ De los veintiséis requerimientos definidos, veinte integran el alcance de la pr
 
 | Código | Requisito | Estado actual |
 |---|---|---|
-| RF01 | Login y diferenciación por rol | API implementada; integración con el frontend pendiente. |
-| RF02 | Gestión de usuarios y talleres | API implementada; frontend con datos simulados. |
-| RF03 | Asignación de alumnos y talleristas | API implementada; frontend con datos simulados. |
-| RF04 | Registrar asistencia | API implementada; frontend avanzado con almacenamiento local. |
-| RF05 | Consultar y modificar asistencia | API implementada; frontend avanzado. |
-| RF06 | Subir material y tareas | API implementada, incluida la carga de adjuntos; frontend tallerista listo. |
-| RF07 | Alumno visualiza material y tareas | API implementada; panel del alumno con lógica JavaScript y datos simulados, pendiente la integración. |
-| RF08 | Alumno envía archivos | API implementada; panel del alumno con lógica JavaScript y datos simulados, pendiente la integración. |
-| RF09 | Tallerista corrige tareas | API implementada; frontend implementado en `correccion-tarea.js`. |
+| RF01 | Login y diferenciación por rol | API y frontend implementados. |
+| RF02 | Gestión de usuarios y talleres | API y frontend implementados. |
+| RF03 | Asignación de alumnos y talleristas | API y frontend implementados. |
+| RF04 | Registrar asistencia | API y frontend implementados. |
+| RF05 | Consultar y modificar asistencia | API y frontend implementados; la vista de asistencia del alumno conserva datos simulados. |
+| RF06 | Subir material y tareas | API y frontend implementados, incluida la carga de adjuntos. |
+| RF07 | Alumno visualiza material y tareas | API y frontend implementados. |
+| RF08 | Alumno envía archivos | API y frontend implementados, con comentario opcional de entrega. |
+| RF09 | Tallerista corrige tareas | API y frontend implementados. |
 | RF10 | Asignar notas | API implementada, con validación de rango; frontend implementado. |
-| RF11 | Informes de asistencia | Frontend avanzado con datos simulados; sin endpoints de informes en la API. |
-| RF12 | Informes de talleres y talleristas | Frontend avanzado; sin endpoints de informes en la API. |
-| RF13 | Exportación en PDF o Excel | No implementada: la descarga actual produce un archivo de texto provisional. |
-| RF14 | Gestión de perfil según rol | API implementada, con sincronización entre `usuarios` y `alumnos`; frontend con simulación. |
-| RF16 | Eliminar material | API implementada; frontend implementado en `material.js`. |
-| RF17 | Eliminar nota asignada | API implementada; frontend implementado. |
-| RF19 | Generar listado de alumnos | Contemplado en el módulo de reportes del frontend; sin endpoint en la API. |
-| RF22 | Informe de talleristas | Contemplado en el módulo de reportes del frontend; sin endpoint en la API. |
+| RF11 | Informes de asistencia | API implementada (reporte de tipo Asistencia); frontend conectado. |
+| RF12 | Informes de talleres y talleristas | API implementada (reporte de tipo General); frontend conectado. |
+| RF13 | Exportación en PDF o Excel | No implementada: la descarga actual produce un archivo JSON. |
+| RF14 | Gestión de perfil según rol | API y frontend implementados, con sincronización entre `usuarios` y `alumnos`. |
+| RF16 | Eliminar material | API y frontend implementados. |
+| RF17 | Eliminar nota asignada | API y frontend implementados. |
+| RF19 | Generar listado de alumnos | A verificar: no se identificó en el código un informe específico. |
+| RF22 | Informe de talleristas | A verificar: no se identificó en el código un informe específico. |
 | RF24 | Consultar datos sensibles | No implementado. |
 | RF25 | Listado de alumnos del taller | API y frontend implementados. |
 
-> **Observación sobre los informes:** las tablas `reportes` y `trazabilidad` existen en la base de datos, pero la API no expone rutas para ellas. RF11, RF12, RF13, RF19 y RF22 dependen de esa capa, que resta implementar.
+> **Observación sobre los informes:** la tabla `reportes` ya cuenta con rutas en la API para generarlos y consultarlos. La tabla `trazabilidad` existe en la base de datos, pero la API todavía no registra acciones en ella. La exportación en PDF o Excel (RF13) resta implementarse.
 
 ### Requerimientos postergados por plazo
 
@@ -295,17 +261,17 @@ De los veintiséis requerimientos definidos, veinte integran el alcance de la pr
 | NRF01 | Diseño responsive | Implementado mediante Bootstrap y hojas de estilo propias. |
 | NRF02 | Disponibilidad 24 horas | Objetivo de despliegue, aún no demostrable. |
 | NRF03 | Rapidez en operaciones | Índices definidos en el SQL; falta medición objetiva. |
-| NRF04 | Navegación clara y consistente | Avanzado en los tres paneles. |
+| NRF04 | Navegación clara y consistente | Cumplido en los tres paneles. |
 | NRF05 | Validación en frontend y backend | Cumplido: la API valida con clases dedicadas por entidad, además de la validación del frontend. |
-| NRF06 | Separación frontend y backend | Cumplido: API REST con arquitectura en capas y frontend independiente. |
+| NRF06 | Separación frontend y backend | Cumplido: API REST con arquitectura en capas y frontend independiente que la consume. |
 | NRF07 | Control de acceso por rol | Cumplido en la API: verificación por rol y por pertenencia al taller en cada ruta. |
-| NRF08 | Protección de datos personales | Parcial: contraseñas con hash y consultas preparadas, pero hay claves publicadas (4.2) y filtración de errores (4.7). |
-| NRF09 | Persistencia relacional | Esquema completo; conviven dos scripts divergentes (4.1). |
+| NRF08 | Protección de datos personales | Parcial: contraseñas con hash y consultas preparadas, pero queda una clave por defecto en el `compose` (4.2) y la filtración de errores (4.7). |
+| NRF09 | Persistencia relacional | Cumplido: un único esquema, con una copia duplicada pendiente de eliminar (4.1). |
 | NRF10 | Trazabilidad | La tabla `trazabilidad` existe, pero la API no registra acciones en ella. |
-| NRF11 | Restricción de formatos | Documentada y respetada en el esquema definitivo; contradicha por los datos de prueba de `backend/api/database.sql`. |
-| NRF12 | Restricción de tamaño | Configurada en el entorno Docker; validación en la API pendiente de verificar. |
+| NRF11 | Restricción de formatos | Parcial: la API restringe los formatos, pero solo admite PDF y JPG, sin los documentos de oficina que el requisito incluye (4.13). |
+| NRF12 | Restricción de tamaño | Cumplido: la API rechaza adjuntos de más de 10 MB. |
 | NRF13 | Código organizado | Cumplido: frontend modular por pantalla y backend en capas. |
-| NRF14 | Documentación técnica | Avanzada; restan `api.md` y `testing.md`. |
+| NRF14 | Documentación técnica | Avanzada; restan `api.md`, `testing.md` y el Acta de cierre. |
 | NRF15 | Uso de Git | Implementado. |
 | NRF16 | Pull Requests obligatorias | Declarado en la documentación y respaldado por el flujo de ramas del repositorio. |
 
@@ -313,13 +279,11 @@ De los veintiséis requerimientos definidos, veinte integran el alcance de la pr
 
 ## 7. Base de datos actual
 
-El esquema definitivo define trece tablas:
+El esquema definitivo, en `backend/api-completa/DataBase/inau_talleres.sql`, define trece tablas:
 
 `usuarios`, `alumnos`, `talleres`, `taller_tallerista`, `horarios_taller`, `inscripciones`, `asistencias`, `registros_asistencia`, `contenidos`, `entregas`, `adjuntos`, `reportes` y `trazabilidad`.
 
-Incluye claves primarias y foráneas, restricciones de unicidad, índices sobre las columnas de filtrado frecuente, restricciones de verificación, datos de prueba y hashes de contraseña válidos. Se corresponde con el modelo de clases documentado en `03-diseño/Modelado/`, con la correspondencia clase-tabla verificada en el Paso 5 del anexo de derivación.
-
-La salvedad es la señalada en 4.1: el repositorio conserva un segundo script divergente, y es ese el que el código de la API espera encontrar.
+Incluye claves primarias y foráneas, restricciones de unicidad, índices sobre las columnas de filtrado frecuente, restricciones de verificación, datos de prueba y hashes de contraseña válidos. Se corresponde con el modelo de clases documentado en `03-diseño/Modelado/`, con la correspondencia clase-tabla verificada en el Paso 5 del anexo de derivación. Es el esquema que carga el entorno Docker y contra el que trabaja la API.
 
 ---
 
@@ -333,6 +297,8 @@ El documento de identificación de amenazas reconoce tres riesgos principales:
 | XSS | 3 | 3 | 9 | Tolerable |
 | Ransomware | 2 | 4 | 8 | Tolerable |
 
+Los mecanismos de autenticación y criptografía que aplica la API se describen en `05-Ciberseguridad/Mecanismos_Autenticacion_Criptografia_INAU.md`.
+
 ### Lo que está bien resuelto en la API
 
 - **Control de acceso**: cada ruta declara los roles admitidos, y la verificación alcanza también la pertenencia. Un tallerista no puede leer ni modificar datos de un taller que no dicta.
@@ -342,7 +308,7 @@ El documento de identificación de amenazas reconoce tres riesgos principales:
 
 ### Lo que queda pendiente
 
-- Las dos claves secretas publicadas (4.2), que anulan en la práctica todo el control de acceso descrito arriba.
+- La clave secreta por defecto del `compose` (4.2), que anula en la práctica el control de acceso descrito arriba en cualquier entorno levantado sin configurarla.
 - La filtración de detalles de la base de datos ante un error (4.7).
 - El registro efectivo en la tabla `trazabilidad`, que NRF10 exige y la API no realiza.
 
@@ -360,9 +326,9 @@ Los tres paneles comparten la misma base y se diferencian únicamente por su pal
 
 ## 10. Gestión del proyecto
 
-El proyecto cuenta con un acta de reuniones de R-01 a R-09, donde se registra la organización inicial del equipo, la entrevista con el cliente, la distribución de tareas, las dificultades de participación, los cambios de alcance, los avances de documentación y el comienzo del backend.
+El proyecto cuenta con un acta de reuniones de R-01 a R-12, donde se registra la organización inicial del equipo, la entrevista con el cliente, la distribución de tareas, las dificultades de participación, los cambios de alcance, los avances de documentación y el desarrollo del backend. Las actas de Sprint Review registran el cierre de los seis sprints, sin revisión con el cliente por su ausencia. El Acta de cierre está creada, pero sin contenido.
 
-El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez como líder y Scrum Master, **tres integrantes**, una duración de doce semanas organizadas en seis sprints quincenales, un esfuerzo estimado de setenta y seis puntos por épica —refinado a sesenta y tres como base de planificación tras la descomposición en historias de usuario— y los riesgos principales del proyecto.
+El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez como líder y Scrum Master, tres integrantes, una duración de doce semanas organizadas en seis sprints quincenales, un esfuerzo estimado de setenta y seis puntos (ver 4.14) y los riesgos principales del proyecto.
 
 ---
 
@@ -370,50 +336,56 @@ El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez com
 
 ### Lo que está bien alineado
 
-1. La arquitectura frontend → API REST → PHP → MySQL es consistente entre la documentación y lo implementado.
+1. La arquitectura frontend → API REST → PHP → MySQL es consistente entre la documentación y lo implementado, y el frontend ya consume la API.
 2. El stack de Bootstrap, HTML, CSS y JavaScript sin framework coincide con la justificación tecnológica.
-3. El esquema SQL definitivo se corresponde con el modelo de clases, con trazabilidad verificada paso a paso.
+3. El esquema SQL definitivo se corresponde con el modelo de clases, con trazabilidad verificada paso a paso, y es el que usa la API.
 4. El alcance incluido, el excluido y el ajuste por plazo son coherentes entre el documento principal, el Charter y el modelo.
 5. El control de acceso de la API cumple lo que NRF07 exige y lo que la política de seguridad declara.
 6. La estructura por capas de la API coincide con la separación descrita en la justificación tecnológica.
+7. El inicio de sesión por correo es coherente entre la API, el frontend y la documentación de identidad visual.
+8. El entorno Docker es reproducible y su puesta en marcha está documentada y probada.
 
 ### Lo que debe corregirse prioritariamente
 
-1. Retirar las dos claves secretas publicadas y generar claves nuevas.
-2. Unificar los dos esquemas SQL en uno solo.
-3. Evitar que la API exponga detalles de la base de datos ante un error.
-4. Retirar la referencia a `planificacion.md` del README y de la estructura documental (el archivo ya fue eliminado; su backlog está en `Doc.md`, §20).
-5. Alinear los identificadores del mock data con los del SQL.
-6. Integrar el login del frontend con la API, definiendo antes si el acceso es por cédula o por correo.
-7. Corregir la ruta del CSS del login.
-8. Actualizar el README del proyecto y el de la API.
-9. Completar `api.md` y `testing.md`; recuperar `seguridad.md`.
-10. Crear `.gitignore` y `LICENSE`; renombrar `backend/.md` a `.gitkeep`.
+1. Retirar la clave secreta por defecto del `compose` y generar claves nuevas.
+2. Evitar que la API exponga detalles de la base de datos ante un error.
+3. Eliminar el script de base de datos duplicado.
+4. Crear `.gitignore` y `LICENSE`; renombrar `backend/.md` a `.gitkeep`.
+5. Alinear los formatos de adjuntos de la API con NRF11.
+6. Impedir la modificación de la cédula del alumno.
+7. Integrar la asistencia del alumno con la API y retirar `mock-data.js` y el `auth.js` vacío.
+8. Centralizar la dirección de la API en un solo archivo.
+9. Crear una hoja de estilos propia para el login.
+10. Implementar la exportación en PDF o Excel y el registro de trazabilidad.
+11. Actualizar el README de la API y el esfuerzo declarado en el Charter.
+12. Completar `api.md`, `testing.md` y el Acta de cierre.
 
 ---
 
 ## 12. Orden recomendado de trabajo
 
 ```text
-1. Retirar las claves publicadas y generar nuevas
+1. Retirar la clave por defecto del compose y generar claves nuevas
         ↓
 2. Crear .gitignore antes de cualquier despliegue
         ↓
-3. Unificar los dos esquemas SQL
+3. Corregir la filtración de errores de la API
         ↓
-4. Corregir la filtración de errores de la API
+4. Eliminar el script SQL duplicado
         ↓
-5. Retirar la referencia a planificacion.md del README y la estructura; recuperar seguridad.md
+5. Alinear los formatos de adjuntos con NRF11 y bloquear la cédula del alumno
         ↓
-6. Actualizar los dos README y la estructura documental
+6. Integrar la asistencia del alumno y retirar los datos simulados
         ↓
-7. Integrar el login del frontend con la API
+7. Centralizar la dirección de la API en el frontend
         ↓
-8. Reemplazar datos simulados por llamadas a la API (los tres paneles)
+8. Implementar la exportación PDF/Excel y la trazabilidad
         ↓
-9. Implementar los endpoints de informes y la trazabilidad
+9. Actualizar el README de la API y el Charter
         ↓
 10. Completar api.md con las rutas implementadas
         ↓
 11. Testing integral y completar testing.md
+        ↓
+12. Redactar el Acta de cierre
 ```
