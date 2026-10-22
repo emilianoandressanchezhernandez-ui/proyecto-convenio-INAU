@@ -35,7 +35,7 @@ Los problemas pendientes se concentran en tres frentes: **la API expone detalles
 | Infraestructura | Implementada | Entorno Docker en `backend/api-completa`, con su puesta en marcha probada en Docker Desktop y documentada para un servidor. |
 | Identidad visual | Definida | Documentación completa y hojas de estilo por panel. |
 | Uso ético de IA | Documentado | Declaración con registro de herramientas utilizadas y firmas. |
-| Gestión | Avanzada | Actas de reuniones R-01 a R-12 y actas de Sprint Review; el Acta de cierre está sin contenido. |
+| Gestión | Avanzada | Actas de reuniones R-01 a R-12 y declaración sobre las instancias de Sprint Review; el Acta de cierre está sin contenido. |
 
 ---
 
@@ -190,11 +190,9 @@ NRF11 establece como formatos permitidos PDF, imágenes JPG y documentos de ofic
 
 **Acción recomendada:** incorporar los tipos de documentos de oficina al validador de adjuntos, o bien ajustar NRF11 si se decide restringir los formatos en la primera versión.
 
-### 4.14 El esfuerzo del Charter no coincide con la planificación
+### 4.14 El esfuerzo del Charter no coincide con la planificación — **Resuelto**
 
-El Charter declara un esfuerzo de 76 puntos. `Doc.md` explica que esa estimación se afinó a 63 puntos al desglosar las historias de usuario, y que la planificación de los seis sprints se hace con los 63.
-
-**Acción recomendada:** actualizar el Charter a 63 puntos, o aclarar en él que la cifra corresponde a la estimación previa al desglose.
+El Charter declaraba un esfuerzo de 76 puntos, mientras que `Doc.md` planifica los seis sprints con 63, la estimación afinada al desglosar las historias de usuario. El Charter se actualizó y ya declara 63 puntos.
 
 ### 4.15 El administrador puede modificar la cédula del alumno
 
@@ -326,9 +324,9 @@ Los tres paneles comparten la misma base y se diferencian únicamente por su pal
 
 ## 10. Gestión del proyecto
 
-El proyecto cuenta con un acta de reuniones de R-01 a R-12, donde se registra la organización inicial del equipo, la entrevista con el cliente, la distribución de tareas, las dificultades de participación, los cambios de alcance, los avances de documentación y el desarrollo del backend. Las actas de Sprint Review registran el cierre de los seis sprints, sin revisión con el cliente por su ausencia. El Acta de cierre está creada, pero sin contenido.
+El proyecto cuenta con un acta de reuniones de R-01 a R-12, donde se registra la organización inicial del equipo, la entrevista con el cliente, la distribución de tareas, las dificultades de participación, los cambios de alcance, los avances de documentación y el desarrollo del backend. La declaración sobre las instancias de Sprint Review deja constancia de que no se realizaron Sprint Reviews con el cliente en ninguno de los seis sprints, dado que el único contacto con INAU fue la entrevista inicial (R-02 y R-03). El Acta de cierre está creada, pero sin contenido.
 
-El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez como líder y Scrum Master, tres integrantes, una duración de doce semanas organizadas en seis sprints quincenales, un esfuerzo estimado de setenta y seis puntos (ver 4.14) y los riesgos principales del proyecto.
+El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez como líder y Scrum Master, tres integrantes, una duración de doce semanas organizadas en seis sprints quincenales, un esfuerzo estimado de sesenta y tres puntos y los riesgos principales del proyecto.
 
 ---
 
@@ -357,7 +355,7 @@ El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez com
 8. Centralizar la dirección de la API en un solo archivo.
 9. Crear una hoja de estilos propia para el login.
 10. Implementar la exportación en PDF o Excel y el registro de trazabilidad.
-11. Actualizar el README de la API y el esfuerzo declarado en el Charter.
+11. Actualizar el README de la API.
 12. Completar `api.md`, `testing.md` y el Acta de cierre.
 
 ---
@@ -381,7 +379,7 @@ El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez com
         ↓
 8. Implementar la exportación PDF/Excel y la trazabilidad
         ↓
-9. Actualizar el README de la API y el Charter
+9. Actualizar el README de la API
         ↓
 10. Completar api.md con las rutas implementadas
         ↓
