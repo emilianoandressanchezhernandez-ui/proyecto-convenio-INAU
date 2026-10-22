@@ -15,7 +15,6 @@
 | **Bootstrap 5.3** | Diseño responsive y componentes | La propuesta del proyecto admitía Tailwind o Bootstrap; se optó por Bootstrap por su curva de aprendizaje más accesible y su sistema de componentes predefinidos, que reduce el tiempo de desarrollo — factor crítico dado el plazo de 12 semanas. Resuelve directamente NRF01. |
 | **Bootstrap Icons** | Iconografía | Consistencia visual sin necesidad de gestionar íconos sueltos, integrado con el mismo framework. |
 | **JavaScript Vanilla** | Comportamiento dinámico | Establecido en la propuesta original del proyecto. Evita la curva de aprendizaje de un framework, priorizando que el equipo comprenda y mantenga su propio código. |
-| **localStorage** | Persistencia temporal | Usado durante la etapa inicial para la demostración sin backend. Tras la integración con la API quedó solo como resto puntual (ver sección 7). |
 | **Mock data** | Simulación de datos | Permitió construir y validar las tres interfaces antes de contar con la API. Fue reemplazado por llamadas reales, salvo un resto en la asistencia del alumno (ver sección 7). |
 
 <br>
@@ -32,8 +31,6 @@
 | **API REST** | Comunicación frontend-backend | Requisito explícito de la propuesta original ("organización del sistema bajo arquitectura de endpoints REST"). Permite mantener las capas desacopladas (NRF06). |
 | **Fetch API** | Consumo de la API desde el cliente | API nativa del navegador, sin necesidad de librerías externas, coherente con la decisión de dependencias mínimas. |
 | **Filesystem del servidor** | Almacenamiento de adjuntos | Establecido en la propuesta original. Los archivos se guardan en un volumen de Docker (`uploads`), sin depender de un servicio de almacenamiento externo. |
-
-> **Nota:** la propuesta original del proyecto presentaba una ambigüedad entre PHP puro, indicado en su stack tecnológico, y Laravel, mencionado en su plantilla de README. Se resolvió utilizar PHP sin framework.
 
 <br>
 
@@ -116,8 +113,6 @@ Esta organización cumple NRF13 y permite que distintos integrantes trabajen en 
 **Frontend primero, con datos simulados.** El desarrollo avanzó sobre mock data antes de implementar el backend, lo que permitió validar flujos y experiencia de usuario sin bloquear el trabajo a la espera de la API. La estructura de los datos simulados replicaba la del modelo de datos, lo que facilitó su sustitución por llamadas reales.
 
 **Navegación mediante parámetros de URL.** Las pantallas de detalle reciben identificadores por URL (`detalle-taller.html?id=1`, `asistencia.html?tallerId=1`), imitando desde el inicio el comportamiento de una aplicación conectada a endpoints REST, lo que simplificó la migración a la API.
-
-**Persistencia local estrictamente provisional.** `localStorage` se utilizó únicamente para demostración durante el desarrollo. No sustituye a MySQL, no ofrece garantías de seguridad y no almacena credenciales.
 
 ---
 
