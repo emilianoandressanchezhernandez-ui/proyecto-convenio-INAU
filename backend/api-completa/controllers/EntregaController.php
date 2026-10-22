@@ -9,6 +9,34 @@ class EntregaController extends Controller
         $this->service = new EntregaService();
     }
 
+
+    public function miEntrega(int $contenidoId): void
+    {
+        try {
+            $usuario = $this->getUsuarioAutenticado();
+
+            if (!$usuario) {
+                return;
+            }
+
+            $entrega = $this->service->getMiEntrega(
+                $contenidoId,
+                $usuario
+            );
+
+            Response::success(
+                $entrega,
+                'Entrega del alumno consultada correctamente.'
+            );
+        } catch (RuntimeException $e) {
+            $this->handleRuntimeException($e);
+        } catch (Exception $e) {
+            $this->handleException($e);
+        }
+    }
+
+
+
     public function byContenido(int $contenidoId): void
     {
         try {
@@ -68,15 +96,36 @@ class EntregaController extends Controller
                 return;
             }
 
+
+            $data = $this->getJsonBody();
+
+            $comentarioAlumno = $data['comentario_alumno'] ?? null;
+
+            if (
+                $comentarioAlumno !== null &&
+                !is_string($comentarioAlumno)
+            ) {
+                throw new InvalidArgumentException(
+                    'El comentario del alumno debe ser texto.'
+                );
+            }
+
             $entrega = $this->service->create(
                 $contenidoId,
-                (int) $usuario['id']
+                (int) $usuario['id'],
+                $comentarioAlumno
             );
+
 
             Response::success(
                 $entrega,
                 'Entrega realizada correctamente.',
                 201
+            );
+        } catch (InvalidArgumentException $e) {
+            Response::error(
+                $e->getMessage(),
+                422
             );
         } catch (RuntimeException $e) {
             $this->handleRuntimeException($e);

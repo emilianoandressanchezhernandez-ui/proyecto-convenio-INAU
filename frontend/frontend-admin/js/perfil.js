@@ -1,207 +1,548 @@
+
 /*
     PERFIL.JS - FRONTEND ADMIN
-    Responsabilidades:
-    - Mostrar los datos del administrador logueado.
-    - Permitir editar correo y telefono (nombre y cedula quedan protegidos,
-      mismo criterio que ya usa el perfil de tallerista).
-    - Permitir cambiar la contraseña (simulado, no se persiste la clave real).
+
+    Integracion con la API real.
+
+    GET /perfil
+    PATCH /perfil
+
+    - Muestra los datos del usuario autenticado.
+    - Permite editar correo y telefono.
+    - Guarda los cambios en MySQL.
+    - No utiliza datos simulados.
+    - No simula cambios de contraseña.
 */
 
-let enEdicion = false;
+const PERFIL_API_URL = "http://localhost:8002";
 
-function inicializarPerfil() {
-    try {
-        validarDatosSimulados();
+let usuarioPerfilActual = null;
+let perfilEnEdicion = false;
+let perfilGuardando = false;
 
-        const usuario = obtenerUsuarioActual();
-        mostrarDatosPerfil(usuario);
 
-        configurarEdicion();
-        configurarCambioPassword();
+// ======================================
+// INICIALIZACION
+// ======================================
 
-    } catch (error) {
-        console.error("Error al cargar el perfil:", error);
-        mostrarAlerta("alerta-perfil", error.message, "danger");
-    }
+async function inicializarPerfil() {
+    configurarEdicionPerfilReal();
+    deshabilitarPasswordPerfil();
+
+    await cargarPerfilReal();
 }
 
 
-// ==============================
-// VALIDACION
-// ==============================
+// ======================================
+// PETICIONES A LA API
+// ======================================
 
-function validarDatosSimulados() {
+async function solicitarPerfilAPI(ruta, opciones = {}) {
+    const respuesta = await fetch(
+        PERFIL_API_URL + ruta,
+        {
+            ...opciones,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                ...(opciones.headers || {})
+            }
+        }
+    );
 
-    if (!window.DATOS_SIMULADOS) {
-        throw new Error("No se pudieron cargar los datos simulados.");
+    const resultado = await respuesta.json();
+
+    if (!respuesta.ok || resultado.ok === false) {
+        const detalles = resultado.errores;
+
+        let mensaje = resultado.mensaje ||
+            "No se pudo completar la operación.";
+
+        if (Array.isArray(detalles) && detalles.length) {
+            mensaje += " " + detalles.join(" ");
+        } else if (
+            detalles &&
+            typeof detalles === "object"
+        ) {
+            const mensajes = Object.values(detalles)
+                .flat()
+                .filter(Boolean);
+
+            if (mensajes.length) {
+                mensaje += " " + mensajes.join(" ");
+            }
+        }
+
+        throw new Error(mensaje);
     }
 
-    if (!window.DATOS_SIMULADOS.usuarioActual) {
-        throw new Error("No se encontró el usuario actual.");
-    }
+    return resultado.datos;
 }
 
 
-// ==============================
-// MOSTRAR DATOS
-// ==============================
+// ======================================
+// CARGAR PERFIL
+// ======================================
 
-function mostrarDatosPerfil(usuario) {
-
-    const nombreCompleto = `${usuario.nombre} ${usuario.apellido}`;
-
-    colocarTexto("nombre-completo", nombreCompleto);
-    colocarTexto("perfil-nombre", nombreCompleto);
-    colocarTexto("perfil-cedula", usuario.cedula);
-    colocarTexto("perfil-correo", usuario.correo);
-    colocarTexto("perfil-telefono", usuario.telefono);
-    colocarTexto("perfil-rol", usuario.rol || "Administrador");
-    colocarTexto("perfil-registro", formatearFecha(usuario.fechaRegistro));
-}
-
-
-// ==============================
-// EDITAR (solo correo y telefono)
-// ==============================
-
-function configurarEdicion() {
-
-    const boton = document.getElementById("btn-editar-perfil");
+async function cargarPerfilReal() {
+    const boton = document.getElementById(
+        "btn-editar-perfil"
+    );
 
     if (boton) {
-        boton.addEventListener("click", alternarEdicion);
+        boton.disabled = true;
+    }
+
+    try {
+        ocultarMensajePerfil();
+
+        usuarioPerfilActual = await solicitarPerfilAPI(
+            "/perfil"
+        );
+
+        if (!usuarioPerfilActual) {
+            throw new Error(
+                "La API no devolvió los datos del usuario."
+            );
+        }
+
+        mostrarDatosPerfilReal(usuarioPerfilActual);
+
+        if (boton) {
+            boton.disabled = false;
+        }
+
+    } catch (error) {
+        console.error(
+            "Error al cargar el perfil:",
+            error
+        );
+
+        mostrarMensajePerfil(
+            "No se pudo cargar el perfil. " +
+            error.message,
+            "danger"
+        );
     }
 }
 
-function alternarEdicion() {
 
-    if (enEdicion) {
-        guardarEdicionPerfil();
-        return;
-    }
+// ======================================
+// MOSTRAR DATOS
+// ======================================
 
-    entrarModoEdicion();
+function mostrarDatosPerfilReal(usuario) {
+    const nombre = usuario.nombre || "";
+    const apellido = usuario.apellido || "";
+
+    const nombreCompleto = [
+        nombre,
+        apellido
+    ].filter(Boolean).join(" ") || "-";
+
+    colocarTextoPerfil(
+        "nombre-completo",
+        nombreCompleto
+    );
+
+    colocarTextoPerfil(
+        "perfil-nombre",
+        nombreCompleto
+    );
+
+    colocarTextoPerfil(
+        "perfil-cedula",
+        usuario.cedula ?? "-"
+    );
+
+    colocarTextoPerfil(
+        "perfil-correo",
+        usuario.correo ?? "-"
+    );
+
+    colocarTextoPerfil(
+        "perfil-telefono",
+        usuario.telefono ?? "-"
+    );
+
+    colocarTextoPerfil(
+        "perfil-rol",
+        formatearRolPerfil(usuario.rol)
+    );
+
+    // La fecha puede tener distintos nombres
+    // segun el modelo User y la base de datos.
+    const fechaRegistro =
+        usuario.fecha_registro ??
+        usuario.fechaRegistro ??
+        usuario.creado_en ??
+        usuario.created_at ??
+        null;
+
+    colocarTextoPerfil(
+        "perfil-registro",
+        fechaRegistro
+            ? formatearFechaPerfilReal(fechaRegistro)
+            : "No disponible"
+    );
 }
 
-function entrarModoEdicion() {
 
-    const usuario = obtenerUsuarioActual();
-
-    document.getElementById("perfil-correo").innerHTML =
-        `<input type="email" id="input-correo" class="form-control" value="${escaparHTML(usuario.correo)}">`;
-
-    document.getElementById("perfil-telefono").innerHTML =
-        `<input type="text" id="input-telefono" class="form-control" value="${escaparHTML(usuario.telefono)}">`;
-
-    const boton = document.getElementById("btn-editar-perfil");
-    boton.innerHTML = `<i class="bi bi-check-circle-fill"></i> Guardar Cambios`;
-
-    enEdicion = true;
-}
-
-function guardarEdicionPerfil() {
-
-    const correo = document.getElementById("input-correo").value.trim();
-    const telefono = document.getElementById("input-telefono").value.trim();
-
-    const error = validarEdicionPerfil(correo, telefono);
-
-    if (error) {
-        mostrarAlerta("alerta-perfil", error, "danger");
-        return;
-    }
-
-    const usuarioActualizado = {
-        ...obtenerUsuarioActual(),
-        correo,
-        telefono
+function formatearRolPerfil(rol) {
+    const roles = {
+        admin: "Administrador",
+        administrador: "Administrador",
+        tallerista: "Tallerista",
+        alumno: "Alumno"
     };
 
-    guardarDato("usuarioActual", usuarioActualizado);
-    window.DATOS_SIMULADOS.usuarioActual = usuarioActualizado;
-
-    mostrarDatosPerfil(usuarioActualizado);
-    mostrarUsuarioEnNavbar();
-
-    const boton = document.getElementById("btn-editar-perfil");
-    boton.innerHTML = `<i class="bi bi-pencil-fill"></i> Editar Perfil`;
-
-    enEdicion = false;
-
-    ocultarAlerta("alerta-perfil");
-    mostrarAlerta("alerta-perfil", "Los datos del perfil se guardaron correctamente.", "success");
+    return roles[String(rol || "").toLowerCase()] ||
+        rol ||
+        "-";
 }
 
-function validarEdicionPerfil(correo, telefono) {
 
-    if (!correo || !telefono) {
-        return "Debés completar el correo y el teléfono.";
+// ======================================
+// CONFIGURAR EDICION
+// ======================================
+
+function configurarEdicionPerfilReal() {
+    const boton = document.getElementById(
+        "btn-editar-perfil"
+    );
+
+    if (!boton) {
+        return;
     }
 
-    const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
+    boton.addEventListener("click", async () => {
+        if (perfilGuardando || !usuarioPerfilActual) {
+            return;
+        }
+
+        if (!perfilEnEdicion) {
+            entrarModoEdicionPerfil();
+        } else {
+            await guardarEdicionPerfilReal();
+        }
+    });
+}
+
+
+// ======================================
+// ENTRAR EN MODO EDICION
+// ======================================
+
+function entrarModoEdicionPerfil() {
+    if (!usuarioPerfilActual) {
+        return;
+    }
+
+    ocultarMensajePerfil();
+
+    const contenedorCorreo =
+        document.getElementById("perfil-correo");
+
+    const contenedorTelefono =
+        document.getElementById("perfil-telefono");
+
+    // Crear los inputs sin insertar datos
+    // del usuario mediante innerHTML.
+
+    const inputCorreo = document.createElement("input");
+
+    inputCorreo.type = "email";
+    inputCorreo.id = "input-correo";
+    inputCorreo.className = "form-control";
+    inputCorreo.value = usuarioPerfilActual.correo || "";
+    inputCorreo.autocomplete = "email";
+
+    const inputTelefono = document.createElement("input");
+
+    inputTelefono.type = "tel";
+    inputTelefono.id = "input-telefono";
+    inputTelefono.className = "form-control";
+    inputTelefono.value = usuarioPerfilActual.telefono || "";
+    inputTelefono.autocomplete = "tel";
+
+    contenedorCorreo.replaceChildren(inputCorreo);
+    contenedorTelefono.replaceChildren(inputTelefono);
+
+    const boton = document.getElementById(
+        "btn-editar-perfil"
+    );
+
+    if (boton) {
+        boton.innerHTML = `
+            <i class="bi bi-check-circle-fill"></i>
+            Guardar Cambios
+        `;
+    }
+
+    perfilEnEdicion = true;
+    inputCorreo.focus();
+}
+
+
+// ======================================
+// GUARDAR PERFIL EN MYSQL
+// ======================================
+
+async function guardarEdicionPerfilReal() {
+    const inputCorreo = document.getElementById(
+        "input-correo"
+    );
+
+    const inputTelefono = document.getElementById(
+        "input-telefono"
+    );
+
+    if (!inputCorreo || !inputTelefono) {
+        return;
+    }
+
+    const correo = inputCorreo.value.trim();
+    const telefono = inputTelefono.value.trim();
+
+    const error = validarEdicionPerfilReal(
+        correo,
+        telefono
+    );
+
+    if (error) {
+        mostrarMensajePerfil(error, "danger");
+        return;
+    }
+
+    const datosActualizados = {};
+
+    if (correo !== (usuarioPerfilActual.correo || "")) {
+        datosActualizados.correo = correo;
+    }
+
+    if (
+        telefono !==
+        (usuarioPerfilActual.telefono || "")
+    ) {
+        datosActualizados.telefono = telefono;
+    }
+
+    if (Object.keys(datosActualizados).length === 0) {
+        salirModoEdicionPerfil();
+
+        mostrarMensajePerfil(
+            "No se realizaron cambios.",
+            "info"
+        );
+
+        return;
+    }
+
+    const boton = document.getElementById(
+        "btn-editar-perfil"
+    );
+
+    perfilGuardando = true;
+
+    if (boton) {
+        boton.disabled = true;
+        boton.innerHTML = `
+            <span
+                class="spinner-border spinner-border-sm"
+                aria-hidden="true"
+            ></span>
+            Guardando...
+        `;
+    }
+
+    try {
+        ocultarMensajePerfil();
+
+        const usuarioActualizado =
+            await solicitarPerfilAPI(
+                "/perfil",
+                {
+                    method: "PATCH",
+                    body: JSON.stringify(
+                        datosActualizados
+                    )
+                }
+            );
+
+        usuarioPerfilActual = usuarioActualizado;
+
+        salirModoEdicionPerfil();
+
+        mostrarDatosPerfilReal(usuarioPerfilActual);
+
+        mostrarMensajePerfil(
+            "Los datos del perfil se guardaron correctamente.",
+            "success"
+        );
+
+    } catch (error) {
+        console.error(
+            "Error al guardar el perfil:",
+            error
+        );
+
+        mostrarMensajePerfil(
+            "No se pudieron guardar los cambios. " +
+            error.message,
+            "danger"
+        );
+
+    } finally {
+        perfilGuardando = false;
+
+        if (boton) {
+            boton.disabled = false;
+
+            boton.innerHTML = perfilEnEdicion
+                ? `<i class="bi bi-check-circle-fill"></i>
+                   Guardar Cambios`
+                : `<i class="bi bi-pencil-fill"></i>
+                   Editar Perfil`;
+        }
+    }
+}
+
+
+// ======================================
+// SALIR DEL MODO EDICION
+// ======================================
+
+function salirModoEdicionPerfil() {
+    perfilEnEdicion = false;
+
+    if (usuarioPerfilActual) {
+        mostrarDatosPerfilReal(usuarioPerfilActual);
+    }
+
+    const boton = document.getElementById(
+        "btn-editar-perfil"
+    );
+
+    if (boton) {
+        boton.innerHTML = `
+            <i class="bi bi-pencil-fill"></i>
+            Editar Perfil
+        `;
+    }
+}
+
+
+// ======================================
+// VALIDACIONES
+// ======================================
+
+function validarEdicionPerfilReal(correo, telefono) {
+    if (!correo) {
+        return "Debés completar el correo electrónico.";
+    }
+
+    const correoValido =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
 
     if (!correoValido) {
         return "El correo electrónico no tiene un formato válido.";
     }
 
+    if (correo.length > 255) {
+        return "El correo electrónico es demasiado largo.";
+    }
+
+    if (telefono.length > 30) {
+        return "El teléfono es demasiado largo.";
+    }
+
     return null;
 }
 
 
-// ==============================
-// CAMBIO DE CONTRASEÑA (simulado)
-// ==============================
+// ======================================
+// CAMBIO DE CONTRASEÑA PENDIENTE
+// ======================================
 
-function configurarCambioPassword() {
+function deshabilitarPasswordPerfil() {
+    const ids = [
+        "password-actual",
+        "password-nueva",
+        "password-confirmar",
+        "btn-guardar-password"
+    ];
 
-    const boton = document.getElementById("btn-guardar-password");
+    ids.forEach(id => {
+        const elemento = document.getElementById(id);
 
-    if (boton) {
-        boton.addEventListener("click", guardarCambioPassword);
-    }
+        if (elemento) {
+            elemento.disabled = true;
+            elemento.title =
+                "Funcionalidad pendiente de implementación";
+        }
+    });
 }
 
-function guardarCambioPassword() {
 
-    const actual = document.getElementById("password-actual").value;
-    const nueva = document.getElementById("password-nueva").value;
-    const confirmar = document.getElementById("password-confirmar").value;
+// ======================================
+// MENSAJES
+// ======================================
 
-    const error = validarCambioPassword(actual, nueva, confirmar);
+function mostrarMensajePerfil(mensaje, tipo = "danger") {
+    const alerta = document.getElementById(
+        "alerta-perfil"
+    );
 
-    if (error) {
-        mostrarAlerta("alerta-perfil", error, "danger");
+    if (!alerta) {
         return;
     }
 
-    // No se persiste la contraseña en ningun lado: cuando exista backend,
-    // este cambio se va a enviar de forma segura y se va a guardar con
-    // hash del lado del servidor, no en el navegador.
+    alerta.textContent = mensaje;
 
-    document.getElementById("password-actual").value = "";
-    document.getElementById("password-nueva").value = "";
-    document.getElementById("password-confirmar").value = "";
+    alerta.className =
+        `alert alert-${tipo}`;
 
-    mostrarAlerta(
-        "alerta-perfil",
-        "La contraseña se actualizó correctamente (simulado).",
-        "success"
-    );
+    alerta.classList.remove("d-none");
 }
 
-function validarCambioPassword(actual, nueva, confirmar) {
 
-    if (!actual || !nueva || !confirmar) {
-        return "Debés completar los 3 campos de contraseña.";
+function ocultarMensajePerfil() {
+    const alerta = document.getElementById(
+        "alerta-perfil"
+    );
+
+    if (alerta) {
+        alerta.textContent = "";
+        alerta.classList.add("d-none");
+    }
+}
+
+
+// ======================================
+// FUNCIONES AUXILIARES
+// ======================================
+
+function colocarTextoPerfil(id, valor) {
+    const elemento = document.getElementById(id);
+
+    if (elemento) {
+        elemento.textContent = valor ?? "-";
+    }
+}
+
+
+function formatearFechaPerfilReal(fecha) {
+    if (!fecha) {
+        return "-";
     }
 
-    if (nueva.length < 8) {
-        return "La nueva contraseña debe tener al menos 8 caracteres.";
+    const [anio, mes, dia] = String(fecha)
+        .slice(0, 10)
+        .split("-");
+
+    if (!anio || !mes || !dia) {
+        return String(fecha);
     }
 
-    if (nueva !== confirmar) {
-        return "Las contraseñas no coinciden.";
-    }
-
-    return null;
+    return `${dia}/${mes}/${anio}`;
 }

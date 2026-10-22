@@ -16,63 +16,123 @@
 
 "use strict";
 
-function inicializarDetalleTaller() {
+
+async function inicializarDetalleTaller() {
     try {
-        validarDatosDetalleTaller();
-
         const idTaller = obtenerIdTallerDetalle();
-        const usuario = typeof obtenerUsuarioActual === "function"
-            ? obtenerUsuarioActual()
-            : window.DATOS_SIMULADOS.usuarioActual;
 
-        const idAlumno = obtenerIdAlumnoDetalle(usuario);
-
-        if (!Number.isFinite(idAlumno)) {
-            throw new Error("No se pudo identificar al alumno actual.");
-        }
-
-        const datos = window.DATOS_SIMULADOS;
-        const talleres = obtenerListadoDetalleTaller("talleres", datos.talleres);
-        const inscripciones = obtenerListadoDetalleTaller("inscripciones", datos.inscripciones);
-
-        const taller = talleres.find(
-            (elemento) => Number(elemento.id) === idTaller
+        // Consultamos el detalle real del taller.
+        // El backend comprueba que el alumno esté inscripto.
+        const taller = await consultarDetalleTallerAPI(
+            `/talleres/${idTaller}`
         );
 
-        if (!taller) {
+        if (!taller || Number(taller.id) !== idTaller) {
             throw new Error("No se encontró el taller solicitado.");
         }
 
-        if (!alumnoInscriptoEnTallerDetalle(idAlumno, idTaller, inscripciones)) {
-            throw new Error("Este taller no figura entre tus inscripciones.");
-        }
-
-        const contenidos = obtenerListadoDetalleTaller("contenidos", datos.contenidos);
-        const asistencias = obtenerListadoDetalleTaller("asistencias", datos.asistencias);
-        const entregas = obtenerListadoDetalleTaller("entregas", datos.entregas);
-        const adjuntos = obtenerListadoDetalleTaller("adjuntos", datos.adjuntos);
-        const talleristas = obtenerListadoDetalleTaller("talleristas", datos.talleristas);
-
+        // Mostramos información general y talleristas reales.
         mostrarInformacionGeneralDetalle(taller);
-        mostrarTalleristaDetalle(taller, talleristas);
-        mostrarAsistenciaDetalle(taller.id, idAlumno, asistencias);
+        mostrarTalleristaDetalle(
+            taller,
+            taller.talleristas || []
+        );
+
         configurarEnlacesDetalle(taller.id);
 
-        renderizarMaterialesDetalle(taller.id, contenidos, adjuntos);
-        renderizarTareasDetalle(taller.id, idAlumno, contenidos, entregas);
+        // Todavía no tenemos conectadas las asistencias reales.
+        // Evitamos presentar un porcentaje simulado como verdadero.
+        colocarTextoDetalle(
+            "asistencia-promedio",
+            "Pendiente de integrar"
+        );
+
+        const enlaceAsistencia =
+            document.getElementById("enlace-asistencia");
+
+        if (enlaceAsistencia) {
+            enlaceAsistencia.href =
+                `asistencia.html?tallerId=${encodeURIComponent(String(taller.id))}`;
+        }
+
+        // Obtener los materiales y las tareas reales.
+        const contenidosAPI = await consultarDetalleTallerAPI(
+            `/talleres/${idTaller}/contenidos`
+        );
+
+        if (!Array.isArray(contenidosAPI)) {
+            throw new Error(
+                "La API devolvió un listado de contenidos inválido."
+            );
+        }
+
+        // Adaptar los campos de MySQL al formato de las
+        // funciones originales del frontend.
+        const contenidos = contenidosAPI.map(contenido => ({
+            ...contenido,
+            tallerId: Number(contenido.taller_id),
+            fechaPublicacion: contenido.fecha_publicacion,
+            fechaLimite: contenido.fecha_limite
+        }));
+
+        // Consultar los adjuntos reales de cada material.
+        const materiales = contenidos.filter(
+            contenido => normalizarDetalle(contenido.tipo) === "material"
+        );
+
+        const adjuntosPorMaterial = await Promise.all(
+            materiales.map(material =>
+                consultarDetalleTallerAPI(
+                    `/contenidos/${material.id}/adjuntos`
+                )
+            )
+        );
+
+        const adjuntos = adjuntosPorMaterial.flatMap(lista =>
+            Array.isArray(lista)
+                ? lista.map(archivo => ({
+                    ...archivo,
+                    contenidoId: Number(archivo.contenido_id),
+                    nombreOriginal: archivo.nombre_original,
+                    tamanoBytes: archivo.tamano_bytes
+                }))
+                : []
+        );
+
+
+
+        // Conservar el diseño original de los materiales.
+        renderizarMaterialesDetalle(
+            idTaller,
+            contenidos,
+            adjuntos
+        );
+
+        // Mostrar las tareas reales. Las entregas se
+        // integrarán en el próximo paso.
+        renderizarTareasDetalle(
+            idTaller,
+            Number.NaN,
+            contenidos,
+            []
+        );
 
         ocultarErrorDetalleTaller();
 
     } catch (error) {
-        console.error("Error al cargar el detalle del taller:", error);
+        console.error(
+            "Error al cargar el detalle del taller:",
+            error
+        );
 
         mostrarErrorDetalleTaller(
-            error.message || "No se pudo cargar la información del taller."
+            error.message ||
+            "No se pudo cargar la información del taller."
         );
 
         mostrarContenidoVacioDetalle(
             "contenedor-materiales",
-            "No se pudo cargar el material."
+            "No se pudieron cargar los materiales."
         );
 
         mostrarContenidoVacioDetalle(
@@ -80,6 +140,45 @@ function inicializarDetalleTaller() {
             "No se pudieron cargar las tareas."
         );
     }
+}
+
+
+
+async function consultarDetalleTallerAPI(ruta) {
+    const respuesta = await fetch(
+        `http://localhost:8002${ruta}`,
+        {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store",
+            headers: {
+                "Accept": "application/json"
+            }
+        }
+    );
+
+    const resultado = await respuesta.json();
+
+    if (!respuesta.ok || resultado.ok === false) {
+        if (respuesta.status === 403) {
+            throw new Error(
+                "No tenés permisos para consultar este taller."
+            );
+        }
+
+        if (respuesta.status === 401) {
+            throw new Error(
+                "Tu sesión ha expirado. Iniciá sesión nuevamente."
+            );
+        }
+
+        throw new Error(
+            resultado.mensaje ||
+            "No se pudo cargar la información del taller."
+        );
+    }
+
+    return resultado.datos;
 }
 
 
@@ -224,10 +323,9 @@ function mostrarInformacionGeneralDetalle(taller) {
         "horario-taller",
         obtenerHorariosDetalle(taller.horarios)
     );
-
     colocarTextoDetalle(
         "ubicacion-taller",
-        obtenerUbicacionDetalle(taller.ubicacion)
+        obtenerUbicacionDetalle(taller)
     );
 
     colocarTextoDetalle(
@@ -254,26 +352,28 @@ function obtenerDiasDetalle(horarios) {
     return dias.length ? dias.join(", ") : "Días no disponibles";
 }
 
+
 function obtenerHorariosDetalle(horarios) {
-    if (typeof formatearHorarios === "function") {
-        const resultado = formatearHorarios(horarios);
-
-        return resultado === "-"
-            ? "Horario no disponible"
-            : resultado;
-    }
-
     if (!Array.isArray(horarios) || horarios.length === 0) {
         return "Horario no disponible";
     }
 
     return horarios
-        .filter((horario) => horario && horario.dia)
-        .map((horario) => {
-            return `${horario.dia}: ${horario.horaInicio || "--:--"} a ${horario.horaFin || "--:--"}`;
+        .filter(horario => horario && horario.dia)
+        .map(horario => {
+            const inicio = String(
+                horario.hora_inicio || horario.horaInicio || "--:--"
+            ).slice(0, 5);
+
+            const fin = String(
+                horario.hora_fin || horario.horaFin || "--:--"
+            ).slice(0, 5);
+
+            return `${horario.dia}: ${inicio} a ${fin}`;
         })
         .join(" | ") || "Horario no disponible";
 }
+
 
 function obtenerUbicacionDetalle(ubicacion) {
     if (!ubicacion || typeof ubicacion !== "object") {
@@ -328,36 +428,41 @@ function aplicarEstiloEstadoDetalle(estado) {
 // TALLERISTA A CARGO
 // ==============================
 
+
 function mostrarTalleristaDetalle(taller, talleristas) {
-    const idTallerista = taller.talleristaId;
+    const lista = Array.isArray(talleristas)
+        ? talleristas
+        : [];
 
-    const persona = talleristas.find(
-        (elemento) => Number(elemento.id) === Number(idTallerista)
-    );
-
-    if (!persona) {
-        colocarTextoDetalle(
-            "tallerista-nombre",
-            "Tallerista no disponible"
-        );
-
-        colocarTextoDetalle("tallerista-correo", "-");
-        return;
-    }
-
-    const nombre = [
-        persona.nombre,
-        persona.apellido
-    ].filter(Boolean).join(" ");
+    const nombres = lista
+        .map(persona => {
+            return [
+                persona.nombre,
+                persona.apellido
+            ].filter(Boolean).join(" ");
+        })
+        .filter(Boolean);
 
     colocarTextoDetalle(
         "tallerista-nombre",
-        nombre || "Tallerista sin nombre"
+        nombres.length > 0
+            ? nombres.join(", ")
+            : "Sin talleristas asignados"
     );
+
+    const especialidades = [
+        ...new Set(
+            lista
+                .map(persona => persona.especialidad)
+                .filter(Boolean)
+        )
+    ];
 
     colocarTextoDetalle(
         "tallerista-correo",
-        persona.correo || "Correo no disponible"
+        especialidades.length > 0
+            ? especialidades.join(" · ")
+            : "Especialidad no disponible"
     );
 }
 
@@ -496,7 +601,8 @@ function renderizarMaterialesDetalle(tallerId, contenidos, adjuntos) {
                     Number(adjunto?.contenidoId) === Number(material.id)
             );
 
-            archivos.forEach((archivo) => {
+
+            archivos.forEach(archivo => {
                 const lineaArchivo = document.createElement("p");
                 lineaArchivo.className = "small mt-2 mb-0";
 
@@ -512,14 +618,42 @@ function renderizarMaterialesDetalle(tallerId, contenidos, adjuntos) {
                 );
 
                 contenido.appendChild(lineaArchivo);
+
+                // Agregar la descarga autenticada.
+                const botonDescarga = document.createElement("button");
+                botonDescarga.type = "button";
+                botonDescarga.className =
+                    "btn btn-sm btn-outline-primary mt-2";
+
+                botonDescarga.textContent = "Descargar archivo";
+
+                botonDescarga.addEventListener("click", async () => {
+                    botonDescarga.disabled = true;
+                    botonDescarga.textContent = "Descargando...";
+
+                    try {
+                        await descargarAdjuntoDetalle(archivo);
+                    } catch (error) {
+                        console.error("Error al descargar:", error);
+                        alert(
+                            error.message ||
+                            "No se pudo descargar el archivo."
+                        );
+                    } finally {
+                        botonDescarga.disabled = false;
+                        botonDescarga.textContent = "Descargar archivo";
+                    }
+                });
+
+                contenido.appendChild(botonDescarga);
             });
 
-            // El mock contiene metadatos, no una URL de descarga real.
-            // No se inventa un enlace a un archivo que todavía no se sirve.
+
             tarjeta.append(icono, contenido);
             contenedor.appendChild(tarjeta);
         });
 }
+
 
 
 // ==============================
@@ -562,7 +696,7 @@ function renderizarTareasDetalle(tallerId, alumnoId, contenidos, entregas) {
                     Number(elemento?.alumnoId) === alumnoId
             );
 
-            const estadoEntrega = entrega?.estado || "Pendiente";
+            const estadoEntrega = entrega?.estado || "Sin consultar";
 
             const tarjeta = document.createElement("article");
             tarjeta.className = "lista-item";
@@ -769,4 +903,60 @@ function ocultarErrorDetalleTaller() {
 
     alerta.textContent = "";
     alerta.classList.add("d-none");
+}
+
+
+async function descargarAdjuntoDetalle(archivo) {
+    const id = Number(archivo.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+        throw new Error(
+            "El identificador del archivo no es válido."
+        );
+    }
+
+    const respuesta = await fetch(
+        `http://localhost:8002/adjuntos/${id}/archivo`,
+        {
+            method: "GET",
+            credentials: "include"
+        }
+    );
+
+    if (!respuesta.ok) {
+        if (respuesta.status === 404) {
+            throw new Error(
+                "Este archivo todavía no está disponible en el servidor."
+            );
+        }
+
+        if (respuesta.status === 403) {
+            throw new Error(
+                "No tenés permisos para descargar este archivo."
+            );
+        }
+
+        throw new Error(
+            "No se pudo descargar el archivo."
+        );
+    }
+
+    const blob = await respuesta.blob();
+
+    const urlTemporal = URL.createObjectURL(blob);
+
+    const enlace = document.createElement("a");
+    enlace.href = urlTemporal;
+    enlace.download =
+        archivo.nombreOriginal ||
+        archivo.nombre_original ||
+        "archivo";
+
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+
+    setTimeout(() => {
+        URL.revokeObjectURL(urlTemporal);
+    }, 1000);
 }

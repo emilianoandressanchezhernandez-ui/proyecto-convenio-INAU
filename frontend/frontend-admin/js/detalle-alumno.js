@@ -1,366 +1,973 @@
+
 /*
-    DETALLE-ALUMNO.JS - FRONTEND ADMIN
-    Responsabilidades:
-    - Mostrar los datos personales del alumno seleccionado.
-    - Mostrar sus observaciones.
-    - Calcular sus estadisticas (talleres, asistencias, % asistencia).
-    - Listar sus talleres, con el tallerista de cada uno.
-    - Permitir editar sus datos y darlo de baja logica.
-*/
+ * DETALLE-ALUMNO.JS - FRONTEND ADMIN
+ *
+ * Funciones:
+ * - Consultar alumno real desde MySQL.
+ * - Mostrar datos personales y observaciones.
+ * - Editar mediante PATCH /alumnos/{id}.
+ * - Desactivar mediante DELETE /alumnos/{id}.
+ * - Consultar talleres e inscripciones reales.
+ * - Mostrar talleristas y horarios reales.
+ * - Consultar asistencias reales.
+ * - Calcular presencias y porcentaje de asistencia.
+ * - Mostrar la fecha de la última presencia.
+ */
+
+"use strict";
 
 let alumnoActual = null;
+let guardandoEdicionAlumno = false;
+let desactivandoAlumno = false;
+let accionesDetalleConfiguradas = false;
 
-function inicializarDetalleAlumno() {
+
+// ==============================
+// INICIALIZACIÓN
+// ==============================
+
+async function inicializarDetalleAlumno() {
+
+    configurarAcciones();
+
     try {
-        validarDatosSimulados();
-
         const id = obtenerParametroURL("id");
-        alumnoActual = buscarAlumnoPorId(id);
 
-        mostrarDatosAlumno(alumnoActual);
-        mostrarEstadisticasAlumno(alumnoActual);
-        renderizarTalleresDelAlumno(alumnoActual);
-        configurarAcciones();
+        if (!id || !/^[1-9]\d*$/.test(String(id))) {
+            throw new Error("El ID del alumno no es válido.");
+        }
+
+        await cargarDetalleAlumno(Number(id));
 
     } catch (error) {
-        console.error("Error al cargar el detalle del alumno:", error);
-        mostrarAlerta("alerta-detalle-alumno", error.message, "danger");
+        console.error("Error al cargar el alumno:", error);
+        mostrarErrorDetalle(error.message);
+        deshabilitarAccionesAlumno();
     }
 }
 
 
 // ==============================
-// VALIDACION Y BUSQUEDA
+// CONSULTAR ALUMNO REAL
 // ==============================
 
-function validarDatosSimulados() {
+async function cargarDetalleAlumno(id) {
 
-    if (!window.DATOS_SIMULADOS) {
-        throw new Error("No se pudieron cargar los datos simulados.");
+    colocarTexto("nombre-alumno", "Cargando alumno...");
+
+    const datos = await inauApi(`/alumnos/${id}`);
+
+    if (
+        !datos ||
+        typeof datos !== "object" ||
+        Number(datos.id) !== id
+    ) {
+        throw new Error("La API no devolvió una ficha válida.");
     }
 
-    if (!Array.isArray(window.DATOS_SIMULADOS.alumnos)) {
-        throw new Error("La lista de alumnos no está disponible.");
-    }
-}
+    alumnoActual = normalizarDetalleAlumno(datos);
 
-function buscarAlumnoPorId(id) {
+    mostrarDatosAlumno(alumnoActual);
+    mostrarEstadisticasAlumno(alumnoActual);
+    actualizarEstadoAcciones();
 
-    if (!id) {
-        throw new Error("No se especificó qué alumno mostrar.");
-    }
+    // Consultar talleres e inscripciones reales.
+    await cargarTalleresRealesDelAlumno(alumnoActual.id);
 
-    const alumnos = obtenerListado(
-        "alumnos",
-        window.DATOS_SIMULADOS.alumnos
-    );
-
-    const alumno = alumnos.find(
-        (a) => a.id === Number(id)
-    );
-
-    if (!alumno) {
-        throw new Error("No se encontró ningún alumno con ese id.");
-    }
-
-    return alumno;
+    // NUEVO: consultar estadísticas de asistencia reales.
+    await cargarAsistenciasRealesDelAlumno(alumnoActual.id);
 }
 
 
 // ==============================
-// DATOS PERSONALES Y OBSERVACIONES
+// NORMALIZACIÓN DE DATOS
+// ==============================
+
+function normalizarDetalleAlumno(datos) {
+
+    return {
+        id: Number(datos.id),
+        usuarioId: datos.usuario_id ?? null,
+
+        nombre: datos.nombre ?? "",
+        apellido: datos.apellido ?? "",
+        cedula: datos.cedula ?? "",
+
+        correo: datos.correo ?? "",
+        telefono: datos.telefono ?? "",
+
+        direccion: datos.direccion ?? "",
+        referenteAdulto: datos.referente_adulto ?? "",
+        centroReferencia: datos.centro_referencia ?? "",
+
+        fechaNacimiento: datos.fecha_nacimiento ?? "",
+        fechaRegistro: datos.fecha_registro ?? "",
+        ultimaAsistencia: datos.ultima_asistencia ?? null,
+
+        estado: datos.estado ?? "Activo",
+        observaciones: datos.observaciones ?? ""
+    };
+}
+
+
+// ==============================
+// MOSTRAR INFORMACIÓN PERSONAL
 // ==============================
 
 function mostrarDatosAlumno(alumno) {
 
-    const nombreCompleto = `${alumno.nombre} ${alumno.apellido}`;
+    const nombreCompleto = [
+        alumno.nombre,
+        alumno.apellido
+    ].filter(Boolean).join(" ");
 
     colocarTexto("nombre-alumno", nombreCompleto);
     colocarTexto("alumno-nombre-completo", nombreCompleto);
     colocarTexto("estado-alumno", alumno.estado);
-    colocarTexto("cedula", alumno.cedula);
-    colocarTexto("fecha-nacimiento", formatearFecha(alumno.fechaNacimiento));
-    colocarTexto("telefono", alumno.telefono);
-    colocarTexto("correo", alumno.correo);
-    colocarTexto("fecha-registro", formatearFecha(alumno.fechaRegistro));
-    colocarTexto("ultima-asistencia", formatearFecha(alumno.ultimaAsistencia));
 
-    const contenedorObservaciones = document.getElementById("observaciones");
+    colocarTexto("cedula", alumno.cedula || "—");
 
-    if (contenedorObservaciones) {
-        contenedorObservaciones.textContent = alumno.observaciones
-            ? alumno.observaciones
-            : "No hay observaciones registradas.";
+    colocarTexto(
+        "fecha-nacimiento",
+        alumno.fechaNacimiento
+            ? formatearFecha(alumno.fechaNacimiento)
+            : "—"
+    );
+
+    colocarTexto("telefono", alumno.telefono || "—");
+    colocarTexto("correo", alumno.correo || "—");
+
+    colocarTexto(
+        "fecha-registro",
+        alumno.fechaRegistro
+            ? formatearFecha(alumno.fechaRegistro)
+            : "—"
+    );
+
+    const observaciones =
+        document.getElementById("observaciones");
+
+    if (observaciones) {
+        observaciones.textContent =
+            alumno.observaciones ||
+            "No hay observaciones registradas.";
     }
+
+    // La última presencia se muestra desde los registros
+    // de asistencia, no desde datos simulados.
 }
 
 
 // ==============================
-// ESTADISTICAS
+// ESTADÍSTICAS
 // ==============================
 
 function mostrarEstadisticasAlumno(alumno) {
 
-    const idsTalleres = obtenerIdsTalleresDelAlumno(alumno.id);
-    const registros = obtenerRegistrosDeAsistencia(alumno.id);
-
-    const cantidadTalleres = idsTalleres.length;
-    const presentes = registros.filter((r) => r.estado === "Presente").length;
-    const porcentaje = calcularPorcentajeAsistencia(registros);
-
-    colocarTexto("cantidad-talleres", cantidadTalleres);
-    colocarTexto("asistencias", presentes);
-    colocarTexto("porcentaje-asistencia", `${porcentaje}%`);
+    // Se actualizarán con consultas reales.
+    colocarTexto("cantidad-talleres", "—");
+    colocarTexto("asistencias", "—");
+    colocarTexto("porcentaje-asistencia", "—");
+    colocarTexto("ultima-asistencia", "Cargando...");
 }
 
-function obtenerIdsTalleresDelAlumno(alumnoId) {
-
-    const inscripciones = window.DATOS_SIMULADOS.inscripciones;
-
-    return inscripciones
-        .filter((inscripcion) => inscripcion.alumnoIds.includes(alumnoId))
-        .map((inscripcion) => inscripcion.tallerId);
-}
-
-function obtenerRegistrosDeAsistencia(alumnoId) {
-
-    const asistencias = window.DATOS_SIMULADOS.asistencias;
-    const registros = [];
-
-    asistencias.forEach((clase) => {
-        const registro = clase.registros.find(
-            (r) => r.alumnoId === alumnoId
-        );
-
-        if (registro) {
-            registros.push(registro);
-        }
-    });
-
-    return registros;
-}
 
 function calcularPorcentajeAsistencia(registros) {
 
-    if (registros.length === 0) {
+    if (!Array.isArray(registros) || registros.length === 0) {
         return 0;
     }
 
     const presentes = registros.filter(
-        (r) => r.estado === "Presente"
+        registro => registro.estado === "Presente"
     ).length;
 
-    return Math.round((presentes / registros.length) * 100);
+    return Math.round(
+        (presentes / registros.length) * 100
+    );
 }
 
 
 // ==============================
-// TABLA DE TALLERES DEL ALUMNO
+// ASISTENCIAS REALES DEL ALUMNO
 // ==============================
 
-function renderizarTalleresDelAlumno(alumno) {
+async function cargarAsistenciasRealesDelAlumno(alumnoId) {
+
+    colocarTexto("asistencias", "—");
+    colocarTexto("porcentaje-asistencia", "—");
+    colocarTexto("ultima-asistencia", "Cargando...");
+
+    try {
+
+        // 1. Consultar todos los talleres.
+        const talleres = await inauApi("/talleres");
+
+        if (!Array.isArray(talleres)) {
+            throw new Error(
+                "No se pudieron consultar los talleres."
+            );
+        }
+
+        // 2. Identificar los talleres inscritos.
+        const resultados = await Promise.all(
+
+            talleres.map(async taller => {
+
+                const inscripciones = await inauApi(
+                    `/talleres/${taller.id}/alumnos`
+                );
+
+                if (!Array.isArray(inscripciones)) {
+                    throw new Error(
+                        `No se pudieron consultar las inscripciones del taller ${taller.id}.`
+                    );
+                }
+
+                const inscrito = inscripciones.some(
+                    inscripcion =>
+                        Number(inscripcion.alumno_id) ===
+                        Number(alumnoId)
+                );
+
+                return inscrito ? taller : null;
+
+            })
+
+        );
+
+        const talleresInscritos = resultados.filter(Boolean);
+
+        // 3. Consultar las jornadas de esos talleres.
+        const jornadasPorTaller = await Promise.all(
+
+            talleresInscritos.map(async taller => {
+
+                const jornadas = await inauApi(
+                    `/talleres/${taller.id}/asistencias`
+                );
+
+                if (!Array.isArray(jornadas)) {
+                    throw new Error(
+                        `No se pudieron consultar las asistencias del taller ${taller.id}.`
+                    );
+                }
+
+                return jornadas;
+
+            })
+
+        );
+
+        const jornadas = jornadasPorTaller.flat();
+
+        // 4. Consultar cada jornada con sus registros.
+        const detalles = await Promise.all(
+
+            jornadas.map(async jornada => {
+
+                const detalle = await inauApi(
+                    `/asistencias/${jornada.id}`
+                );
+
+                if (
+                    !detalle ||
+                    typeof detalle !== "object" ||
+                    !Array.isArray(detalle.registros)
+                ) {
+                    throw new Error(
+                        `No se pudieron consultar los registros de la jornada ${jornada.id}.`
+                    );
+                }
+
+                return detalle;
+
+            })
+
+        );
+
+        // 5. Obtener los registros individuales del alumno.
+        const registrosAlumno = [];
+
+        detalles.forEach(detalle => {
+
+            detalle.registros.forEach(registro => {
+
+                if (
+                    Number(registro.alumno_id) ===
+                    Number(alumnoId)
+                ) {
+                    registrosAlumno.push({
+                        estado: registro.estado,
+                        fecha: detalle.fecha
+                    });
+                }
+
+            });
+
+        });
+
+        // 6. Calcular cuántas veces estuvo presente.
+        const presentes = registrosAlumno.filter(
+            registro => registro.estado === "Presente"
+        );
+
+        colocarTexto("asistencias", presentes.length);
+
+        // Sin registros individuales no hay porcentaje.
+        if (registrosAlumno.length === 0) {
+
+            colocarTexto(
+                "porcentaje-asistencia",
+                "Sin datos"
+            );
+
+            colocarTexto(
+                "ultima-asistencia",
+                "Sin registros"
+            );
+
+            return;
+        }
+
+        // 7. Calcular porcentaje real.
+        const porcentaje = calcularPorcentajeAsistencia(
+            registrosAlumno
+        );
+
+        colocarTexto(
+            "porcentaje-asistencia",
+            `${porcentaje}%`
+        );
+
+        // 8. Última fecha en que estuvo presente.
+        if (presentes.length > 0) {
+
+            const fechas = presentes
+                .map(registro => registro.fecha)
+                .filter(Boolean)
+                .sort();
+
+            if (fechas.length > 0) {
+
+                const ultimaFecha = fechas[fechas.length - 1];
+
+                colocarTexto(
+                    "ultima-asistencia",
+                    formatearFecha(ultimaFecha)
+                );
+
+            } else {
+
+                colocarTexto(
+                    "ultima-asistencia",
+                    "Fecha no disponible"
+                );
+            }
+
+        } else {
+
+            colocarTexto(
+                "ultima-asistencia",
+                "Sin presencias"
+            );
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Error al cargar las asistencias:",
+            error
+        );
+
+        // Ante un fallo, no mostrar cifras incompletas.
+        colocarTexto("asistencias", "—");
+        colocarTexto("porcentaje-asistencia", "—");
+        colocarTexto(
+            "ultima-asistencia",
+            "No disponible"
+        );
+
+        mostrarErrorDetalle(
+            "No se pudieron cargar las estadísticas de asistencia."
+        );
+    }
+}
+
+
+// ==============================
+// CONSULTAR TALLERES REALES
+// ==============================
+
+async function cargarTalleresRealesDelAlumno(alumnoId) {
 
     const tabla = document.getElementById("tabla-talleres");
 
-    if (!tabla) {
-        return;
-    }
-
-    const idsTalleres = obtenerIdsTalleresDelAlumno(alumno.id);
-
-    const talleres = window.DATOS_SIMULADOS.talleres.filter(
-        (taller) => idsTalleres.includes(taller.id)
-    );
-
-    if (talleres.length === 0) {
+    if (tabla) {
         tabla.innerHTML = `
             <tr>
-                <td colspan="4" class="text-center text-muted py-4">
-                    Este alumno no está inscripto en ningún taller.
+                <td colspan="4" class="text-center py-4">
+                    Cargando talleres...
                 </td>
             </tr>
         `;
-        return;
     }
 
-    tabla.innerHTML = talleres.map((taller) => `
-        <tr>
-            <td>${escaparHTML(taller.nombre)}</td>
-            <td>${escaparHTML(obtenerNombreTallerista(taller.talleristaId))}</td>
-            <td>${formatearHorarios(taller.horarios)}</td>
-            <td>${escaparHTML(taller.estado)}</td>
-        </tr>
-    `).join("");
-}
+    try {
 
-function obtenerNombreTallerista(talleristaId) {
+        // 1. Consultar todos los talleres.
+        const talleres = await inauApi("/talleres");
 
-    const talleristas = obtenerListado(
-        "talleristas",
-        window.DATOS_SIMULADOS.talleristas
-    );
+        if (!Array.isArray(talleres)) {
+            throw new Error(
+                "La API no devolvió una lista válida de talleres."
+            );
+        }
 
-    const tallerista = talleristas.find(
-        (t) => t.id === talleristaId
-    );
+        // 2. Consultar los alumnos inscritos.
+        const resultados = await Promise.all(
 
-    if (!tallerista) {
-        return "Sin asignar";
+            talleres.map(async taller => {
+
+                const inscripciones = await inauApi(
+                    `/talleres/${taller.id}/alumnos`
+                );
+
+                if (!Array.isArray(inscripciones)) {
+                    throw new Error(
+                        `No se pudieron consultar las inscripciones del taller ${taller.id}.`
+                    );
+                }
+
+                const inscrito = inscripciones.some(
+                    inscripcion =>
+                        Number(inscripcion.alumno_id) ===
+                        Number(alumnoId)
+                );
+
+                return {
+                    taller,
+                    inscrito
+                };
+            })
+
+        );
+
+        // 3. Conservar los talleres inscritos.
+        const talleresInscritos = resultados
+            .filter(resultado => resultado.inscrito)
+            .map(resultado => resultado.taller);
+
+        // 4. Consultar horarios y talleristas.
+        const talleresCompletos = await Promise.all(
+
+            talleresInscritos.map(async taller => {
+
+                const [detalle, talleristas] =
+                    await Promise.all([
+                        inauApi(`/talleres/${taller.id}`),
+                        inauApi(
+                            `/talleres/${taller.id}/talleristas`
+                        )
+                    ]);
+
+                if (
+                    !detalle ||
+                    typeof detalle !== "object" ||
+                    Number(detalle.id) !== Number(taller.id) ||
+                    !Array.isArray(talleristas)
+                ) {
+                    throw new Error(
+                        `La API devolvió datos incompletos del taller ${taller.id}.`
+                    );
+                }
+
+                return {
+                    ...detalle,
+                    talleristas
+                };
+
+            })
+
+        );
+
+        // 5. Renderizar datos reales.
+        renderizarTalleresReales(talleresCompletos);
+
+        colocarTexto(
+            "cantidad-talleres",
+            talleresCompletos.length
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Error al consultar talleres:",
+            error
+        );
+
+        colocarTexto("cantidad-talleres", "—");
+
+        if (tabla) {
+            tabla.innerHTML = `
+                <tr>
+                    <td colspan="4"
+                        class="text-center text-danger py-4">
+                        No se pudieron cargar los talleres.
+                    </td>
+                </tr>
+            `;
+        }
+
+        mostrarErrorDetalle(
+            error.message ||
+            "No se pudieron cargar los talleres."
+        );
     }
-
-    return `${tallerista.nombre} ${tallerista.apellido}`;
 }
 
 
 // ==============================
-// ACCIONES: EDITAR Y DESACTIVAR
+// RENDERIZAR TALLERES
+// ==============================
+
+function renderizarTalleresReales(talleres) {
+
+    const tabla = document.getElementById("tabla-talleres");
+
+    if (!tabla) return;
+
+    if (!Array.isArray(talleres) || talleres.length === 0) {
+
+        tabla.innerHTML = `
+            <tr>
+                <td colspan="4"
+                    class="text-center text-muted py-4">
+                    Este alumno no tiene talleres registrados.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    tabla.innerHTML = talleres.map(taller => {
+
+        const nombresTalleristas = taller.talleristas
+            .map(tallerista =>
+                `${tallerista.nombre} ${tallerista.apellido}`
+            )
+            .join(", ") || "Sin asignar";
+
+        const horarios = formatearHorariosReales(
+            taller.horarios || []
+        );
+
+        return `
+            <tr>
+                <td>
+                    ${escaparHTML(taller.nombre || "—")}
+                </td>
+
+                <td>
+                    ${escaparHTML(nombresTalleristas)}
+                </td>
+
+                <td>
+                    ${escaparHTML(horarios)}
+                </td>
+
+                <td>
+                    ${escaparHTML(taller.estado || "—")}
+                </td>
+            </tr>
+        `;
+
+    }).join("");
+}
+
+
+// ==============================
+// FORMATEAR HORARIOS
+// ==============================
+
+function formatearHorariosReales(horarios) {
+
+    if (!Array.isArray(horarios) || horarios.length === 0) {
+        return "Sin horarios registrados";
+    }
+
+    return horarios.map(horario => {
+
+        const dia = horario.dia || "Día sin especificar";
+
+        const inicio = String(
+            horario.hora_inicio || ""
+        ).slice(0, 5);
+
+        const fin = String(
+            horario.hora_fin || ""
+        ).slice(0, 5);
+
+        return `${dia}: ${inicio} - ${fin}`;
+
+    }).join(" / ");
+}
+
+
+// ==============================
+// CONFIGURAR ACCIONES
 // ==============================
 
 function configurarAcciones() {
 
-    const botonEditar = document.getElementById("btn-editar");
-    const botonGuardarEdicion = document.getElementById("btn-guardar-editar-alumno");
-    const botonDesactivar = document.getElementById("btn-desactivar");
-
-    if (botonEditar) {
-        botonEditar.addEventListener("click", abrirModalEditarAlumno);
+    if (accionesDetalleConfiguradas) {
+        return;
     }
 
-    if (botonGuardarEdicion) {
-        botonGuardarEdicion.addEventListener("click", guardarEdicionAlumno);
+    accionesDetalleConfiguradas = true;
+
+    const botonEditar =
+        document.getElementById("btn-editar");
+
+    const botonGuardar =
+        document.getElementById(
+            "btn-guardar-editar-alumno"
+        );
+
+    const botonDesactivar =
+        document.getElementById("btn-desactivar");
+
+    botonEditar?.addEventListener(
+        "click",
+        abrirModalEditarAlumno
+    );
+
+    botonGuardar?.addEventListener(
+        "click",
+        guardarEdicionAlumno
+    );
+
+    botonDesactivar?.addEventListener(
+        "click",
+        desactivarAlumno
+    );
+}
+
+
+function deshabilitarAccionesAlumno() {
+
+    const editar = document.getElementById("btn-editar");
+    const desactivar = document.getElementById("btn-desactivar");
+
+    if (editar) editar.disabled = true;
+    if (desactivar) desactivar.disabled = true;
+}
+
+
+function actualizarEstadoAcciones() {
+
+    const editar = document.getElementById("btn-editar");
+    const desactivar = document.getElementById("btn-desactivar");
+
+    if (editar) {
+        editar.disabled = !alumnoActual;
     }
 
-    if (botonDesactivar) {
-        botonDesactivar.addEventListener("click", desactivarAlumno);
+    if (desactivar) {
+        desactivar.disabled =
+            !alumnoActual ||
+            alumnoActual.estado === "Inactivo" ||
+            desactivandoAlumno;
     }
 }
 
 
-// EDITAR
+// ==============================
+// EDITAR ALUMNO
+// ==============================
 
 function abrirModalEditarAlumno() {
 
-    document.getElementById("editar-alumno-nombre").value = alumnoActual.nombre;
-    document.getElementById("editar-alumno-apellido").value = alumnoActual.apellido;
-    document.getElementById("editar-alumno-cedula").value = alumnoActual.cedula;
-    document.getElementById("editar-alumno-fecha-nacimiento").value = alumnoActual.fechaNacimiento;
-    document.getElementById("editar-alumno-correo").value = alumnoActual.correo;
-    document.getElementById("editar-alumno-telefono").value = alumnoActual.telefono;
-    document.getElementById("editar-alumno-observaciones").value = alumnoActual.observaciones || "";
+    if (!alumnoActual) {
+        return;
+    }
+
+    document.getElementById(
+        "editar-alumno-nombre"
+    ).value = alumnoActual.nombre;
+
+    document.getElementById(
+        "editar-alumno-apellido"
+    ).value = alumnoActual.apellido;
+
+    const cedulaInput =
+        document.getElementById("editar-alumno-cedula");
+
+    cedulaInput.value = alumnoActual.cedula;
+    cedulaInput.readOnly = true;
+
+    cedulaInput.title =
+        "La cédula no puede modificarse desde esta operación.";
+
+    document.getElementById(
+        "editar-alumno-fecha-nacimiento"
+    ).value = alumnoActual.fechaNacimiento;
+
+    document.getElementById(
+        "editar-alumno-correo"
+    ).value = alumnoActual.correo;
+
+    document.getElementById(
+        "editar-alumno-telefono"
+    ).value = alumnoActual.telefono;
+
+    document.getElementById(
+        "editar-alumno-observaciones"
+    ).value = alumnoActual.observaciones;
 
     ocultarAlerta("alerta-editar-alumno");
 
-    const modal = bootstrap.Modal.getOrCreateInstance(
+    bootstrap.Modal.getOrCreateInstance(
         document.getElementById("modal-editar-alumno")
-    );
-    modal.show();
+    ).show();
 }
 
-function guardarEdicionAlumno() {
+
+// ==============================
+// GUARDAR EDICIÓN REAL
+// ==============================
+
+async function guardarEdicionAlumno() {
+
+    if (!alumnoActual || guardandoEdicionAlumno) {
+        return;
+    }
 
     const datosEditados = {
-        nombre: document.getElementById("editar-alumno-nombre").value.trim(),
-        apellido: document.getElementById("editar-alumno-apellido").value.trim(),
-        cedula: document.getElementById("editar-alumno-cedula").value.trim(),
-        fechaNacimiento: document.getElementById("editar-alumno-fecha-nacimiento").value,
-        correo: document.getElementById("editar-alumno-correo").value.trim(),
-        telefono: document.getElementById("editar-alumno-telefono").value.trim(),
-        observaciones: document.getElementById("editar-alumno-observaciones").value.trim()
+
+        nombre: document.getElementById(
+            "editar-alumno-nombre"
+        ).value.trim(),
+
+        apellido: document.getElementById(
+            "editar-alumno-apellido"
+        ).value.trim(),
+
+        fecha_nacimiento: document.getElementById(
+            "editar-alumno-fecha-nacimiento"
+        ).value,
+
+        correo: document.getElementById(
+            "editar-alumno-correo"
+        ).value.trim() || null,
+
+        telefono: document.getElementById(
+            "editar-alumno-telefono"
+        ).value.trim() || null,
+
+        observaciones: document.getElementById(
+            "editar-alumno-observaciones"
+        ).value.trim() || null
     };
 
     const error = validarEdicionAlumno(datosEditados);
 
     if (error) {
-        mostrarAlerta("alerta-editar-alumno", error, "danger");
+
+        mostrarAlerta(
+            "alerta-editar-alumno",
+            error,
+            "danger"
+        );
+
         return;
     }
 
-    const alumnoActualizado = {
-        ...alumnoActual,
-        ...datosEditados
-    };
-
-    actualizarAlumnoEnListado(alumnoActualizado);
-
-    alumnoActual = alumnoActualizado;
-    mostrarDatosAlumno(alumnoActual);
-
-    const modal = bootstrap.Modal.getOrCreateInstance(
-        document.getElementById("modal-editar-alumno")
+    const botonGuardar = document.getElementById(
+        "btn-guardar-editar-alumno"
     );
-    modal.hide();
+
+    guardandoEdicionAlumno = true;
+
+    if (botonGuardar) {
+        botonGuardar.disabled = true;
+        botonGuardar.textContent = "Guardando...";
+    }
+
+    try {
+
+        const datosActualizados = await inauApi(
+            `/alumnos/${alumnoActual.id}`,
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(datosEditados)
+            }
+        );
+
+        if (!datosActualizados?.id) {
+            throw new Error(
+                "La API no confirmó el alumno actualizado."
+            );
+        }
+
+        alumnoActual = normalizarDetalleAlumno(
+            datosActualizados
+        );
+
+        mostrarDatosAlumno(alumnoActual);
+        actualizarEstadoAcciones();
+
+        // No reiniciar las estadísticas de asistencia:
+        // siguen siendo válidas tras editar datos personales.
+
+        bootstrap.Modal.getOrCreateInstance(
+            document.getElementById("modal-editar-alumno")
+        ).hide();
+
+    } catch (error) {
+
+        console.error("Error al editar alumno:", error);
+
+        mostrarAlerta(
+            "alerta-editar-alumno",
+            error.message ||
+            "No se pudo actualizar el alumno.",
+            "danger"
+        );
+
+    } finally {
+
+        guardandoEdicionAlumno = false;
+
+        if (botonGuardar) {
+            botonGuardar.disabled = false;
+            botonGuardar.textContent = "Guardar";
+        }
+    }
 }
+
+
+// ==============================
+// VALIDAR EDICIÓN
+// ==============================
 
 function validarEdicionAlumno(datos) {
 
-    // Observaciones queda afuera de la validacion de obligatorios:
-    // es el unico campo opcional del formulario.
-
-    const camposObligatorios = [
-        datos.nombre, datos.apellido, datos.cedula,
-        datos.fechaNacimiento, datos.correo, datos.telefono
-    ];
-
-    if (camposObligatorios.some((campo) => !campo)) {
-        return "Todos los campos son obligatorios, excepto observaciones.";
+    if (
+        !datos.nombre ||
+        !datos.apellido ||
+        !datos.fecha_nacimiento
+    ) {
+        return (
+            "Nombre, apellido y fecha de nacimiento " +
+            "son obligatorios."
+        );
     }
 
-    const todosLosAlumnos = obtenerListado(
-        "alumnos",
-        window.DATOS_SIMULADOS.alumnos
-    );
-
-    const cedulaDuplicada = todosLosAlumnos.some(
-        (a) => a.cedula === datos.cedula && a.id !== alumnoActual.id
-    );
-
-    if (cedulaDuplicada) {
-        return "Ya existe otro alumno registrado con esa cédula.";
+    if (
+        datos.correo &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo)
+    ) {
+        return "El correo electrónico no es válido.";
     }
 
     return null;
 }
 
 
-// DESACTIVAR (baja logica)
+// ==============================
+// DESACTIVAR ALUMNO
+// ==============================
 
-function desactivarAlumno() {
+async function desactivarAlumno() {
 
-    if (alumnoActual.estado === "Inactivo") {
+    if (
+        !alumnoActual ||
+        alumnoActual.estado === "Inactivo" ||
+        desactivandoAlumno
+    ) {
         return;
     }
 
-    const nombreCompleto = `${alumnoActual.nombre} ${alumnoActual.apellido}`;
-    const confirmar = confirm(`¿Desea desactivar a ${nombreCompleto}?`);
+    const nombreCompleto =
+        `${alumnoActual.nombre} ${alumnoActual.apellido}`;
+
+    const confirmar = window.confirm(
+        `¿Desea desactivar a ${nombreCompleto}?`
+    );
 
     if (!confirmar) {
         return;
     }
 
-    const alumnoActualizado = {
-        ...alumnoActual,
-        estado: "Inactivo"
-    };
+    const boton = document.getElementById(
+        "btn-desactivar"
+    );
 
-    actualizarAlumnoEnListado(alumnoActualizado);
+    desactivandoAlumno = true;
 
-    alumnoActual = alumnoActualizado;
-    mostrarDatosAlumno(alumnoActual);
+    if (boton) {
+        boton.disabled = true;
+    }
+
+    try {
+
+        await inauApi(
+            `/alumnos/${alumnoActual.id}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        // Recuperar el estado actualizado desde MySQL.
+        const datos = await inauApi(
+            `/alumnos/${alumnoActual.id}`
+        );
+
+        alumnoActual = normalizarDetalleAlumno(datos);
+
+        mostrarDatosAlumno(alumnoActual);
+        actualizarEstadoAcciones();
+
+    } catch (error) {
+
+        console.error("Error al desactivar alumno:", error);
+
+        mostrarErrorDetalle(
+            error.message ||
+            "No se pudo desactivar el alumno."
+        );
+
+        try {
+            await cargarDetalleAlumno(alumnoActual.id);
+        } catch (recargaError) {
+            console.error(
+                "Error al recuperar el alumno:",
+                recargaError
+            );
+        }
+
+    } finally {
+
+        desactivandoAlumno = false;
+        actualizarEstadoAcciones();
+    }
 }
 
 
-// ACTUALIZACION COMPARTIDA
+// ==============================
+// ERRORES
+// ==============================
 
-function actualizarAlumnoEnListado(alumnoActualizado) {
+function mostrarErrorDetalle(mensaje) {
 
-    const listaCompleta = obtenerListado(
-        "alumnos",
-        window.DATOS_SIMULADOS.alumnos
+    mostrarAlerta(
+        "alerta-detalle-alumno",
+        mensaje,
+        "danger"
     );
-
-    const listaActualizada = listaCompleta.map(
-        (a) => a.id === alumnoActualizado.id ? alumnoActualizado : a
-    );
-
-    guardarDato("alumnos", listaActualizada);
 }

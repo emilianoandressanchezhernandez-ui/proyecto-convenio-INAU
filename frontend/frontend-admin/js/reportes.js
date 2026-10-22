@@ -1,48 +1,187 @@
+
 /*
     REPORTES.JS - FRONTEND ADMIN
-    Responsabilidades:
-    - Listar los reportes generados.
-    - Calcular y mostrar estadisticas generales del sistema.
-    - Filtrar por periodo y por taller.
-    - Generar un reporte nuevo (usando el filtro de taller ya seleccionado).
+
+    Integración con la API real:
+    - Listar reportes guardados en MySQL.
+    - Mostrar estadísticas reales del sistema.
+    - Filtrar por período y taller.
+    - Generar reportes generales y de asistencia.
 */
+
+const REPORTES_API_URL = "http://localhost:8002";
 
 let todosLosReportes = [];
 let reportesActuales = [];
+let talleresReportes = [];
 
-function inicializarReportes() {
-    todosLosReportes = obtenerListado(
-        "reportes",
-        window.DATOS_SIMULADOS.reportes
+
+// ======================================
+// COMUNICACIÓN CON LA API
+// ======================================
+
+async function solicitarReportesAPI(ruta, opciones = {}) {
+    const respuesta = await fetch(
+        REPORTES_API_URL + ruta,
+        {
+            ...opciones,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                ...(opciones.headers || {})
+            }
+        }
     );
-    reportesActuales = todosLosReportes;
 
-    cargarSelectorDeTalleres("filtro-taller");
-    cargarSelectorDePeriodos();
+    const resultado = await respuesta.json();
 
-    renderizarTablaReportes(reportesActuales);
-    mostrarEstadisticasGenerales();
-    configurarFiltro();
-    configurarGeneracion();
+    if (!respuesta.ok || resultado.ok === false) {
+        throw new Error(
+            resultado.mensaje ||
+            "No se pudo completar la operación."
+        );
+    }
+
+    return resultado.datos;
 }
 
 
-// ==============================
-// TABLA
-// ==============================
+// ======================================
+// INICIALIZACIÓN
+// ======================================
+
+async function inicializarReportes() {
+    configurarFiltro();
+    configurarGeneracion();
+
+    await cargarDatosReportes();
+}
+
+async function cargarDatosReportes() {
+    const tabla = document.getElementById("tabla-reportes");
+
+    if (tabla) {
+        tabla.innerHTML = `
+            <tr>
+                <td colspan="5"
+                    class="text-center text-muted py-5">
+                    Cargando reportes...
+                </td>
+            </tr>
+        `;
+    }
+
+    try {
+        const [reportes, talleres, alumnos] = await Promise.all([
+            solicitarReportesAPI("/reportes"),
+            solicitarReportesAPI("/talleres"),
+            solicitarReportesAPI("/alumnos")
+        ]);
+
+        todosLosReportes = Array.isArray(reportes)
+            ? reportes
+            : [];
+
+        talleresReportes = Array.isArray(talleres)
+            ? talleres
+            : [];
+
+        const listaAlumnos = Array.isArray(alumnos)
+            ? alumnos
+            : [];
+
+        cargarSelectorTalleresReportes();
+        cargarSelectorDePeriodos();
+
+        aplicarFiltro();
+
+        mostrarEstadisticasGenerales(
+            talleresReportes,
+            listaAlumnos
+        );
+
+        await actualizarAsistenciaPromedio();
+
+    } catch (error) {
+        console.error(
+            "Error al cargar reportes:",
+            error
+        );
+
+        if (tabla) {
+            tabla.innerHTML = `
+                <tr>
+                    <td colspan="5"
+                        class="text-center text-danger py-5">
+                        No se pudieron cargar los reportes.
+                    </td>
+                </tr>
+            `;
+        }
+    }
+}
+
+
+// ======================================
+// SELECTOR DE TALLERES
+// ======================================
+
+function cargarSelectorTalleresReportes() {
+    const select = document.getElementById(
+        "filtro-taller"
+    );
+
+    if (!select) {
+        return;
+    }
+
+    const seleccionAnterior = select.value;
+
+    const ordenados = [...talleresReportes].sort(
+        (a, b) => String(a.nombre).localeCompare(
+            String(b.nombre),
+            "es"
+        )
+    );
+
+    select.innerHTML = `
+        <option value="">Todos los talleres</option>
+        ${ordenados.map(taller => `
+            <option value="${Number(taller.id)}">
+                ${escaparHTMLReporte(taller.nombre)}
+            </option>
+        `).join("")}
+    `;
+
+    if (
+        seleccionAnterior &&
+        ordenados.some(
+            taller => String(taller.id) === seleccionAnterior
+        )
+    ) {
+        select.value = seleccionAnterior;
+    }
+}
+
+
+// ======================================
+// TABLA DE REPORTES
+// ======================================
 
 function renderizarTablaReportes(reportes) {
-
-    const tabla = document.getElementById("tabla-reportes");
+    const tabla = document.getElementById(
+        "tabla-reportes"
+    );
 
     if (!tabla) {
         return;
     }
 
-    if (reportes.length === 0) {
+    if (!reportes.length) {
         tabla.innerHTML = `
             <tr>
-                <td colspan="5" class="text-center text-muted py-5">
+                <td colspan="5"
+                    class="text-center text-muted py-5">
                     No se encontraron reportes.
                 </td>
             </tr>
@@ -51,17 +190,40 @@ function renderizarTablaReportes(reportes) {
     }
 
     const ordenados = [...reportes].sort(
-        (a, b) => b.fechaGeneracion.localeCompare(a.fechaGeneracion)
+        (a, b) => {
+            const fechaA = a.fecha_generacion || "";
+            const fechaB = b.fecha_generacion || "";
+
+            return fechaB.localeCompare(fechaA) ||
+                Number(b.id) - Number(a.id);
+        }
     );
 
-    tabla.innerHTML = ordenados.map((reporte) => `
+    tabla.innerHTML = ordenados.map(reporte => `
         <tr>
-            <td>${escaparHTML(reporte.nombre)}</td>
-            <td>${formatearFechaHora(reporte.fechaGeneracion)}</td>
-            <td>${escaparHTML(reporte.tipo)}</td>
-            <td>${escaparHTML(reporte.estado)}</td>
             <td>
-                <a href="detalle-reporte.html?id=${reporte.id}" class="btn btn-sm btn-outline-primary">
+                ${escaparHTMLReporte(reporte.nombre)}
+            </td>
+
+            <td>
+                ${formatearFechaReporte(
+        reporte.fecha_generacion
+    )}
+            </td>
+
+            <td>
+                ${escaparHTMLReporte(reporte.tipo)}
+            </td>
+
+            <td>
+                ${escaparHTMLReporte(reporte.estado)}
+            </td>
+
+            <td>
+                <a
+                    href="detalle-reporte.html?id=${Number(reporte.id)}"
+                    class="btn btn-sm btn-outline-primary"
+                >
                     Ver
                 </a>
             </td>
@@ -70,117 +232,234 @@ function renderizarTablaReportes(reportes) {
 }
 
 
-// ==============================
-// ESTADISTICAS (siempre del sistema completo, no del filtro)
-// ==============================
+// ======================================
+// ESTADÍSTICAS GENERALES
+// ======================================
 
-function mostrarEstadisticasGenerales() {
-
-    const d = window.DATOS_SIMULADOS;
-
-    const talleres = obtenerListado("talleres", d.talleres);
-    const alumnos = obtenerListado("alumnos", d.alumnos);
-    const asistencias = obtenerListado("asistencias", d.asistencias);
-
+function mostrarEstadisticasGenerales(
+    talleres,
+    alumnos
+) {
     const talleresActivos = talleres.filter(
-        (t) => t.estado === "Activo"
+        taller => taller.estado === "Activo"
     ).length;
 
-    const asistenciaPromedio = calcularAsistenciaPromedioGeneral(asistencias);
+    colocarTextoReporte(
+        "stat-talleres-activos",
+        talleresActivos
+    );
 
-    colocarTexto("stat-talleres-activos", talleresActivos);
-    colocarTexto("stat-alumnos", alumnos.length);
-    colocarTexto("stat-asistencia-promedio", `${asistenciaPromedio}%`);
-    colocarTexto("stat-reportes-generados", todosLosReportes.length);
+    colocarTextoReporte(
+        "stat-alumnos",
+        alumnos.length
+    );
+
+    colocarTextoReporte(
+        "stat-reportes-generados",
+        todosLosReportes.length
+    );
 }
 
-function calcularAsistenciaPromedioGeneral(asistencias) {
 
-    let totalRegistros = 0;
-    let totalPresentes = 0;
+// ======================================
+// ASISTENCIA PROMEDIO REAL
+// ======================================
 
-    asistencias.forEach((clase) => {
-        clase.registros.forEach((registro) => {
-            totalRegistros++;
-            if (registro.estado === "Presente") {
-                totalPresentes++;
-            }
-        });
-    });
+async function actualizarAsistenciaPromedio() {
+    const elemento = document.getElementById(
+        "stat-asistencia-promedio"
+    );
 
-    if (totalRegistros === 0) {
-        return 0;
+    if (!elemento) {
+        return;
     }
 
-    return Math.round((totalPresentes / totalRegistros) * 100);
+    elemento.textContent = "--";
+
+    try {
+        // Consultar las jornadas reales de cada taller.
+        const resultados = await Promise.all(
+            talleresReportes.map(taller =>
+                solicitarReportesAPI(
+                    `/talleres/${Number(taller.id)}/asistencias`
+                )
+            )
+        );
+
+        const jornadas = resultados.flatMap(
+            lista => Array.isArray(lista) ? lista : []
+        );
+
+        if (!jornadas.length) {
+            elemento.textContent = "0%";
+            return;
+        }
+
+        // Cada jornada tiene sus registros individuales.
+        const detalles = await Promise.all(
+            jornadas.map(jornada =>
+                solicitarReportesAPI(
+                    `/asistencias/${Number(jornada.id)}`
+                )
+            )
+        );
+
+        let totalRegistros = 0;
+        let totalPresentes = 0;
+
+        detalles.forEach(detalle => {
+            const registros = Array.isArray(detalle.registros)
+                ? detalle.registros
+                : [];
+
+            registros.forEach(registro => {
+                if (!registro.estado) {
+                    return;
+                }
+
+                totalRegistros++;
+
+                if (registro.estado === "Presente") {
+                    totalPresentes++;
+                }
+            });
+        });
+
+        const promedio = totalRegistros > 0
+            ? Math.round(
+                totalPresentes / totalRegistros * 100
+            )
+            : 0;
+
+        elemento.textContent = `${promedio}%`;
+
+    } catch (error) {
+        console.error(
+            "No se pudo calcular la asistencia promedio:",
+            error
+        );
+
+        elemento.textContent = "--";
+    }
 }
 
 
-// ==============================
-// SELECTOR DE PERIODOS
-// ==============================
+// ======================================
+// SELECTOR DE PERÍODOS
+// ======================================
 
-// Arma la lista de periodos (mes/año) a partir de las fechas reales
-// en las que ya se generaron reportes, en vez de tener una lista fija.
 function cargarSelectorDePeriodos() {
-
-    const select = document.getElementById("filtro-periodo");
+    const select = document.getElementById(
+        "filtro-periodo"
+    );
 
     if (!select) {
         return;
     }
 
+    const seleccionAnterior = select.value;
     const periodos = new Set();
 
-    todosLosReportes.forEach((reporte) => {
-        const [anio, mes] = reporte.fechaGeneracion.split(" ")[0].split("-");
-        periodos.add(`${anio}-${mes}`);
+    todosLosReportes.forEach(reporte => {
+        const fecha = reporte.fecha_generacion || "";
+
+        if (fecha.length >= 7) {
+            periodos.add(fecha.slice(0, 7));
+        }
     });
 
     const opciones = [...periodos]
         .sort()
-        .reverse()
-        .map((periodo) => `<option value="${periodo}">${periodo}</option>`)
-        .join("");
+        .reverse();
 
-    select.innerHTML = `<option value="">Todos los períodos</option>${opciones}`;
+    select.innerHTML = `
+        <option value="">Todos los períodos</option>
+        ${opciones.map(periodo => `
+            <option value="${periodo}">
+                ${formatearPeriodoReporte(periodo)}
+            </option>
+        `).join("")}
+    `;
+
+    if (opciones.includes(seleccionAnterior)) {
+        select.value = seleccionAnterior;
+    }
+}
+
+function formatearPeriodoReporte(periodo) {
+    const [anio, mes] = periodo.split("-");
+
+    const nombresMeses = [
+        "Enero", "Febrero", "Marzo",
+        "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre",
+        "Octubre", "Noviembre", "Diciembre"
+    ];
+
+    const indiceMes = Number(mes) - 1;
+
+    if (
+        indiceMes < 0 ||
+        indiceMes >= nombresMeses.length
+    ) {
+        return periodo;
+    }
+
+    return `${nombresMeses[indiceMes]} ${anio}`;
 }
 
 
-// ==============================
-// FILTRO
-// ==============================
+// ======================================
+// FILTROS
+// ======================================
 
 function configurarFiltro() {
+    const selectPeriodo = document.getElementById(
+        "filtro-periodo"
+    );
 
-    const selectPeriodo = document.getElementById("filtro-periodo");
-    const selectTaller = document.getElementById("filtro-taller");
+    const selectTaller = document.getElementById(
+        "filtro-taller"
+    );
 
     if (selectPeriodo) {
-        selectPeriodo.addEventListener("change", aplicarFiltro);
+        selectPeriodo.addEventListener(
+            "change",
+            aplicarFiltro
+        );
     }
 
     if (selectTaller) {
-        selectTaller.addEventListener("change", aplicarFiltro);
+        selectTaller.addEventListener(
+            "change",
+            aplicarFiltro
+        );
     }
 }
 
 function aplicarFiltro() {
+    const periodo = document.getElementById(
+        "filtro-periodo"
+    )?.value || "";
 
-    const periodo = document.getElementById("filtro-periodo").value;
-    const tallerId = document.getElementById("filtro-taller").value;
+    const tallerId = document.getElementById(
+        "filtro-taller"
+    )?.value || "";
 
-    let filtrados = todosLosReportes;
+    let filtrados = [...todosLosReportes];
 
     if (periodo) {
-        filtrados = filtrados.filter((r) =>
-            r.fechaGeneracion.startsWith(periodo)
+        filtrados = filtrados.filter(
+            reporte => String(
+                reporte.fecha_generacion || ""
+            ).startsWith(periodo)
         );
     }
 
     if (tallerId) {
         filtrados = filtrados.filter(
-            (r) => r.tallerId === Number(tallerId)
+            reporte =>
+                Number(reporte.taller_id) === Number(tallerId)
         );
     }
 
@@ -190,115 +469,141 @@ function aplicarFiltro() {
 }
 
 
-// ==============================
-// GENERAR REPORTE NUEVO
-// ==============================
+// ======================================
+// GENERAR REPORTE REAL
+// ======================================
 
 function configurarGeneracion() {
-
-    const boton = document.getElementById("btn-generar-reporte");
+    const boton = document.getElementById(
+        "btn-generar-reporte"
+    );
 
     if (boton) {
-        boton.addEventListener("click", generarReporte);
+        boton.addEventListener(
+            "click",
+            generarReporte
+        );
     }
 }
 
-// Genera un reporte usando el filtro de taller ya seleccionado en la
-// pantalla: si hay un taller elegido, genera un reporte de asistencia
-// de ese taller puntual. Si no hay ninguno elegido, genera un resumen
-// general de todo el sistema.
-function generarReporte() {
+async function generarReporte() {
+    const boton = document.getElementById(
+        "btn-generar-reporte"
+    );
 
-    const tallerId = document.getElementById("filtro-taller").value;
+    const tallerId = document.getElementById(
+        "filtro-taller"
+    )?.value || "";
 
-    const nuevoReporte = tallerId
-        ? generarReporteDeTaller(Number(tallerId))
-        : generarReporteGeneral();
+    const datos = tallerId
+        ? {
+            tipo: "Asistencia",
+            taller_id: Number(tallerId)
+        }
+        : {
+            tipo: "General"
+        };
 
-    todosLosReportes.push(nuevoReporte);
-    guardarDato("reportes", todosLosReportes);
+    if (boton) {
+        boton.disabled = true;
+        boton.innerHTML = `
+            <span
+                class="spinner-border spinner-border-sm"
+                aria-hidden="true"
+            ></span>
+            Generando...
+        `;
+    }
 
-    cargarSelectorDePeriodos();
-    aplicarFiltro();
-    mostrarEstadisticasGenerales();
+    try {
+        // Se genera y guarda el reporte en MySQL.
+        const nuevoReporte = await solicitarReportesAPI(
+            "/reportes",
+            {
+                method: "POST",
+                body: JSON.stringify(datos)
+            }
+        );
+
+        // Actualizar el listado desde la base de datos.
+        todosLosReportes = await solicitarReportesAPI(
+            "/reportes"
+        );
+
+        cargarSelectorDePeriodos();
+        aplicarFiltro();
+
+        colocarTextoReporte(
+            "stat-reportes-generados",
+            todosLosReportes.length
+        );
+
+        alert(
+            "Reporte generado correctamente.\n\n" +
+            nuevoReporte.nombre
+        );
+
+    } catch (error) {
+        console.error(
+            "Error al generar reporte:",
+            error
+        );
+
+        alert(
+            "No se pudo generar el reporte.\n" +
+            error.message
+        );
+
+    } finally {
+        if (boton) {
+            boton.disabled = false;
+            boton.innerHTML = `
+                <i class="bi bi-file-earmark-plus-fill"></i>
+                Generar Reporte
+            `;
+        }
+    }
 }
 
-function generarReporteDeTaller(tallerId) {
 
-    const d = window.DATOS_SIMULADOS;
+// ======================================
+// FUNCIONES AUXILIARES
+// ======================================
 
-    const talleres = obtenerListado("talleres", d.talleres);
-    const taller = talleres.find((t) => t.id === tallerId);
+function colocarTextoReporte(id, texto) {
+    const elemento = document.getElementById(id);
 
-    const asistencias = obtenerListado("asistencias", d.asistencias)
-        .filter((clase) => clase.tallerId === tallerId);
-
-    let totalRegistros = 0;
-    let presentes = 0;
-    let ausentes = 0;
-
-    asistencias.forEach((clase) => {
-        clase.registros.forEach((registro) => {
-            totalRegistros++;
-            if (registro.estado === "Presente") presentes++;
-            if (registro.estado === "Ausente") ausentes++;
-        });
-    });
-
-    return {
-        id: generarId(todosLosReportes),
-        nombre: `Reporte de Asistencia - ${taller.nombre}`,
-        tipo: "Asistencia",
-        tallerId: tallerId,
-        fechaInicio: taller.fechaInicio,
-        fechaFin: taller.fechaFin,
-        fechaGeneracion: obtenerFechaHoraActual(),
-        contenido: {
-            totalClases: asistencias.length,
-            asistenciasRegistradas: totalRegistros,
-            presentes,
-            ausentes,
-            justificados: totalRegistros - presentes - ausentes
-        },
-        formato: "PDF",
-        generadoPor: d.usuarioActual.id,
-        estado: "Generado"
-    };
+    if (elemento) {
+        elemento.textContent = texto;
+    }
 }
 
-function generarReporteGeneral() {
-
-    const d = window.DATOS_SIMULADOS;
-
-    const talleres = obtenerListado("talleres", d.talleres);
-    const alumnos = obtenerListado("alumnos", d.alumnos);
-    const talleristas = obtenerListado("talleristas", d.talleristas);
-
-    return {
-        id: generarId(todosLosReportes),
-        nombre: "Reporte General del Sistema",
-        tipo: "General",
-        tallerId: null,
-        fechaInicio: null,
-        fechaFin: null,
-        fechaGeneracion: obtenerFechaHoraActual(),
-        contenido: {
-            totalTalleres: talleres.length,
-            talleresActivos: talleres.filter((t) => t.estado === "Activo").length,
-            totalAlumnos: alumnos.length,
-            totalTalleristas: talleristas.length
-        },
-        formato: "PDF",
-        generadoPor: d.usuarioActual.id,
-        estado: "Generado"
-    };
+function escaparHTMLReporte(valor) {
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 }
 
-function obtenerFechaHoraActual() {
+function formatearFechaReporte(fecha) {
+    if (!fecha) {
+        return "Sin fecha";
+    }
 
-    const ahora = new Date();
-    const fecha = ahora.toISOString().split("T")[0];
-    const hora = ahora.toTimeString().slice(0, 5);
+    // Formato recibido de MySQL: YYYY-MM-DD HH:mm:ss
+    const [parteFecha, parteHora = ""] =
+        String(fecha).split(" ");
 
-    return `${fecha} ${hora}`;
+    const [anio, mes, dia] =
+        parteFecha.split("-");
+
+    if (!anio || !mes || !dia) {
+        return escaparHTMLReporte(fecha);
+    }
+
+    const hora = parteHora.slice(0, 5);
+
+    return `${dia}/${mes}/${anio}${hora ? " " + hora : ""}`;
 }

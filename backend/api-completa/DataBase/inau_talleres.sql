@@ -216,6 +216,7 @@ CREATE TABLE entregas (
     estado           ENUM('Pendiente', 'Entregada', 'Corregida') NOT NULL DEFAULT 'Pendiente',
     nota             TINYINT,
     comentario       TEXT,
+    comentario_alumno TEXT NULL,
  
     FOREIGN KEY (contenido_id) REFERENCES contenidos(id) ON DELETE CASCADE,
     FOREIGN KEY (alumno_id)    REFERENCES alumnos(id)    ON DELETE CASCADE,
@@ -295,11 +296,11 @@ CREATE TABLE trazabilidad (
  
 -- Usuarios: 1 administrador, 2 talleristas, 2 alumnos con cuenta
 INSERT INTO usuarios (nombre, apellido, cedula, correo, telefono, clave_hash, rol, especialidad, estado, fecha_registro) VALUES
-('Carlos', 'Pérez',     '3.456.789-0', 'carlos.perez@inau.gov.uy',     '099 456 789', '$2y$12$.Fvn3QkhSJip4AEcBNeH3eUFB67Y/zUXpnpVzHvNme3qcHV1zlwjm', 'admin',      NULL,                                          'Activo', '2026-01-15'),
-('María',  'López',     '1.111.111-1', 'maria.lopez@inau.gov.uy',      '099 201 201', '$2y$12$TKsTID4s7JybYg.l7mJVkuhBL.3dz4utOUxK.w4..tfcZWZdANTcO', 'tallerista', 'Programación Web',                            'Activo', '2026-01-20'),
-('Martín', 'Rodríguez', '4.567.890-1', 'martin.rodriguez@ejemplo.com', '099 123 456', '$2y$12$TKsTID4s7JybYg.l7mJVkuhBL.3dz4utOUxK.w4..tfcZWZdANTcO', 'tallerista', 'Programación Web, Robótica y Diseño Gráfico', 'Activo', '2026-03-10'),
-('Sofía',  'Pereira',   '5.123.456-7', 'sofia.pereira@email.com',      '099 111 111', '$2y$12$TKsTID4s7JybYg.l7mJVkuhBL.3dz4utOUxK.w4..tfcZWZdANTcO', 'alumno',     NULL,                                          'Activo', '2026-03-10'),
-('Mateo',  'Rodríguez', '5.234.567-8', 'mateo.rodriguez@email.com',    '099 222 222', '$2y$12$TKsTID4s7JybYg.l7mJVkuhBL.3dz4utOUxK.w4..tfcZWZdANTcO', 'alumno',     NULL,                                          'Activo', '2026-03-10');
+('Carlos', 'Pérez',     '3.456.789-0', 'carlos.perez@inau.gov.uy',     '099 456 789', '$2y$10$JED5uwhdYzlfdaEHGV.h/ufi8ndBUToAMW/o6eL0nIRvtvr27nyFq', 'admin',      NULL,                                          'Activo', '2026-01-15'),
+('María',  'López',     '1.111.111-1', 'maria.lopez@inau.gov.uy',      '099 201 201', '$2y$10$cQ2J1aEKwswCISC93ENtteHaKvyAvLG8UXnJgx4eQFB9wIZPJzJbO',  'tallerista', 'Programación Web',                            'Activo', '2026-01-20'),
+('Martín', 'Rodríguez', '4.567.890-1', 'martin.rodriguez@ejemplo.com', '099 123 456', '$2y$10$rdPvrborLD//wRvHMI4KEOURB61VY7wssnw0EJKvOVcGoIENxD2Ke',  'tallerista', 'Programación Web, Robótica y Diseño Gráfico', 'Activo', '2026-03-10'),
+('Sofía',  'Pereira',   '5.123.456-7', 'sofia.pereira@email.com',      '099 111 111', '$2y$10$cnlQ14rzxuDbhi0qL5N/u.yzvKrLsrwtLrFcO8hlf9CZFUq/I1/zu',  'alumno',     NULL,                                          'Activo', '2026-03-10'),
+('Mateo',  'Rodríguez', '5.234.567-8', 'mateo.rodriguez@email.com',    '099 222 222', '$2y$10$uHnIUGe8xsRMw7eIjPHOnOXuPZ7BdYH6SeKVD1qYfSDXHM0E2nevO',  'alumno',     NULL,                                          'Activo', '2026-03-10');
  
  
 -- Alumnos: los dos primeros con cuenta vinculada, el tercero sin acceso todavía
@@ -361,8 +362,8 @@ INSERT INTO asistencias (taller_id, fecha) VALUES
  
 -- El tallerista 3 (Martín Rodríguez) es quien cargó esta jornada
 INSERT INTO registros_asistencia (asistencia_id, alumno_id, usuario_registro, estado, observaciones) VALUES
-(1, 1, 3, 'Presente',    NULL),
-(1, 2, 3, 'Ausente',     NULL);
+(1, 1, 3, 'Presente', NULL),
+(1, 2, 3, 'Ausente',  NULL);
  
  
 -- Trazabilidad de ejemplo
@@ -370,4 +371,3 @@ INSERT INTO trazabilidad (usuario_id, accion, entidad, entidad_id, fecha, detall
 (3, 'crear',  'contenido', 2, '2026-08-03 09:30:00', '{"titulo": "Primera página web", "tipo": "Tarea"}'),
 (3, 'editar', 'entrega',   1, '2026-08-16 08:12:00', '{"campo": "nota", "valor_anterior": null, "valor_nuevo": 9}'),
 (1, 'crear',  'alumno',    3, '2026-08-20 11:05:00', '{"nombre": "Valentina Gómez"}');
- 

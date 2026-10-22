@@ -5,6 +5,7 @@
  * EL MAPA DE LA API
  * ==================================================================
  * Todas las direcciones que existen, juntas y en una sola pantalla.
+ *
  * Si alguien pregunta "¿qué se le puede pedir a esta API?", se le
  * muestra este archivo y listo.
  *
@@ -14,6 +15,7 @@
  *
  * ------------------------------------------------------------------
  * La MISMA dirección puede hacer cosas distintas según el método.
+ *
  * Por ejemplo:
  *
  *   GET  /alumnos     -> lista alumnos
@@ -222,7 +224,7 @@ $router->add(
     '/talleres/{id}',
     'TallerController',
     'show',
-    'admin'
+    'auth'
 );
 
 // Crear un taller.
@@ -357,6 +359,60 @@ $router->add(
 
 
 // ------------------------------------------------------------------
+// REPORTES - NUEVO
+// Solo el administrador puede listar, consultar y generar reportes.
+// ------------------------------------------------------------------
+
+$router->add(
+    'GET',
+    '/reportes',
+    'ReporteController',
+    'index',
+    'admin'
+);
+
+$router->add(
+    'GET',
+    '/reportes/{id}',
+    'ReporteController',
+    'show',
+    'admin'
+);
+
+$router->add(
+    'POST',
+    '/reportes',
+    'ReporteController',
+    'store',
+    'admin'
+);
+
+
+//
+// REPORTES DEL TALLERISTA
+// Consultar únicamente los reportes de sus talleres asignados.
+// La autorización se verifica en ReporteService.
+//
+
+$router->add(
+    'GET',
+    '/mis-reportes',
+    'ReporteController',
+    'misReportes',
+    'admin|tallerista'
+);
+
+$router->add(
+    'GET',
+    '/mis-reportes/{id}',
+    'ReporteController',
+    'miReporte',
+    'admin|tallerista'
+);
+
+
+
+// ------------------------------------------------------------------
 // CONTENIDOS
 // Materiales y tareas publicados dentro de los talleres.
 // ------------------------------------------------------------------
@@ -406,6 +462,18 @@ $router->add(
 // ENTREGAS Y CORRECCIONES
 // Los alumnos realizan entregas y los talleristas las corrigen.
 // ------------------------------------------------------------------
+
+
+// Consultar exclusivamente la entrega del alumno autenticado.
+// Devuelve null si el alumno todavía no realizó la entrega.
+
+$router->add(
+    'GET',
+    '/contenidos/{id}/mi-entrega',
+    'EntregaController',
+    'miEntrega',
+    'alumno'
+);
 
 // Listar las entregas realizadas para una tarea.
 
@@ -537,5 +605,6 @@ $router->add(
     'delete',
     'admin|tallerista|alumno'
 );
+
 
 return $router;

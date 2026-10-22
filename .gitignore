@@ -1,0 +1,25 @@
+# Variables de entorno y credenciales privadas
+.env
+.env.*
+!.env.example
+!.env.docker.example
+
+# Dependencias PHP
+vendor/
+
+# Archivos temporales y copias de seguridad
+*.backup.js
+*.bak
+*.tmp
+verificar-claves-temporal.php
+verificar-sql-temporal.php
+
+# Archivos del sistema y editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Archivos generados por la aplicación
+Backend/api-completa/uploads/
+Backend/api-completa/storage/uploads/

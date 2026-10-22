@@ -11,7 +11,8 @@ class EntregaRepository extends Repository
                     fecha_entrega,
                     estado,
                     nota,
-                    comentario
+                    comentario,
+                    comentario_alumno
                 FROM entregas
                 WHERE id = :id
                 LIMIT 1";
@@ -37,6 +38,7 @@ class EntregaRepository extends Repository
                     e.estado,
                     e.nota,
                     e.comentario,
+                    e.comentario_alumno,
                     a.nombre,
                     a.apellido,
                     a.cedula
@@ -66,7 +68,8 @@ class EntregaRepository extends Repository
                     fecha_entrega,
                     estado,
                     nota,
-                    comentario
+                    comentario,
+                    comentario_alumno
                 FROM entregas
                 WHERE contenido_id = :contenido_id
                   AND alumno_id = :alumno_id
@@ -84,33 +87,39 @@ class EntregaRepository extends Repository
         return $row ?: null;
     }
 
+
     public function create(
         int $contenidoId,
         int $alumnoId,
-        string $fechaEntrega
+        string $fechaEntrega,
+        ?string $comentarioAlumno = null
     ): int {
         $sql = "INSERT INTO entregas (
-                    contenido_id,
-                    alumno_id,
-                    fecha_entrega,
-                    estado
-                ) VALUES (
-                    :contenido_id,
-                    :alumno_id,
-                    :fecha_entrega,
-                    'Entregada'
-                )";
+                contenido_id,
+                alumno_id,
+                fecha_entrega,
+                estado,
+                comentario_alumno
+            ) VALUES (
+                :contenido_id,
+                :alumno_id,
+                :fecha_entrega,
+                'Entregada',
+                :comentario_alumno
+            )";
 
         $query = $this->db->prepare($sql);
 
         $query->execute([
             'contenido_id' => $contenidoId,
             'alumno_id' => $alumnoId,
-            'fecha_entrega' => $fechaEntrega
+            'fecha_entrega' => $fechaEntrega,
+            'comentario_alumno' => $comentarioAlumno
         ]);
 
         return (int) $this->db->lastInsertId();
     }
+
 
     public function actualizarComentario(
         int $id,

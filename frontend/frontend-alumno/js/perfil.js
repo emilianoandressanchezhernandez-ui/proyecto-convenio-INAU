@@ -2,161 +2,329 @@
 /*
     PERFIL.JS - FRONTEND ALUMNO
 
-    Responsabilidades:
-    - Mostrar los datos del perfil del alumno.
-    - Permitir actualizar el correo, teléfono y biografía en modo de prueba.
-    - Permitir previsualizar y quitar una foto de perfil.
-    - Validar los campos y la confirmación de contraseña.
+    Integración con la API real.
 
-    IMPORTANTE:
-    - Los cambios se guardan en localStorage, no en la base de datos.
-    - La API actual permite actualizar correo y teléfono mediante PATCH /perfil.
-    - La biografía, la foto y el cambio de contraseña aún no tienen persistencia
-      implementada en el backend. La contraseña nunca se guarda en el navegador.
+    GET /perfil:
+    - Datos personales del alumno autenticado.
+
+    PATCH /perfil:
+    - Actualización de correo y teléfono.
+
+    La API todavía no permite guardar:
+    - Fotografía de perfil.
+    - Biografía.
+    - Cambio de contraseña.
+
+    No se utilizan datos simulados ni localStorage
+    para leer o guardar el perfil.
 */
 
 "use strict";
 
-const MAX_TAMANO_FOTO_PERFIL = 2 * 1024 * 1024; // 2 MB
-const TIPOS_FOTO_PERFIL_PERMITIDOS = ["image/jpeg", "image/png"];
-
 let usuarioPerfilActual = null;
+let guardandoPerfil = false;
 
 
-// ==============================
+// ======================================
 // INICIALIZACIÓN
-// ==============================
+// ======================================
 
-function inicializarPerfil() {
+async function inicializarPerfil() {
     try {
-        validarDatosPerfil();
-
-        usuarioPerfilActual = obtenerUsuarioPerfil();
-        mostrarDatosPerfil(usuarioPerfilActual);
+        prepararFuncionesNoDisponiblesPerfil();
         configurarFormularioPerfil();
-        configurarFotoPerfil();
-        configurarBiografiaPerfil();
+
+        const resultado = await solicitarPerfilAlumno(
+            "GET",
+            "/perfil"
+        );
+
+        usuarioPerfilActual = resultado;
+
+        if (typeof sincronizarUsuarioAlumno === "function") {
+            sincronizarUsuarioAlumno(usuarioPerfilActual);
+        }
+
+        mostrarDatosPerfil(usuarioPerfilActual);
+        ocultarAlertaPerfil();
 
     } catch (error) {
-        console.error("Error al inicializar el perfil del alumno:", error);
+        console.error(
+            "Error al cargar el perfil del alumno:",
+            error
+        );
+
         mostrarAlertaPerfil(
-            "No se pudieron cargar los datos del perfil. Recargá la página e intentá nuevamente.",
+            error.message ||
+            "No se pudo cargar la información del perfil.",
             "danger"
         );
+
         deshabilitarFormularioPerfil();
     }
 }
 
-function validarDatosPerfil() {
-    if (!window.DATOS_SIMULADOS || typeof window.DATOS_SIMULADOS !== "object") {
-        throw new Error("No se encontraron los datos simulados.");
+
+// ======================================
+// PETICIONES A LA API
+// ======================================
+
+async function solicitarPerfilAlumno(
+    metodo,
+    ruta,
+    datos = null
+) {
+    const opciones = {
+        method: metodo,
+        credentials: "include",
+        cache: "no-store",
+        headers: {
+            Accept: "application/json"
+        }
+    };
+
+    if (datos !== null) {
+        opciones.headers["Content-Type"] =
+            "application/json";
+
+        opciones.body = JSON.stringify(datos);
     }
 
-    if (!window.DATOS_SIMULADOS.usuarioActual || typeof window.DATOS_SIMULADOS.usuarioActual !== "object") {
-        throw new Error("No se encontró el alumno actual.");
+    const respuesta = await fetch(
+        `${ALUMNO_API_URL}${ruta}`,
+        opciones
+    );
+
+    if (respuesta.status === 401) {
+        if (typeof redirigirAlLogin === "function") {
+            redirigirAlLogin();
+        }
+
+        throw new Error(
+            "La sesión expiró. Iniciá sesión nuevamente."
+        );
     }
+
+    let resultado;
+
+    try {
+        resultado = await respuesta.json();
+    } catch (error) {
+        throw new Error(
+            "El servidor no devolvió una respuesta JSON válida."
+        );
+    }
+
+    if (!respuesta.ok || !resultado.ok) {
+        throw new Error(
+            resultado.mensaje ||
+            `La solicitud falló (HTTP ${respuesta.status}).`
+        );
+    }
+
+    const perfil = resultado.datos?.usuario ??
+        resultado.datos;
+
+    if (
+        !perfil ||
+        typeof perfil !== "object" ||
+        Array.isArray(perfil)
+    ) {
+        throw new Error(
+            "La API no devolvió un perfil válido."
+        );
+    }
+
+    return perfil;
 }
 
-function obtenerUsuarioPerfil() {
-    if (typeof obtenerUsuarioActual === "function") {
-        return obtenerUsuarioActual();
-    }
 
-    return window.DATOS_SIMULADOS.usuarioActual;
-}
-
-
-// ==============================
-// MOSTRAR LOS DATOS
-// ==============================
+// ======================================
+// MOSTRAR INFORMACIÓN PERSONAL
+// ======================================
 
 function mostrarDatosPerfil(usuario) {
     colocarValorPerfil("nombre", usuario.nombre);
     colocarValorPerfil("apellido", usuario.apellido);
     colocarValorPerfil("cedula", usuario.cedula);
-    colocarValorPerfil("fecha-nacimiento", formatearFechaPerfil(usuario.fechaNacimiento));
+
+    colocarValorPerfil(
+        "fecha-nacimiento",
+        formatearFechaPerfil(
+            usuario.fecha_nacimiento
+        )
+    );
+
     colocarValorPerfil("correo", usuario.correo);
     colocarValorPerfil("telefono", usuario.telefono);
-    colocarValorPerfil("referente-adulto", usuario.referenteAdulto);
-    colocarValorPerfil("centro-referencia", usuario.centroReferencia);
-    colocarValorPerfil("biografia", usuario.biografia || "");
 
-    const nombreCompleto = [usuario.nombre, usuario.apellido].filter(Boolean).join(" ");
-    colocarTextoPerfil("perfil-nombre", nombreCompleto || "Alumno");
-    colocarTextoPerfil("perfil-rol", usuario.rol || "Alumno");
+    colocarValorPerfil(
+        "referente-adulto",
+        usuario.referente_adulto
+    );
 
-    // En la muestra, id representa la ficha de alumnos. usuarioId es el ID
-    // separado de la cuenta de acceso, de acuerdo al modelo SQL del proyecto.
-    colocarTextoPerfil("usuario-id", usuario.id ?? "--");
+    colocarValorPerfil(
+        "centro-referencia",
+        usuario.centro_referencia
+    );
+
+    const nombreCompleto = [
+        usuario.nombre,
+        usuario.apellido
+    ].filter(Boolean).join(" ");
+
+    colocarTextoPerfil(
+        "perfil-nombre",
+        nombreCompleto || "Alumno"
+    );
+
+    colocarTextoPerfil(
+        "perfil-rol",
+        "Alumno"
+    );
+
+    // Mostrar el identificador de la ficha del alumno.
+    colocarTextoPerfil(
+        "usuario-id",
+        usuario.alumno_id
+    );
+
     colocarTextoPerfil(
         "fecha-ingreso",
-        formatearFechaPerfil(usuario.fechaIngreso || usuario.fechaRegistro)
+        formatearFechaPerfil(
+            usuario.fecha_ingreso
+        )
     );
-    colocarTextoPerfil("ultimo-acceso", formatearFechaHoraPerfil(usuario.ultimoAcceso));
 
-    mostrarFotoPerfil(usuario.fotoPerfil);
-    document.title = `INAU - Mi Perfil${nombreCompleto ? ` - ${nombreCompleto}` : ""}`;
+    colocarTextoPerfil(
+        "ultimo-acceso",
+        formatearFechaHoraPerfil(
+            usuario.ultimoAcceso
+        )
+    );
+
+    mostrarFotoPerfil();
+
+    document.title = nombreCompleto
+        ? `INAU - Mi Perfil - ${nombreCompleto}`
+        : "INAU - Mi Perfil";
 }
+
+
+// ======================================
+// FORMATEAR FECHAS
+// ======================================
 
 function formatearFechaPerfil(fechaISO) {
-    if (!fechaISO) return "Sin información";
+    if (!fechaISO) {
+        return "Sin información";
+    }
 
     if (typeof formatearFecha === "function") {
-        const fecha = formatearFecha(fechaISO);
-        return fecha === "-" ? "Sin información" : fecha;
+        const resultado = formatearFecha(fechaISO);
+
+        return resultado === "-"
+            ? "Sin información"
+            : resultado;
     }
 
-    const coincidencia = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(fechaISO));
-    return coincidencia
-        ? `${coincidencia[3]}/${coincidencia[2]}/${coincidencia[1]}`
-        : "Sin información";
+    const coincidencia =
+        /^(\d{4})-(\d{2})-(\d{2})/.exec(
+            String(fechaISO)
+        );
+
+    if (!coincidencia) {
+        return "Sin información";
+    }
+
+    return (
+        `${coincidencia[3]}/` +
+        `${coincidencia[2]}/` +
+        `${coincidencia[1]}`
+    );
 }
 
-function formatearFechaHoraPerfil(valorFecha) {
-    if (!valorFecha) return "Sin información";
+function formatearFechaHoraPerfil(fechaHora) {
+    if (!fechaHora) {
+        return "Sin información";
+    }
 
     if (typeof formatearFechaHora === "function") {
-        const fecha = formatearFechaHora(valorFecha);
-        return fecha === "-" ? "Sin información" : fecha;
+        const resultado = formatearFechaHora(fechaHora);
+
+        return resultado === "-"
+            ? "Sin información"
+            : resultado;
     }
 
-    const texto = String(valorFecha).replace("T", " ");
+    const texto = String(fechaHora).replace(
+        "T",
+        " "
+    );
+
     const partes = texto.split(" ");
-    const fecha = formatearFechaPerfil(partes[0]);
-    return partes[1] ? `${fecha} ${partes[1].slice(0, 5)}` : fecha;
+
+    const fecha = formatearFechaPerfil(
+        partes[0]
+    );
+
+    if (partes[1]) {
+        return `${fecha} ${partes[1].slice(0, 5)}`;
+    }
+
+    return fecha;
 }
 
 
-// ==============================
-// GUARDAR CONTACTO Y BIOGRAFÍA
-// ==============================
+// ======================================
+// CONFIGURAR FORMULARIO
+// ======================================
 
 function configurarFormularioPerfil() {
-    const formulario = document.getElementById("form-perfil");
-    if (!formulario) throw new Error("No se encontró el formulario del perfil.");
+    const formulario = document.getElementById(
+        "form-perfil"
+    );
 
-    if (formulario.dataset.perfilConfigurado === "true") return;
+    if (!formulario) {
+        throw new Error(
+            "No se encontró el formulario del perfil."
+        );
+    }
+
+    if (
+        formulario.dataset.perfilConfigurado === "true"
+    ) {
+        return;
+    }
 
     formulario.dataset.perfilConfigurado = "true";
-    formulario.addEventListener("submit", guardarCambiosPerfil);
+
+    formulario.addEventListener(
+        "submit",
+        guardarCambiosPerfil
+    );
 }
 
-function guardarCambiosPerfil(evento) {
+
+// ======================================
+// GUARDAR CORREO Y TELÉFONO
+// ======================================
+
+async function guardarCambiosPerfil(evento) {
     evento.preventDefault();
+
+    if (guardandoPerfil || !usuarioPerfilActual) {
+        return;
+    }
+
     ocultarAlertaPerfil();
 
     const correo = obtenerValorPerfil("correo");
     const telefono = obtenerValorPerfil("telefono");
-    const biografia = obtenerValorPerfil("biografia");
-    const password = obtenerValorPerfil("password", false);
-    const confirmarPassword = obtenerValorPerfil("confirmar-password", false);
 
     const error = validarDatosFormularioPerfil({
         correo,
-        telefono,
-        biografia,
-        password,
-        confirmarPassword
+        telefono
     });
 
     if (error) {
@@ -164,49 +332,92 @@ function guardarCambiosPerfil(evento) {
         return;
     }
 
-    const usuarioActualizado = {
-        ...usuarioPerfilActual,
-        correo,
-        telefono,
-        biografia
-    };
+    const formulario = document.getElementById(
+        "form-perfil"
+    );
 
-    if (!guardarUsuarioPerfil(usuarioActualizado)) {
+    const botonGuardar = formulario?.querySelector(
+        'button[type="submit"]'
+    );
+
+    guardandoPerfil = true;
+
+    if (botonGuardar) {
+        botonGuardar.disabled = true;
+    }
+
+    try {
+        const perfilActualizado =
+            await solicitarPerfilAlumno(
+                "PATCH",
+                "/perfil",
+                {
+                    correo,
+                    telefono
+                }
+            );
+
+        usuarioPerfilActual = perfilActualizado;
+
+        // Mantener actualizada la identidad compartida.
+        if (
+            typeof sincronizarUsuarioAlumno ===
+            "function"
+        ) {
+            sincronizarUsuarioAlumno(
+                perfilActualizado
+            );
+        }
+
+        mostrarDatosPerfil(perfilActualizado);
+
+        if (
+            typeof mostrarUsuarioEnNavbar ===
+            "function"
+        ) {
+            mostrarUsuarioEnNavbar();
+        }
+
         mostrarAlertaPerfil(
-            "No se pudieron guardar los cambios en este navegador. Revisá el espacio disponible e intentá nuevamente.",
+            "Los datos de contacto se guardaron correctamente.",
+            "success"
+        );
+
+    } catch (error) {
+        console.error(
+            "Error al actualizar el perfil:",
+            error
+        );
+
+        mostrarAlertaPerfil(
+            error.message ||
+            "No se pudieron guardar los cambios.",
             "danger"
         );
-        return;
+
+    } finally {
+        guardandoPerfil = false;
+
+        if (botonGuardar) {
+            botonGuardar.disabled = false;
+        }
     }
-
-    usuarioPerfilActual = usuarioActualizado;
-    limpiarCamposContrasenaPerfil();
-    mostrarDatosPerfil(usuarioPerfilActual);
-
-    if (typeof mostrarUsuarioEnNavbar === "function") {
-        mostrarUsuarioEnNavbar();
-    }
-
-    if (password || confirmarPassword) {
-        mostrarAlertaPerfil(
-            "El correo, teléfono y biografía se guardaron en este navegador. El cambio de contraseña es solo una validación de prueba: no se modificó la contraseña real.",
-            "warning"
-        );
-        return;
-    }
-
-    mostrarAlertaPerfil(
-        "Los cambios del perfil se guardaron en este navegador (modo de prueba).",
-        "success"
-    );
 }
+
+
+// ======================================
+// VALIDACIONES
+// ======================================
 
 function validarDatosFormularioPerfil(datos) {
     if (!datos.correo) {
         return "Debés completar el correo electrónico.";
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo)) {
+    const correoValido =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!correoValido.test(datos.correo)) {
         return "El correo electrónico no tiene un formato válido.";
     }
 
@@ -215,251 +426,215 @@ function validarDatosFormularioPerfil(datos) {
     }
 
     if (!validarTelefonoPerfil(datos.telefono)) {
-        return "El teléfono debe contener entre 8 y 15 dígitos. Podés usar espacios, guiones, paréntesis o el signo +.";
-    }
-
-    if (datos.biografia.length > 300) {
-        return "La biografía no puede superar los 300 caracteres.";
-    }
-
-    const escribioPassword = datos.password !== "";
-    const escribioConfirmacion = datos.confirmarPassword !== "";
-
-    if (escribioPassword || escribioConfirmacion) {
-        if (!escribioPassword || !escribioConfirmacion) {
-            return "Para probar el cambio de contraseña, completá ambos campos.";
-        }
-
-        if (datos.password.length < 8) {
-            return "La nueva contraseña debe tener al menos 8 caracteres.";
-        }
-
-        if (datos.password !== datos.confirmarPassword) {
-            return "La contraseña y su confirmación no coinciden.";
-        }
+        return (
+            "El teléfono debe contener entre 8 y 15 dígitos. " +
+            "Podés utilizar espacios, guiones, paréntesis o +."
+        );
     }
 
     return null;
 }
 
 function validarTelefonoPerfil(telefono) {
-    const limpio = String(telefono).replace(/[\s\-()+]/g, "");
+    const limpio = String(telefono).replace(
+        /[\s\-()+]/g,
+        ""
+    );
+
     return /^\d{8,15}$/.test(limpio);
 }
 
-function guardarUsuarioPerfil(usuario) {
-    let resultado;
 
-    if (typeof guardarDato === "function") {
-        resultado = guardarDato("usuarioActual", usuario);
-    } else {
-        try {
-            localStorage.setItem("usuarioActual", JSON.stringify(usuario));
-            resultado = true;
-        } catch (error) {
-            console.error("No se pudo guardar el perfil en localStorage:", error);
-            resultado = false;
+// ======================================
+// FUNCIONES TODAVÍA NO DISPONIBLES
+// ======================================
+
+function prepararFuncionesNoDisponiblesPerfil() {
+
+    // Fotografía de perfil:
+    // no existe persistencia en el backend.
+
+    const inputFoto = document.getElementById(
+        "input-foto-perfil"
+    );
+
+    const botonEliminarFoto = document.getElementById(
+        "btn-eliminar-foto"
+    );
+
+    if (inputFoto) {
+        inputFoto.disabled = true;
+    }
+
+    if (botonEliminarFoto) {
+        botonEliminarFoto.disabled = true;
+        botonEliminarFoto.title =
+            "Función no disponible por el momento.";
+    }
+
+    const etiquetaFoto = document.querySelector(
+        'label[for="input-foto-perfil"]'
+    );
+
+    if (etiquetaFoto) {
+        etiquetaFoto.classList.add("d-none");
+    }
+
+    // Biografía:
+    // no existe persistencia en el backend.
+
+    const biografia = document.getElementById(
+        "biografia"
+    );
+
+    if (biografia) {
+        biografia.value = "";
+        biografia.disabled = true;
+
+        biografia.placeholder =
+            "Función no disponible por el momento.";
+
+        const ayuda = biografia.parentElement
+            ?.querySelector(".form-text");
+
+        if (ayuda) {
+            ayuda.textContent =
+                "La biografía estará disponible cuando " +
+                "se implemente su almacenamiento en el servidor.";
         }
     }
 
-    if (resultado === false) return false;
-
-    window.DATOS_SIMULADOS.usuarioActual = usuario;
-    return true;
-}
-
-function limpiarCamposContrasenaPerfil() {
-    colocarValorPerfil("password", "");
-    colocarValorPerfil("confirmar-password", "");
-}
-
-
-// ==============================
-// FOTO DE PERFIL
-// ==============================
-
-function configurarFotoPerfil() {
-    const inputFoto = document.getElementById("input-foto-perfil");
-    const botonEliminar = document.getElementById("btn-eliminar-foto");
-
-    if (inputFoto && inputFoto.dataset.fotoConfigurada !== "true") {
-        inputFoto.dataset.fotoConfigurada = "true";
-        inputFoto.addEventListener("change", procesarFotoSeleccionadaPerfil);
-    }
-
-    if (botonEliminar && botonEliminar.dataset.fotoConfigurada !== "true") {
-        botonEliminar.dataset.fotoConfigurada = "true";
-        botonEliminar.addEventListener("click", eliminarFotoPerfil);
-    }
-}
-
-function procesarFotoSeleccionadaPerfil(evento) {
-    const input = evento.currentTarget;
-    const archivo = input.files?.[0];
-
-    if (!archivo) return;
-
-    if (!TIPOS_FOTO_PERFIL_PERMITIDOS.includes(archivo.type)) {
-        input.value = "";
-        mostrarAlertaPerfil("La foto debe ser una imagen JPG o PNG.", "warning");
-        return;
-    }
-
-    if (archivo.size <= 0 || archivo.size > MAX_TAMANO_FOTO_PERFIL) {
-        input.value = "";
-        mostrarAlertaPerfil("La foto debe pesar más de 0 bytes y no superar los 2 MB.", "warning");
-        return;
-    }
-
-    const lector = new FileReader();
-
-    lector.addEventListener("load", () => {
-        if (typeof lector.result !== "string" || !lector.result.startsWith("data:image/")) {
-            input.value = "";
-            mostrarAlertaPerfil("No se pudo leer la imagen seleccionada.", "danger");
-            return;
-        }
-
-        const usuarioActualizado = {
-            ...usuarioPerfilActual,
-            fotoPerfil: lector.result
-        };
-
-        if (!guardarUsuarioPerfil(usuarioActualizado)) {
-            input.value = "";
-            mostrarAlertaPerfil(
-                "No se pudo guardar la foto en este navegador. Probá con una imagen más pequeña.",
-                "danger"
-            );
-            return;
-        }
-
-        usuarioPerfilActual = usuarioActualizado;
-        mostrarFotoPerfil(usuarioPerfilActual.fotoPerfil);
-        mostrarAlertaPerfil(
-            "La foto se guardó en este navegador (modo de prueba). Todavía no se subió al servidor.",
-            "success"
+    const botonEliminarBiografia =
+        document.getElementById(
+            "btn-eliminar-biografia"
         );
-        input.value = "";
-    });
 
-    lector.addEventListener("error", () => {
-        input.value = "";
-        mostrarAlertaPerfil("No se pudo leer el archivo de imagen.", "danger");
-    });
-
-    lector.readAsDataURL(archivo);
-}
-
-function eliminarFotoPerfil() {
-    if (!usuarioPerfilActual?.fotoPerfil) {
-        mostrarFotoPerfil(null);
-        mostrarAlertaPerfil("No hay una foto de perfil para quitar.", "info");
-        return;
+    if (botonEliminarBiografia) {
+        botonEliminarBiografia.disabled = true;
     }
 
-    const usuarioActualizado = {
-        ...usuarioPerfilActual,
-        fotoPerfil: null
-    };
+    // Cambio de contraseña:
+    // no se permite desde PATCH /perfil.
 
-    if (!guardarUsuarioPerfil(usuarioActualizado)) {
-        mostrarAlertaPerfil("No se pudo quitar la foto guardada.", "danger");
-        return;
+    const password = document.getElementById(
+        "password"
+    );
+
+    const confirmarPassword =
+        document.getElementById(
+            "confirmar-password"
+        );
+
+    if (password) {
+        password.value = "";
+        password.disabled = true;
+        password.placeholder =
+            "No disponible por el momento";
     }
 
-    usuarioPerfilActual = usuarioActualizado;
-    mostrarFotoPerfil(null);
-    mostrarAlertaPerfil("La foto se quitó de este navegador (modo de prueba).", "success");
+    if (confirmarPassword) {
+        confirmarPassword.value = "";
+        confirmarPassword.disabled = true;
+        confirmarPassword.placeholder =
+            "No disponible por el momento";
+    }
 }
 
-function mostrarFotoPerfil(foto) {
-    const contenedor = document.getElementById("logo-circle-perfil");
-    if (!contenedor) return;
+
+// ======================================
+// FOTO PREDETERMINADA
+// ======================================
+
+function mostrarFotoPerfil() {
+    const contenedor = document.getElementById(
+        "logo-circle-perfil"
+    );
+
+    if (!contenedor) {
+        return;
+    }
 
     contenedor.replaceChildren();
 
-    if (typeof foto === "string" && foto.startsWith("data:image/")) {
-        const imagen = document.createElement("img");
-        imagen.src = foto;
-        imagen.alt = "Foto de perfil del alumno";
-        contenedor.appendChild(imagen);
-        return;
-    }
-
     const icono = document.createElement("i");
+
     icono.className = "bi bi-person-fill";
     icono.setAttribute("aria-hidden", "true");
+
     contenedor.appendChild(icono);
 }
 
 
-// ==============================
-// BIOGRAFÍA
-// ==============================
+// ======================================
+// AUXILIARES
+// ======================================
 
-function configurarBiografiaPerfil() {
-    const boton = document.getElementById("btn-eliminar-biografia");
+function obtenerValorPerfil(elementoId) {
+    const elemento = document.getElementById(
+        elementoId
+    );
 
-    if (!boton || boton.dataset.biografiaConfigurada === "true") return;
-
-    boton.dataset.biografiaConfigurada = "true";
-    boton.addEventListener("click", eliminarBiografiaPerfil);
-}
-
-function eliminarBiografiaPerfil() {
-    colocarValorPerfil("biografia", "");
-
-    const usuarioActualizado = {
-        ...usuarioPerfilActual,
-        biografia: ""
-    };
-
-    if (!guardarUsuarioPerfil(usuarioActualizado)) {
-        mostrarAlertaPerfil("No se pudo eliminar la biografía guardada.", "danger");
-        return;
+    if (!elemento) {
+        return "";
     }
 
-    usuarioPerfilActual = usuarioActualizado;
-    mostrarAlertaPerfil(
-        "La biografía se eliminó de los datos guardados en este navegador (modo de prueba).",
-        "success"
-    );
-}
-
-
-// ==============================
-// AUXILIARES DE FORMULARIO Y ALERTAS
-// ==============================
-
-function obtenerValorPerfil(elementoId, recortar = true) {
-    const elemento = document.getElementById(elementoId);
-    if (!elemento) return "";
-
-    const valor = elemento.value ?? "";
-    return recortar ? String(valor).trim() : String(valor);
+    return String(elemento.value ?? "").trim();
 }
 
 function colocarValorPerfil(elementoId, valor) {
-    const elemento = document.getElementById(elementoId);
-    if (elemento) elemento.value = valor ?? "";
-}
+    const elemento = document.getElementById(
+        elementoId
+    );
 
-function colocarTextoPerfil(elementoId, valor) {
-    const elemento = document.getElementById(elementoId);
     if (elemento) {
-        elemento.textContent = valor === null || valor === undefined || valor === ""
-            ? "Sin información"
-            : String(valor);
+        elemento.value = valor ?? "";
     }
 }
 
-function mostrarAlertaPerfil(mensaje, tipo = "info") {
-    const alerta = document.getElementById("alerta-perfil");
-    if (!alerta) return;
+function colocarTextoPerfil(elementoId, valor) {
+    const elemento = document.getElementById(
+        elementoId
+    );
 
-    const tiposPermitidos = ["success", "danger", "warning", "info"];
-    const tipoSeguro = tiposPermitidos.includes(tipo) ? tipo : "info";
+    if (!elemento) {
+        return;
+    }
+
+    elemento.textContent =
+        valor === null ||
+            valor === undefined ||
+            valor === ""
+            ? "Sin información"
+            : String(valor);
+}
+
+
+// ======================================
+// ALERTAS
+// ======================================
+
+function mostrarAlertaPerfil(
+    mensaje,
+    tipo = "info"
+) {
+    const alerta = document.getElementById(
+        "alerta-perfil"
+    );
+
+    if (!alerta) {
+        return;
+    }
+
+    const tiposPermitidos = [
+        "success",
+        "danger",
+        "warning",
+        "info"
+    ];
+
+    const tipoSeguro = tiposPermitidos.includes(
+        tipo
+    ) ? tipo : "info";
 
     alerta.className = `alert alert-${tipoSeguro}`;
     alerta.setAttribute("role", "alert");
@@ -468,27 +643,35 @@ function mostrarAlertaPerfil(mensaje, tipo = "info") {
 }
 
 function ocultarAlertaPerfil() {
-    const alerta = document.getElementById("alerta-perfil");
-    if (!alerta) return;
+    const alerta = document.getElementById(
+        "alerta-perfil"
+    );
+
+    if (!alerta) {
+        return;
+    }
 
     alerta.textContent = "";
-    alerta.classList.add("d-none");
-    alerta.classList.remove("alert-success", "alert-danger", "alert-warning", "alert-info");
+    alerta.className = "alert d-none";
 }
 
-function deshabilitarFormularioPerfil() {
-    const formulario = document.getElementById("form-perfil");
-    if (!formulario) return;
 
-    formulario.querySelectorAll("input, textarea, button").forEach((control) => {
+// ======================================
+// BLOQUEAR FORMULARIO ANTE ERRORES
+// ======================================
+
+function deshabilitarFormularioPerfil() {
+    const formulario = document.getElementById(
+        "form-perfil"
+    );
+
+    if (!formulario) {
+        return;
+    }
+
+    formulario.querySelectorAll(
+        "input, textarea, button"
+    ).forEach((control) => {
         control.disabled = true;
     });
-
-    const botonFoto = document.getElementById("btn-eliminar-foto");
-    const inputFoto = document.getElementById("input-foto-perfil");
-    const botonBiografia = document.getElementById("btn-eliminar-biografia");
-
-    if (botonFoto) botonFoto.disabled = true;
-    if (inputFoto) inputFoto.disabled = true;
-    if (botonBiografia) botonBiografia.disabled = true;
 }

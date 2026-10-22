@@ -18,8 +18,15 @@ class AlumnoRepository extends Repository
                 centro_referencia,
                 fecha_nacimiento,
                 estado,
-                fecha_registro,
-                ultima_asistencia,
+                fecha_ingreso AS fecha_registro,
+                (
+                    SELECT MAX(a2.fecha)
+                    FROM asistencias a2
+                    INNER JOIN registros_asistencia r2
+                        ON r2.asistencia_id = a2.id
+                    WHERE r2.alumno_id = alumnos.id
+                      AND r2.estado = 'Presente'
+                ) AS ultima_asistencia,
                 observaciones
             FROM alumnos
             ORDER BY apellido ASC, nombre ASC
@@ -46,8 +53,15 @@ class AlumnoRepository extends Repository
                 centro_referencia,
                 fecha_nacimiento,
                 estado,
-                fecha_registro,
-                ultima_asistencia,
+                fecha_ingreso AS fecha_registro,
+                (
+                    SELECT MAX(a2.fecha)
+                    FROM asistencias a2
+                    INNER JOIN registros_asistencia r2
+                        ON r2.asistencia_id = a2.id
+                    WHERE r2.alumno_id = alumnos.id
+                      AND r2.estado = 'Presente'
+                ) AS ultima_asistencia,
                 observaciones
             FROM alumnos
             WHERE id = :id
@@ -81,8 +95,15 @@ class AlumnoRepository extends Repository
                 centro_referencia,
                 fecha_nacimiento,
                 estado,
-                fecha_registro,
-                ultima_asistencia,
+                fecha_ingreso AS fecha_registro,
+                (
+                    SELECT MAX(a2.fecha)
+                    FROM asistencias a2
+                    INNER JOIN registros_asistencia r2
+                        ON r2.asistencia_id = a2.id
+                    WHERE r2.alumno_id = alumnos.id
+                      AND r2.estado = 'Presente'
+                ) AS ultima_asistencia,
                 observaciones
             FROM alumnos
             WHERE usuario_id = :usuario_id
@@ -137,7 +158,7 @@ class AlumnoRepository extends Repository
                 centro_referencia,
                 fecha_nacimiento,
                 estado,
-                fecha_registro,
+                fecha_ingreso,
                 observaciones
             ) VALUES (
                 :usuario_id,

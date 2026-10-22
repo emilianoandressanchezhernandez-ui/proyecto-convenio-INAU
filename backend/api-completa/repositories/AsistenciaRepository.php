@@ -99,7 +99,7 @@ class AsistenciaRepository extends Repository
                     alumno_id,
                     estado,
                     observaciones,
-                    usuario_registro_id
+                    usuario_registro AS usuario_registro_id
                 FROM registros_asistencia
                 WHERE asistencia_id = :asistencia_id
                   AND alumno_id = :alumno_id
@@ -125,7 +125,7 @@ class AsistenciaRepository extends Repository
                     ra.alumno_id,
                     ra.estado,
                     ra.observaciones,
-                    ra.usuario_registro_id,
+                    ra.usuario_registro AS usuario_registro_id,
                     a.nombre,
                     a.apellido,
                     a.cedula
@@ -156,7 +156,7 @@ class AsistenciaRepository extends Repository
                     alumno_id,
                     estado,
                     observaciones,
-                    usuario_registro_id
+                    usuario_registro
                 ) VALUES (
                     :asistencia_id,
                     :alumno_id,
@@ -188,7 +188,7 @@ class AsistenciaRepository extends Repository
         $sql = "UPDATE registros_asistencia
                 SET estado = :estado,
                     observaciones = :observaciones,
-                    usuario_registro_id = :usuario_registro_id
+                    usuario_registro = :usuario_registro_id
                 WHERE asistencia_id = :asistencia_id
                   AND alumno_id = :alumno_id";
 
