@@ -113,7 +113,7 @@
 ---
 
 ### Esfuerzo estimado: 
-**76 Puntos, distribuidos en seis épicas principales de desarrollo, correspondientes al alcance ajustado de la primera versión.**
+**63 puntos, distribuidos en seis épicas principales de desarrollo, correspondientes al alcance ajustado de la primera versión.**
 
 ---
 
