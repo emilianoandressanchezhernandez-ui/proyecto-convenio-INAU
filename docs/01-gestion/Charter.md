@@ -135,7 +135,12 @@
    5. - Acta de Cierre.
    6. - Declaracion de Etica de IA-(terminarlo, y agregar fechas).
    7. - Acta de reuniones(Agregar fechas).
-   8. - Eliminar el documento de doker deskop. > Eliminado.
+   
+   >--
+   8. - Eliminar el documento de doker deskop de todas partes. > Completado parcialmente(Revision de coherencia falta).
    9. - Hacer el documento de testing y Api.
-   10. - Justificacion tecnologica revisar. > Revisado y ajustado.
-   11. - Revisar el documento de doker. > Revisado y ajustado.
+   10. - Justificacion tecnologica revisar. > Completado.
+   11. - Revisar el documento de doker. > Completado.
+   --<
+
+   12. - Revision de Coherencia de ultimo(Ultimo documento a actualizar).

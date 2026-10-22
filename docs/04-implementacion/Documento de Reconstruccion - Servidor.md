@@ -260,5 +260,3 @@ sudo cp -r frontend/* /var/www/talleres/
 ## Relación con el resto de la documentación
 
 - El entorno de contenedores (servicios, imagen, variables) está definido en `backend/api-completa/compose.yaml` y su `Dockerfile`; su documentación de diseño está en `docs/04-implementacion/inau-infraestructura-docker.md`.
-- La prueba del entorno en una máquina local está en `docs/04-implementacion/Documento de Reconstruccion - Doker desktop.md`.
-- Este documento cubre el escenario restante: montar el sitio en un servidor nuevo, de cero, hasta dejarlo en producción con HTTPS.

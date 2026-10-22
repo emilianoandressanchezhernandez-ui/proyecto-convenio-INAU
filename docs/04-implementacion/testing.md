@@ -21,7 +21,7 @@
 |---|---|
 | Fecha de ejecución | <fecha> |
 | Rama / commit | `cambios-frontend` / `<commit>` |
-| Entorno | Docker Desktop (ver Documento de Reconstrucción) |
+| Entorno | Docker Desktop |
 | API | http://localhost:8002 |
 | Frontend | http://localhost:8000 |
 | Navegadores | <Chrome x, Firefox y> |

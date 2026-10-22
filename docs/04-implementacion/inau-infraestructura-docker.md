@@ -4,7 +4,7 @@
 
 ---
 
-Este documento describe el entorno en contenedores de **TheNewfutures**. El entorno vive en `backend/api-completa/` y levanta **la API PHP y la base de datos MySQL** con `docker compose`. El frontend (HTML + CSS + JS) no forma parte de estos contenedores: es un sitio estático que se sirve aparte y consume la API. Docker reemplaza el uso de **XAMPP o servidor local** (mencionado en `docs/03-diseño/Justificacion Tecnologica.md`, sección 1.3), de modo que el equipo trabaje con el mismo entorno y el proyecto pueda trasladarse a un servidor externo cuando INAU lo requiera.
+Este documento describe el entorno en contenedores de **TheNewfutures**. El entorno vive en `backend/api-completa/` y levanta **la API PHP y la base de datos MySQL** con `docker compose`. El frontend (HTML + CSS + JS) no forma parte de estos contenedores: es un sitio estático que se sirve aparte y consume la API. Docker reemplaza la instalación de un **servidor local** (como XAMPP) en cada computadora, de modo que el equipo trabaje con el mismo entorno y el proyecto pueda trasladarse a un servidor externo cuando INAU lo requiera.
 
 ---
 
@@ -93,9 +93,6 @@ El archivo está en `backend/api-completa/docker/php-apache/Dockerfile`. Sus dec
 | Base `php:8.3-apache` | PHP y servidor web en una sola imagen. |
 | Extensión `pdo_mysql` | Conexión de la API a MySQL mediante PDO. |
 | Módulo `rewrite` + `app.conf` con `AllowOverride All` | Permite que Apache envíe todas las rutas de la API a `index.php` mediante `.htaccess`. `app.conf` desactiva además el listado de carpetas (`Options -Indexes`). |
-
->**Nota: revisar, posiblemente borrar**: | Composer en una etapa previa de construcción | Las dependencias se instalan desde `composer.lock` (`--no-dev`), sin copiar la carpeta `vendor` desde la computadora de cada integrante. |
-
 | `uploads.ini` | NRF12: limita el tamaño de los archivos subidos (`upload_max_filesize = 10M`, `post_max_size = 12M`). El tipo de archivo se valida en la propia API (NRF11). |
 | `entrypoint.sh` | Crea la carpeta `uploads` y le asigna los permisos del usuario de Apache al iniciar el contenedor. |
 
@@ -113,7 +110,17 @@ La conexión está implementada en `backend/api-completa/core/Database.php` medi
 
 ## 7. Puesta en marcha
 
-Los comandos se ejecutan desde `backend/api-completa/`. El procedimiento completo —prueba limpia, operación, logs y verificación de la base— está en `docs/04-implementacion/Documento de Reconstruccion - Doker desktop.md`. Para un servidor nuevo, ver `docs/04-implementacion/Documento de Reconstruccion - Servidor.md`.
+Los comandos se ejecutan desde `backend/api-completa/`:
+
+```bash
+docker compose up -d --build   # construye la imagen y levanta los servicios
+docker compose ps              # verifica que api y database estén activos
+docker compose logs api        # revisa los logs de la API (o database, para MySQL)
+docker compose down            # detiene los servicios sin borrar los datos
+docker compose down -v         # detiene y borra los volúmenes: la base se recrea en el próximo inicio
+```
+
+Para un servidor nuevo, el procedimiento completo está en `docs/04-implementacion/Documento de Reconstruccion - Servidor.md`.
 
 Accesos por defecto en desarrollo:
 
