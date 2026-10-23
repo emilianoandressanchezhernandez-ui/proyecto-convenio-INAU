@@ -137,7 +137,7 @@
    7. - Acta de reuniones(Agregar fechas).
    
    >--
-   8. - Eliminar el documento de doker deskop de todas partes. > Completado parcialmente(Revision de coherencia falta).
+   8. - Eliminar el documento de doker deskop de todas partes. > Completado.
    9. - Hacer el documento de testing y Api.
    10. - Justificacion tecnologica revisar. > Completado.
    11. - Revisar el documento de doker. > Completado.

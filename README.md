@@ -224,4 +224,4 @@ La documentación se organiza en carpetas numeradas según la etapa del proyecto
 | `02-analisis` | Relevamiento, entrevista con el cliente, requerimientos, historias de usuario y planificación de sprints |
 | `03-diseño` | Modelo de clases, modelo entidad-relación, identidad visual y justificación tecnológica |
 | `04-implementacion` | Estado inicial del desarrollo, entorno de ejecución, reconstrucción y despliegue, API y pruebas |
-| `05-Ciberseguridad` | Asignatura electiva: identificación de amenazas y mecanismos de autenticación y criptografía |
+| `05-Ciberseguridad` | Identificación de amenazas y mecanismos de autenticación y criptografía |
