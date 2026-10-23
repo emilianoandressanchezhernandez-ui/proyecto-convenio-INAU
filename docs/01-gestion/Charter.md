@@ -141,3 +141,4 @@
    11. - Revisar el documento de doker. > **Completado.**
    12. - Revision de Coherencia de ultimo(Ultimo documento a actualizar).
    13. - Revisar los documentos de Ciberseguridad.
+   14. - Hacer Terminos y condiciones.
