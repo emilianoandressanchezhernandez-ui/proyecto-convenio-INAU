@@ -4,7 +4,7 @@
 
 ## 1. Situación inicial del cliente.
 
-**Organismo público vinculado a actividades socioeducativas (INAU) que gestiona talleres mediante convenio. Actualmente, la gestión de talleres, participantes y asistencias requiere una herramienta digital que centralice la información y mejore la coordinación entre talleristas y la administración.**
+Organismo público vinculado a actividades socioeducativas (INAU) que gestiona talleres mediante convenio. Actualmente, la gestión de talleres, participantes y asistencias requiere una herramienta digital que centralice la información y mejore la coordinación entre talleristas y la administración.
 
 ---
 
@@ -12,15 +12,15 @@
 
 ## 2. Necesidad presentada por el cliente.
 
->**El problema principal a resolver es la falta de organización y accesibilidad en la plataforma actual. Se requiere un espacio unificado donde estudiantes, talleristas y administradores dispongan de funciones específicas que permitan optimizar, asegurar y promover la accesibilidad, disponibilidad y estructuración de la información.**
+>El problema principal a resolver es la falta de organización y accesibilidad en la plataforma actual. Se requiere un espacio unificado donde estudiantes, talleristas y administradores dispongan de funciones específicas que permitan optimizar, asegurar y promover la accesibilidad, disponibilidad y estructuración de la información.
 >
->**-Se busca implementar una plataforma integral con las facultades mencionadas, mediante la cual:**
+>-Se busca implementar una plataforma integral con las facultades mencionadas, mediante la cual:
 >
->**-Los alumnos puedan acceder a sus talleres, tareas, información académica y foros de discusión.**
+>-Los alumnos puedan acceder a sus talleres, tareas, información académica y foros de discusión.
 >
->**-Los talleristas puedan publicar material didáctico e información, evaluar entregas y llevar el control de asistencias.**
+>-Los talleristas puedan publicar material didáctico e información, evaluar entregas y llevar el control de asistencias.
 >
->**-Los administradores cuenten con la capacidad de supervisar y gestionar de manera global la actividad dentro del sistema.**
+>-Los administradores cuenten con la capacidad de supervisar y gestionar de manera global la actividad dentro del sistema.
 >
 
 ---
