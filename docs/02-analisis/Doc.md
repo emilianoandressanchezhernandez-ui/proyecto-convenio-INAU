@@ -712,9 +712,9 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 | Sprint 1 | Acceso al sistema y asignación a talleres | Inicio de sesión por rol y asignación de alumnos y talleristas a talleres | 11 | Completado |
 | Sprint 2 | Gestión de usuarios, talleres y asistencia | Gestión de alumnos, talleristas y talleres; registro y corrección de asistencia | 11 | Completado |
 | Sprint 3 | Material, tareas y entregas | Publicación de material y tareas, consulta y entrega del alumno, gestión de perfil | 10 | Completado |
-| Sprint 4 | Corrección, calificación y depuración | Corrección de entregas, asignación y eliminación de notas, eliminación de material | 11 | Completado, parcialmente. |
+| Sprint 4 | Corrección, calificación y depuración | Corrección de entregas, asignación y eliminación de notas, eliminación de material | 11 | Completado. |
 | Sprint 5 | Informes y exportación | Informes de asistencia y de talleres, exportación a PDF o Excel | 11 | En proceso |
-| Sprint 6 | Consultas complementarias y cierre | Consulta de datos sensibles, listados de alumnos e informe de talleristas | 9 | Completado |
+| Sprint 6 | Consultas complementarias y cierre | Consulta de datos sensibles, listados de alumnos e informe de talleristas | 9 | En proceso |
 | **Total** | | | **63** | |
 
 ---
@@ -747,8 +747,8 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 | Gestión de usuarios y talleres | RF02, RF03 | Cumplido. |
 | Registro y corrección de asistencia | RF04, RF05 | Cumplido. |
 | Material, tareas y entregas | RF06, RF07, RF08 | Cumplido. |
-| Corrección y calificación | RF09, RF10, RF16, RF17 | Completado, parcialmente. |
-| Informes y exportación | RF11, RF12, RF13, RF19, RF22 | Cumplido. |
+| Corrección y calificación | RF09, RF10, RF16, RF17 | Completado. |
+| Informes y exportación | RF11, RF12, RF13, RF19, RF22 | En proceso. |
 | Gestión de perfil | RF14 | Cumplido. |
 | Datos sensibles y listado por taller | RF24, RF25 | En proceso. |
 | Funciones postergadas por plazo | RF15, RF18, RF20, RF21, RF23, RF26 | Pendiente para fase futura. |
