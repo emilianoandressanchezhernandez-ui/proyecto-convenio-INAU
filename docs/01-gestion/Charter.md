@@ -129,18 +129,14 @@
 
 # Cosas pendientes:
    1. - Entrevista con cliente, ajustar documento despues de la entrevista(Todos los documentos relacionados).
-   2. - Hacer documento de control de cambios(Hurgente).
+   2. - Hacer documento de control de cambios(Hurgente, pero dejar para el final).
    3. - Manual de Usuaro(Leguaje simple).
    4. - Backup completo del proyecto funcionando (docker + datos).
    5. - Acta de Cierre.
-   6. - Declaracion de Etica de IA-(terminarlo, y agregar fechas).
-   7. - Acta de reuniones(Agregar fechas).
-   
-   >--
-   8. - Eliminar el documento de doker deskop de todas partes. > Completado.
-   9. - Hacer el documento de testing y Api.
-   10. - Justificacion tecnologica revisar. > Completado.
-   11. - Revisar el documento de doker. > Completado.
-   --<
-
+   6. - Declaracion de Etica de IA-(terminarlo, y agregar fechas). > **Parcialmente Completado.**
+   7. - Acta de reuniones(Agregar fechas). > **Completado.**
+   8. - Eliminar el documento de doker deskop de todas partes. > **Completado.**
+   9. - Hacer el documento de testing y Api(Probar en un servidor ubuntu).
+   10. - Justificacion tecnologica revisar. > **Completado.**
+   11. - Revisar el documento de doker. > **Completado.**
    12. - Revision de Coherencia de ultimo(Ultimo documento a actualizar).
