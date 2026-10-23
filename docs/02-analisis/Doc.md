@@ -558,6 +558,8 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 
 ---
 
+<br>
+
 ### 21.2 Sprint 2 (Semanas 3-4): Gestión de usuarios, talleres y asistencia
 
 #### Objetivo del sprint
@@ -582,8 +584,9 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 
 #### Resultado del sprint:
 
-
 ---
+
+<br>
 
 ### 21.3 Sprint 3 (Semanas 5-6): Material, tareas y entregas
 
@@ -612,6 +615,8 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 
 ---
 
+<br>
+
 ### 21.4 Sprint 4 (Semanas 7-8): Corrección, calificación y depuración de contenidos
 
 #### Objetivo del sprint
@@ -639,6 +644,8 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 
 ---
 
+<br>
+
 ### 21.5 Sprint 5 (Semanas 9-10): Informes y exportación
 
 #### Objetivo del sprint
@@ -664,6 +671,8 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 #### Resultado del sprint
 
 ---
+
+<br>
 
 ### 21.6 Sprint 6 (Semanas 11-12): Consultas complementarias y cierre
 
@@ -703,8 +712,8 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 | Sprint 1 | Acceso al sistema y asignación a talleres | Inicio de sesión por rol y asignación de alumnos y talleristas a talleres | 11 | Completado |
 | Sprint 2 | Gestión de usuarios, talleres y asistencia | Gestión de alumnos, talleristas y talleres; registro y corrección de asistencia | 11 | Completado |
 | Sprint 3 | Material, tareas y entregas | Publicación de material y tareas, consulta y entrega del alumno, gestión de perfil | 10 | Completado |
-| Sprint 4 | Corrección, calificación y depuración | Corrección de entregas, asignación y eliminación de notas, eliminación de material | 11 | Completado |
-| Sprint 5 | Informes y exportación | Informes de asistencia y de talleres, exportación a PDF o Excel | 11 | Completado |
+| Sprint 4 | Corrección, calificación y depuración | Corrección de entregas, asignación y eliminación de notas, eliminación de material | 11 | Completado, parcialmente. |
+| Sprint 5 | Informes y exportación | Informes de asistencia y de talleres, exportación a PDF o Excel | 11 | En proceso |
 | Sprint 6 | Consultas complementarias y cierre | Consulta de datos sensibles, listados de alumnos e informe de talleristas | 9 | Completado |
 | **Total** | | | **63** | |
 
@@ -738,10 +747,10 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 | Gestión de usuarios y talleres | RF02, RF03 | Cumplido. |
 | Registro y corrección de asistencia | RF04, RF05 | Cumplido. |
 | Material, tareas y entregas | RF06, RF07, RF08 | Cumplido. |
-| Corrección y calificación | RF09, RF10, RF16, RF17 | Cumplido. |
+| Corrección y calificación | RF09, RF10, RF16, RF17 | Completado, parcialmente. |
 | Informes y exportación | RF11, RF12, RF13, RF19, RF22 | Cumplido. |
 | Gestión de perfil | RF14 | Cumplido. |
-| Datos sensibles y listado por taller | RF24, RF25 | Cumplido. |
+| Datos sensibles y listado por taller | RF24, RF25 | En proceso. |
 | Funciones postergadas por plazo | RF15, RF18, RF20, RF21, RF23, RF26 | Pendiente para fase futura. |
 | Foros, notificaciones y mensajería interna | Alcance excluido | Pendiente para fase futura. |
 | Soporte multiformato y asistencia avanzada | Alcance excluido | Pendiente para fase futura. |
