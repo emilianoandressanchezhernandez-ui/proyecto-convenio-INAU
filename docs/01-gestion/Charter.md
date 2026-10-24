@@ -133,15 +133,15 @@
    3. - Manual de Usuaro(Leguaje simple).
    4. - Backup completo del proyecto funcionando (docker + datos).
    5. - Acta de Cierre.
-   6. - Declaracion de Etica de IA-(terminarlo, y agregar fechas). > **Parcialmente Completado.**
+   6. - Declaracion de Etica de IA-(terminarlo, y agregar fechas). > **Parcialmente Completado(Falta colocar los nuevos usos de IA).**
    7. - Acta de reuniones(Agregar fechas). > **Completado.**
    8. - Eliminar el documento de doker deskop de todas partes. > **Completado.**
-   9. - Hacer el documento de testing y Api(Probar en un servidor ubuntu).
+   9. - Hacer el documento de testing y Api(Probar en un servidor ubuntu). > **Testing completado(Falta API)**
    10. - Justificacion tecnologica revisar. > **Completado.**
    11. - Revisar el documento de doker. > **Completado.**
    12. - Revision de Coherencia de ultimo(Ultimo documento a actualizar).
    13. - Revisar los documentos de Ciberseguridad.
    14. - Hacer Terminos y condiciones.
    15. - La conclucion del DOC. > **Completado.**
-   16. - Usar el NMAP, durante la prueba de la paguina.
+   16. - Usar el NMAP, durante la prueba de la paguina. > **Parcialmente(Falta NMAP)**
    17. - Verificar la capacidad maxima de usuarios simultaneos en el sistema(Servidor web y database).
