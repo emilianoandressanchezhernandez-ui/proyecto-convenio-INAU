@@ -144,3 +144,4 @@
    14. - Hacer Terminos y condiciones.
    15. - La conclucion del DOC. > **Completado.**
    16. - Usar el NMAP, durante la prueba de la paguina.
+   17. - Verificar la capacidad maxima de usuarios simultaneos en el sistema(Servidor web y database).
