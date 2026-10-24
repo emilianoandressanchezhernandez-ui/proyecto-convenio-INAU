@@ -129,7 +129,7 @@
 
 # Cosas pendientes:
    1. - Entrevista con cliente, ajustar documento despues de la entrevista(Todos los documentos relacionados).
-   2. - Hacer documento de control de cambios(Hurgente, pero dejar para el final).
+   2. - Hacer documento de control de cambios(Hurgente, pero dejar para el final). > **Completado.**
    3. - Manual de Usuaro(Leguaje simple).
    4. - Backup completo del proyecto funcionando (docker + datos).
    5. - Acta de Cierre.
@@ -142,3 +142,5 @@
    12. - Revision de Coherencia de ultimo(Ultimo documento a actualizar).
    13. - Revisar los documentos de Ciberseguridad.
    14. - Hacer Terminos y condiciones.
+   15. - La conclucion del DOC. > **Completado.**
+   16. - Usar el NMAP, durante la prueba de la paguina.

@@ -24,14 +24,12 @@ proyecto-convenio-INAU/
 ├── README.md
 │
 ├── backend/
-│   ├── DataBase/
-│   │   └── inau_talleres.sql        → copia del script (pendiente de unificar)
 │   └── api-completa/                → API REST en PHP (53 rutas)
 │       ├── index.php · routes.php · config.php · README.md
 │       ├── compose.yaml · composer.json · composer.lock
 │       ├── .env.example · .env.docker.example · .htaccess · .dockerignore
 │       ├── DataBase/
-│       │   └── inau_talleres.sql    → script que carga el entorno Docker
+│       │   └── inau_talleres.sql    → script de la base de datos (esquema y datos de prueba)
 │       ├── controllers/   (11)
 │       ├── core/          (6)
 │       ├── dtos/          (7)
@@ -47,11 +45,13 @@ proyecto-convenio-INAU/
 │   │
 │   ├── 01-gestion/
 │   │   ├── Acta de cierre.md
-│   │   ├── Acta de Reuniones.md
-│   │   ├── Actas de Sprint Review.md
 │   │   ├── Charter.md
-│   │   ├── Declaración de Etica en el uso de IA.md
-│   │   └── Revision_Coherencia_INAU.md
+│   │   ├── Control_de_Cambios.md
+│   │   ├── Revision_Coherencia_INAU.md
+│   │   └── Documentos del equipo/
+│   │       ├── Acta de Reuniones.md
+│   │       ├── Actas de Sprint Review.md
+│   │       └── Declaración de Etica en el uso de IA.md
 │   │
 │   ├── 02-analisis/
 │   │   ├── Doc.md
@@ -74,8 +74,11 @@ proyecto-convenio-INAU/
 │   │   └── testing.md
 │   │
 │   └── 05-Ciberseguridad/
+│       ├── Doc NMAP.md
+│       ├── Hardening de Infraestructura y Contenedores.md
 │       ├── Identificación de amenazas.md
-│       └── Mecanismos_Autenticacion_Criptografia_INAU.md
+│       ├── Mecanismos_Autenticacion_Criptografia_INAU.md
+│       └── Plan de Contingencia.md
 │
 └── frontend/
     ├── index.html                   → pantalla de acceso
@@ -172,20 +175,20 @@ proyecto-convenio-INAU/
 | Carpeta | Contenido | Archivos |
 | --- | --- | --- |
 | Raíz | `README.md` | 1 |
-| `backend/DataBase/` | Copia del script de la base de datos (pendiente de unificar) | 1 |
 | `backend/api-completa/` | API REST en PHP, configuración Docker y script de la base de datos con datos de prueba | 74 |
 | `docs/` | Índice de la estructura del repositorio | 1 |
-| `docs/01-gestion/` | Actas de reuniones, de Sprint Review y de cierre; charter; declaración de uso ético de IA; revisión de coherencia | 6 |
+| `docs/01-gestion/` | Charter, control de cambios, revisión de coherencia y acta de cierre | 4 |
+| `docs/01-gestion/Documentos del equipo/` | Actas de reuniones, declaración sobre las Sprint Review y declaración de uso ético de IA | 3 |
 | `docs/02-analisis/` | Documento principal del proyecto, entrevista y requerimientos | 3 |
 | `docs/03-diseño/` | Identidad visual y justificación tecnológica | 2 |
 | `docs/03-diseño/Modelado/` | Modelo de clases y MER, anexo de derivación y análisis del modelo | 3 |
 | `docs/04-implementacion/` | Reconstrucción en servidor, estado inicial, infraestructura, documentación de API y de pruebas | 5 |
-| `docs/05-Ciberseguridad/` | Identificación de amenazas y mecanismos de autenticación y criptografía (asignatura electiva) | 2 |
+| `docs/05-Ciberseguridad/` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening de infraestructura y contenedores, escaneo con Nmap y plan de contingencia (asignatura electiva) | 5 |
 | `frontend/` | Pantalla de acceso y scripts compartidos (`api.js`, `auth.js`) | 3 |
 | `frontend/frontend-admin/` | Panel del administrador: 11 páginas, 1 hoja de estilos, 15 scripts | 28 |
 | `frontend/frontend-tallerista/` | Panel del tallerista: 9 páginas, 1 hoja de estilos, 12 scripts | 23 |
 | `frontend/frontend-alumno/` | Panel del alumno: 7 páginas, 1 hoja de estilos, 10 scripts | 18 |
-| **Total** | | **170** |
+| **Total** | | **173** |
 
 <br>
 
@@ -220,8 +223,8 @@ La documentación se organiza en carpetas numeradas según la etapa del proyecto
 
 | Carpeta | Contenido |
 | --- | --- |
-| `01-gestion` | Gestión del proyecto: actas, charter, declaración de uso de IA y control de coherencia |
+| `01-gestion` | Gestión del proyecto: charter, actas, declaración de uso de IA, control de cambios y revisión de coherencia |
 | `02-analisis` | Relevamiento, entrevista con el cliente, requerimientos, historias de usuario y planificación de sprints |
 | `03-diseño` | Modelo de clases, modelo entidad-relación, identidad visual y justificación tecnológica |
 | `04-implementacion` | Estado inicial del desarrollo, entorno de ejecución, reconstrucción y despliegue, API y pruebas |
-| `05-Ciberseguridad` | Identificación de amenazas y mecanismos de autenticación y criptografía |
+| `05-Ciberseguridad` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening, escaneo con Nmap y plan de contingencia |

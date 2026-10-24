@@ -773,3 +773,9 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 ---
 
 ## 25. Conclusión.
+
+El proyecto partió de una necesidad general del cliente: organizar la gestión de los talleres que se dictan en convenio con INAU. La entrevista permitió convertirla en un alcance concreto, con tres roles diferenciados y veintiséis requerimientos funcionales, y el equipo organizó el trabajo con Scrum en seis sprints quincenales. El plan se ajustó de 91 a 63 puntos para respetar el plazo de doce semanas y la capacidad de un equipo de tres integrantes, y seis funciones se postergaron de forma explícita para una fase futura, según consta en el Control de Cambios.
+
+Como resultado, se cerró el alcance de la primera versión: una API REST en PHP organizada en capas, una base de datos MySQL derivada del modelo de clases, autenticación con JWT y control de acceso por rol, y tres paneles web responsive conectados a la API. El administrador gestiona usuarios y talleres y dispone de informes exportables; el tallerista registra la asistencia, publica material y tareas y corrige las entregas; y el alumno consulta el material y entrega sus trabajos. Todo el entorno se levanta con Docker y su despliegue en un servidor quedó documentado.
+
+La principal limitación fue la ausencia del cliente durante el desarrollo: sin Sprint Reviews, el alcance dependió por completo de la entrevista inicial. Aun así, la trazabilidad entre entrevista, requerimientos, historias de usuario, modelo y código permite verificar que lo construido responde a lo que el cliente pidió. El sistema queda como una primera versión funcional, con mejoras identificadas en la Revisión de Coherencia y preparada para incorporar las funciones postergadas.

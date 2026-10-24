@@ -8,14 +8,12 @@ proyecto-convenio-INAU/
 ├── README.md
 │
 ├── backend/
-│   ├── DataBase/
-│   │   └── inau_talleres.sql        → copia del script (pendiente de unificar)
 │   └── api-completa/                → API REST en PHP (53 rutas)
 │       ├── index.php · routes.php · config.php · README.md
 │       ├── compose.yaml · composer.json · composer.lock
 │       ├── .env.example · .env.docker.example · .htaccess · .dockerignore
 │       ├── DataBase/
-│       │   └── inau_talleres.sql    → script que carga el entorno Docker
+│       │   └── inau_talleres.sql    → script de la base de datos (esquema y datos de prueba)
 │       ├── controllers/   (11)
 │       ├── core/          (6)
 │       ├── dtos/          (7)
@@ -31,11 +29,13 @@ proyecto-convenio-INAU/
 │   │
 │   ├── 01-gestion/
 │   │   ├── Acta de cierre.md
-│   │   ├── Acta de Reuniones.md
-│   │   ├── Actas de Sprint Review.md
 │   │   ├── Charter.md
-│   │   ├── Declaración de Etica en el uso de IA.md
-│   │   └── Revision_Coherencia_INAU.md
+│   │   ├── Control_de_Cambios.md
+│   │   ├── Revision_Coherencia_INAU.md
+│   │   └── Documentos del equipo/
+│   │       ├── Acta de Reuniones.md
+│   │       ├── Actas de Sprint Review.md
+│   │       └── Declaración de Etica en el uso de IA.md
 │   │
 │   ├── 02-analisis/
 │   │   ├── Doc.md
@@ -58,8 +58,11 @@ proyecto-convenio-INAU/
 │   │   └── testing.md
 │   │
 │   └── 05-Ciberseguridad/
+│       ├── Doc NMAP.md
+│       ├── Hardening de Infraestructura y Contenedores.md
 │       ├── Identificación de amenazas.md
-│       └── Mecanismos_Autenticacion_Criptografia_INAU.md
+│       ├── Mecanismos_Autenticacion_Criptografia_INAU.md
+│       └── Plan de Contingencia.md
 │
 └── frontend/
     ├── index.html                   → pantalla de acceso
@@ -156,20 +159,20 @@ proyecto-convenio-INAU/
 | Carpeta | Contenido | Archivos |
 | --- | --- | --- |
 | Raíz | `README.md` | 1 |
-| `backend/DataBase/` | Copia del script de la base de datos (pendiente de unificar) | 1 |
 | `backend/api-completa/` | API REST en PHP, configuración Docker y script de la base de datos con datos de prueba | 74 |
 | `docs/` | Índice de la estructura del repositorio | 1 |
-| `docs/01-gestion/` | Actas de reuniones, de Sprint Review y de cierre; project charter; declaración de uso ético de IA; revisión de coherencia | 6 |
+| `docs/01-gestion/` | Project charter, control de cambios, revisión de coherencia y acta de cierre | 4 |
+| `docs/01-gestion/Documentos del equipo/` | Actas de reuniones, declaración sobre las Sprint Review y declaración de uso ético de IA | 3 |
 | `docs/02-analisis/` | Documento principal del proyecto, entrevista y requerimientos | 3 |
 | `docs/03-diseño/` | Identidad visual y justificación tecnológica | 2 |
 | `docs/03-diseño/Modelado/` | Modelo de clases y MER, anexo de derivación y análisis del modelo | 3 |
 | `docs/04-implementacion/` | Reconstrucción en servidor, estado inicial, infraestructura, documentación de API y de pruebas | 5 |
-| `docs/05-Ciberseguridad/` | Identificación de amenazas y mecanismos de autenticación y criptografía | 2 |
+| `docs/05-Ciberseguridad/` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening de infraestructura y contenedores, escaneo con Nmap y plan de contingencia (asignatura electiva) | 5 |
 | `frontend/` | Pantalla de acceso y scripts compartidos (`api.js`, `auth.js`) | 3 |
 | `frontend/frontend-admin/` | Panel del administrador: 11 páginas, 1 hoja de estilos, 15 scripts | 28 |
 | `frontend/frontend-tallerista/` | Panel del tallerista: 9 páginas, 1 hoja de estilos, 12 scripts | 23 |
 | `frontend/frontend-alumno/` | Panel del alumno: 7 páginas, 1 hoja de estilos, 10 scripts | 18 |
-| **Total** | | **170** |
+| **Total** | | **173** |
 
 <br>
 
@@ -179,11 +182,11 @@ La documentación se agrupa en cinco carpetas numeradas: las cuatro primeras ref
 
 Los documentos de modelado se ubican en una subcarpeta propia dentro de `03-diseño`, dado que constituyen un conjunto de tres piezas que se referencian entre sí: el modelo, su derivación justificada y el análisis de cómo resuelve la operativa.
 
-La revisión de coherencia se ubica en `01-gestion` por tratarse de un control de calidad sobre el conjunto del proyecto, y no de un artefacto técnico de una etapa determinada.
+La revisión de coherencia y el control de cambios se ubican en `01-gestion` por tratarse de registros sobre el conjunto del proyecto, y no de artefactos técnicos de una etapa determinada. Dentro de esa carpeta, la subcarpeta `Documentos del equipo/` agrupa los registros propios del equipo: las actas de reuniones, la declaración sobre las Sprint Review y la declaración de uso ético de IA.
 
-El trabajo de ciberseguridad (identificación de amenazas y mecanismos de autenticación y criptografía) corresponde a una asignatura distinta del proyecto principal. Se conserva en el repositorio para mantener la trazabilidad del trabajo del equipo, pero en la carpeta separada `05-Ciberseguridad` para no confundirlo con la documentación del sistema.
+El trabajo de ciberseguridad (identificación de amenazas, mecanismos de autenticación y criptografía, hardening de infraestructura y contenedores, escaneo con Nmap y plan de contingencia) corresponde a una asignatura distinta del proyecto principal. Se conserva en el repositorio para mantener la trazabilidad del trabajo del equipo, pero en la carpeta separada `05-Ciberseguridad` para no confundirlo con la documentación del sistema.
 
-El script de base de datos que se utiliza se ubica en `backend/api-completa/DataBase/`, junto al código que lo consume y desde donde lo carga el entorno Docker, en lugar de dejarlo en la raíz del repositorio. Existe además una copia idéntica en `backend/DataBase/`, pendiente de unificar.
+El script de base de datos que se utiliza se ubica en `backend/api-completa/DataBase/`, junto al código que lo consume y desde donde lo carga el entorno Docker, en lugar de dejarlo en la raíz del repositorio.
 
 <br>
 
