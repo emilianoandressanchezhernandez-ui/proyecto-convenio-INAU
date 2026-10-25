@@ -183,6 +183,16 @@ Firewall del servidor durante todas las ejecuciones: `ufw` activo, con política
 
 `ss` mostró a `docker-proxy` escuchando únicamente en `127.0.0.1:8002` y `127.0.0.1:3308`.
 
+**Verificación desde otra computadora de la red (25 de octubre de 2026).** Desde una computadora con Windows de la misma red, mediante el navegador Chrome (ejecución asistida por IA con la extensión Claude en Chrome):
+
+| Comprobación | Resultado |
+|---|---|
+| Abrir `http://192.168.1.6` e iniciar sesión como administrador | El inicio de sesión funcionó y redirigió al panel del administrador. Una consulta a la API a través de Nginx (`/api/talleres`) respondió 200 con los tres talleres |
+| Abrir `http://192.168.1.6:8002/perfil` | El navegador no pudo conectarse y mostró una página de error |
+| Petición a `http://192.168.1.6:8002/perfil` y a `http://192.168.1.6:3308/` | Ambas fallaron sin conexión tras unos 21 segundos de espera; la petición de control a `http://192.168.1.6/index.html` respondió en 10 ms |
+
+La corrección no afectó el funcionamiento del sitio, y la API y MySQL ya no son accesibles directamente desde otra computadora de la red.
+
 ### 10.3 Comparación con la matriz de exposición
 
 | Puerto | Esperado (sección 8) | Ejecución 3 (antes) | Ejecución 4 (después) | Resultado |
@@ -204,8 +214,8 @@ Firewall del servidor durante todas las ejecuciones: `ufw` activo, con política
 
 ### 10.5 Alcance y limitaciones de estos resultados
 
-- Los escaneos se ejecutaron desde el propio servidor hacia su dirección de red. Confirman qué servicios escuchan en las interfaces del equipo y que la corrección los restringió a `127.0.0.1`; no reemplazan un escaneo desde otra computadora de la red, que queda pendiente como verificación adicional.
-- No se verificó todavía en este registro que el sitio siga funcionando después de la corrección (inicio de sesión a través de Nginx).
+- Los escaneos con Nmap se ejecutaron desde el propio servidor hacia su dirección de red. La exposición desde otra computadora de la red, después de la corrección, se comprobó con el navegador y no con Nmap; no se registró un escaneo con Nmap desde otra computadora antes de la corrección.
+- La corrección se aplicó en el `.env` del servidor de prueba. El `compose.yaml` del repositorio sigue publicando los puertos 8002 y 3308 en todas las interfaces cuando no se definen `API_PORT` y `MYSQL_PORT`.
 - El escaneo no prueba que los servicios sean seguros: solo describe la superficie de red de los puertos incluidos en el comando.
 
 ## 11. Fuentes dentro del proyecto
