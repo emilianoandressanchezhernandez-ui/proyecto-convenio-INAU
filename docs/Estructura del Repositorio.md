@@ -8,6 +8,7 @@ proyecto-convenio-INAU/
 ├── README.md
 │
 ├── backend/
+│   ├── .gitignore                   → reglas de exclusión de Git (vacío)
 │   └── api-completa/                → API REST en PHP (53 rutas)
 │       ├── index.php · routes.php · config.php · README.md
 │       ├── compose.yaml · composer.json · composer.lock
@@ -55,7 +56,8 @@ proyecto-convenio-INAU/
 │   │   ├── PrimeraVista.md
 │   │   ├── api.md
 │   │   ├── inau-infraestructura-docker.md
-│   │   └── testing.md
+│   │   └── Testing/
+│   │       └── Testing-01.md
 │   │
 │   └── 05-Ciberseguridad/
 │       ├── Doc NMAP.md
@@ -159,6 +161,7 @@ proyecto-convenio-INAU/
 | Carpeta | Contenido | Archivos |
 | --- | --- | --- |
 | Raíz | `README.md` | 1 |
+| `backend/` | Reglas de exclusión de Git (archivo vacío) | 1 |
 | `backend/api-completa/` | API REST en PHP, configuración Docker y script de la base de datos con datos de prueba | 74 |
 | `docs/` | Índice de la estructura del repositorio | 1 |
 | `docs/01-gestion/` | Project charter, control de cambios, revisión de coherencia y acta de cierre | 4 |
@@ -166,13 +169,14 @@ proyecto-convenio-INAU/
 | `docs/02-analisis/` | Documento principal del proyecto, entrevista y requerimientos | 3 |
 | `docs/03-diseño/` | Identidad visual y justificación tecnológica | 2 |
 | `docs/03-diseño/Modelado/` | Modelo de clases y MER, anexo de derivación y análisis del modelo | 3 |
-| `docs/04-implementacion/` | Reconstrucción en servidor, estado inicial, infraestructura, documentación de API y de pruebas | 5 |
+| `docs/04-implementacion/` | Reconstrucción en servidor, estado inicial, infraestructura y documentación de la API | 4 |
+| `docs/04-implementacion/Testing/` | Plan y registro de pruebas | 1 |
 | `docs/05-Ciberseguridad/` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening de infraestructura y contenedores, escaneo con Nmap y plan de contingencia (asignatura electiva) | 5 |
 | `frontend/` | Pantalla de acceso y scripts compartidos (`api.js`, `auth.js`) | 3 |
 | `frontend/frontend-admin/` | Panel del administrador: 11 páginas, 1 hoja de estilos, 15 scripts | 28 |
 | `frontend/frontend-tallerista/` | Panel del tallerista: 9 páginas, 1 hoja de estilos, 12 scripts | 23 |
 | `frontend/frontend-alumno/` | Panel del alumno: 7 páginas, 1 hoja de estilos, 10 scripts | 18 |
-| **Total** | | **173** |
+| **Total** | | **174** |
 
 <br>
 
@@ -181,6 +185,8 @@ proyecto-convenio-INAU/
 La documentación se agrupa en cinco carpetas numeradas: las cuatro primeras reflejan la etapa del proyecto a la que corresponde cada documento (gestión, análisis, diseño e implementación) y la quinta, `05-Ciberseguridad`, reúne el trabajo de la asignatura electiva. La numeración garantiza que el listado respete el orden lógico del proceso en lugar del orden alfabético.
 
 Los documentos de modelado se ubican en una subcarpeta propia dentro de `03-diseño`, dado que constituyen un conjunto de tres piezas que se referencian entre sí: el modelo, su derivación justificada y el análisis de cómo resuelve la operativa.
+
+Las pruebas se ubican en una subcarpeta propia dentro de `04-implementacion`, `Testing/`, con un documento por cada ejecución (`Testing-01.md`), de modo que las pruebas posteriores se agreguen sin modificar el registro de las anteriores.
 
 La revisión de coherencia y el control de cambios se ubican en `01-gestion` por tratarse de registros sobre el conjunto del proyecto, y no de artefactos técnicos de una etapa determinada. Dentro de esa carpeta, la subcarpeta `Documentos del equipo/` agrupa los registros propios del equipo: las actas de reuniones, la declaración sobre las Sprint Review y la declaración de uso ético de IA.
 

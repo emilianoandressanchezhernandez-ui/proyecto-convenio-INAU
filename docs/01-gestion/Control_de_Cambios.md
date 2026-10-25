@@ -29,7 +29,10 @@ Registra **qué cambió en el proyecto, por qué, quién lo detectó y qué impa
 | CC-11 | 23/10/2026 | Hallazgo técnico | RF13 (exportación de informes a PDF o Excel) no está terminado: la descarga actual genera un archivo JSON. | Tiempo: el Sprint 5 pasa de "Completado" a "En proceso". Alcance: RF13 se mantiene dentro de la primera versión. | Aceptado: se completa antes del cierre del proyecto. | Incompleto |
 | CC-12 | 23/10/2026 | Hallazgo técnico | RF24 (consulta de datos sensibles por parte del administrador) no está implementado. | Tiempo: el Sprint 6 pasa de "Completado" a "En proceso". Alcance: RF24 se mantiene dentro de la primera versión. | Aceptado: se completa antes del cierre del proyecto. | Incompleto |
 | CC-13 | 22/10/2026 | Hallazgo técnico | NRF11 admite PDF, imágenes JPG y documentos de oficina (DOCX, XLSX, PPTX), pero la API acepta únicamente PDF y JPG. | Alcance: hay que ampliar los formatos que acepta la API o restringir el requisito. | [Decisión pendiente del equipo] | Propuesto |
-| CC-14 | 23/10/2026 | Decisión técnica del equipo | Se elimina la carpeta independiente `backend/DataBase/`, que conservaba una copia sin uso del script de la base de datos. | Técnico: queda un único script, en `backend/api-completa/DataBase/inau_talleres.sql`, que es el que carga el entorno Docker; se evita que las dos copias vuelvan a divergir. Documentación: el README, la Estructura del Repositorio y la Revisión de Coherencia deben dejar de mencionar la copia. | Aceptado. | Aplicado |
+| CC-14 | 23/10/2026 | Decisión técnica del equipo | Se elimina la carpeta independiente `backend/DataBase/`, que conservaba una copia sin uso del script de la base de datos. | Técnico: queda un único script, en `backend/api-completa/DataBase/inau_talleres.sql`, que es el que carga el entorno Docker; se evita que las dos copias vuelvan a divergir. Documentación: se actualizaron el README y la Estructura del Repositorio; la Revisión de Coherencia se actualiza al final. | Aplicado |
+
+
+**Estados:** *Propuesto*, cambio identificado y pendiente de decisión; *Aceptado*, aprobado por el equipo; *Aplicado*, ya incorporado al proyecto; *Postergado*, trasladado a una fase futura; *Rechazado*, descartado; *Incompleto*, aceptado pero todavía no terminado.
 
 ---
 

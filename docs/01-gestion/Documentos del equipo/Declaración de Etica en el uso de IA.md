@@ -52,6 +52,8 @@
 | Claude Opus 4.8 | `21/10/2026	` - Documentación (Acta de Reuniones y Declaración de Ética de IA). | Se utilizó para la revisión de formato (Acta de Reuniones y Declaración de Ética de IA). No se usó la IA para la generación de estos documentos, solo para revisiones de formato y ortografía. | Gabriel Rendon |
 | Claude Opus 5.5 | `21/10 – 23/10/2026` - Documentación, redacción y revisión (justificación tecnológica, revisión del documento de Docker y actas de reuniones). | Se utilizó para revisar el formato y la ortografía de las actas de reuniones y la Declaración de Ética de IA. No se empleó la IA para generar estos documentos, sino únicamente para realizar revisiones y correcciones de formato y ortografía. | Gabriel Rendon |
 | GPT-5.6 Luna | `11/10 – 20/10/2026` - Generación de código (JavaScript y PHP). | Se utilizó para la generación de código mediante la técnica conocida como *vibe coding*, debido a la falta de tiempo. El código generado fue revisado y verificado tanto por el líder del proyecto, Emiliano Sánchez, como por el integrante responsable de su generación con IA. | Thiago Ferragut |
+| Claude Opus 5.5 | `23/10/2026	` - Documentacion(Testing) | Se utilizo IA para realizar la pruevas del sistema en un sevidor de Ubutu. El proceso fue supervisado y los datos verificados por el subcoordinador(Gabriel Rendon) | Gabriel Rendon |
+| Claude Opus 5.5 | `24/10/2026	` - Documentacion revicion y redaccion(Control de Cambios, README y Estructura del Repositorio). | Gabriel Rendon |
 
 ---
 
