@@ -88,7 +88,7 @@ Se prueban los requerimientos de la primera versión desde la interfaz de cada r
 | DEF-02 | CP-13 | La exportación de informes genera un archivo JSON, no PDF ni Excel | Alta | Abierto | Control de Cambios CC-11 |
 | DEF-03 | CP-14 | No existe opción para generar el listado de alumnos ni el informe de talleristas | Media | Abierto | Revisión de Coherencia §5 (RF19 y RF22) |
 | DEF-04 | CP-16 | No existe la consulta de datos sensibles | Media | Abierto | Control de Cambios CC-12 |
-| DEF-05 | NF-04 | El formulario y la API rechazan los documentos de oficina que NRF11 admite | Media | Abierto | Control de Cambios CC-13 |
+| DEF-05 | NF-04 | El formulario y la API rechazan los documentos de oficina que NRF11 admite | Media | Cerrado | por cambio de requisito (CC-13) |
 | DEF-06 | CP-09 | El formulario del tallerista no permite adjuntar archivos al material; la API sí lo admite | Media | Abierto | — |
 | DEF-07 | CP-11 | La interfaz del tallerista no ofrece eliminar una nota (RF17); la API sí lo admite | Media | Abierto | — |
 | DEF-08 | CP-10 | El adjunto de ejemplo del script SQL está registrado en la base, pero el archivo no existe en el servidor | Baja | Abierto | — |

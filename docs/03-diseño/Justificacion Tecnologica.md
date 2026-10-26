@@ -163,7 +163,7 @@ La composición del equipo y la asignación de roles se detallan en el Project C
 | NRF08 — Protección de datos personales | Hash de contraseñas, consultas preparadas, control de permisos por endpoint |
 | NRF09 — Persistencia relacional | MySQL |
 | NRF10 — Trazabilidad | Tabla `trazabilidad`, más el registro del usuario responsable en `registros_asistencia` y de la fecha de carga en `adjuntos` |
-| NRF11 — Restricción de formatos | Validación de extensión y MIME type (PDF, JPG, documentos de oficina) |
+| NRF11 — Restricción de formatos | Validación de extensión y MIME type (PDF y JPG) |
 | NRF12 — Restricción de tamaño | Límite configurado en PHP (`upload_max_filesize`) y validado en el endpoint |
 | NRF13 — Código organizado | Estructura modular por pantalla en el frontend y arquitectura en capas en el backend |
 | NRF14 — Documentación técnica | Carpeta `docs/` versionada |
