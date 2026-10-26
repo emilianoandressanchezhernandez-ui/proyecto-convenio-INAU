@@ -9,6 +9,46 @@ class AsistenciaController extends Controller
         $this->service = new AsistenciaService();
     }
 
+    /**
+     * GET /mis-asistencias
+     * Devuelve únicamente las asistencias del alumno autenticado.
+     */
+    public function misAsistencias($id = null): void
+    {
+        try {
+            $usuario = $this->getUsuarioAutenticado();
+
+            if (!$usuario) {
+                return;
+            }
+
+            $asistencias = $this->service->getMisAsistencias(
+                $usuario
+            );
+
+            Response::success(
+                $asistencias,
+                'Tus asistencias se obtuvieron correctamente.'
+            );
+        } catch (RuntimeException $e) {
+            $status = $e->getCode() === 403 ? 403 : 400;
+
+            if ($e->getCode() === 404) {
+                $status = 404;
+            }
+
+            Response::error(
+                $e->getMessage(),
+                $status
+            );
+        } catch (Exception $e) {
+            Response::error(
+                'No se pudieron obtener las asistencias.',
+                500
+            );
+        }
+    }
+
     public function byTaller(int $tallerId): void
     {
         try {

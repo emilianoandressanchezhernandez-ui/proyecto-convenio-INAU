@@ -16,6 +16,8 @@ class AlumnoValidator
 
         if (empty(trim($datos['cedula'] ?? ''))) {
             $errores['cedula'] = 'La cédula es obligatoria.';
+        } elseif (!self::cedulaValida($datos['cedula'])) {
+            $errores['cedula'] = 'La cédula debe contener exactamente 8 dígitos.';
         }
 
         if (empty(trim($datos['fecha_nacimiento'] ?? ''))) {
@@ -30,6 +32,14 @@ class AlumnoValidator
             !filter_var($datos['correo'], FILTER_VALIDATE_EMAIL)
         ) {
             $errores['correo'] = 'El correo electrónico no es válido.';
+        }
+
+        if (
+            isset($datos['telefono']) &&
+            $datos['telefono'] !== '' &&
+            !self::telefonoValido($datos['telefono'])
+        ) {
+            $errores['telefono'] = 'El teléfono debe contener entre 8 y 15 dígitos y no puede incluir letras.';
         }
 
         if (
@@ -60,12 +70,28 @@ class AlumnoValidator
             $errores['apellido'] = 'El apellido no puede estar vacío.';
         }
 
+        if (array_key_exists('cedula', $datos)) {
+            if (empty(trim($datos['cedula']))) {
+                $errores['cedula'] = 'La cédula no puede estar vacía.';
+            } elseif (!self::cedulaValida($datos['cedula'])) {
+                $errores['cedula'] = 'La cédula debe contener exactamente 8 dígitos.';
+            }
+        }
+
         if (
             isset($datos['correo']) &&
             $datos['correo'] !== '' &&
             !filter_var($datos['correo'], FILTER_VALIDATE_EMAIL)
         ) {
             $errores['correo'] = 'El correo electrónico no es válido.';
+        }
+
+        if (
+            isset($datos['telefono']) &&
+            $datos['telefono'] !== '' &&
+            !self::telefonoValido($datos['telefono'])
+        ) {
+            $errores['telefono'] = 'El teléfono debe contener entre 8 y 15 dígitos y no puede incluir letras.';
         }
 
         if (
@@ -83,6 +109,32 @@ class AlumnoValidator
         }
 
         return $errores;
+    }
+
+    private static function cedulaValida(string $cedula): bool
+    {
+        // Permite 51234567 y 5.123.456-7.
+        // No permite letras ni otros caracteres.
+        if (!preg_match('/^[0-9.-]+$/', $cedula)) {
+            return false;
+        }
+
+        $digitos = str_replace(['.', '-'], '', $cedula);
+
+        return preg_match('/^[0-9]{8}$/', $digitos) === 1;
+    }
+
+    private static function telefonoValido(string $telefono): bool
+    {
+        // Permite números y separadores habituales.
+        if (!preg_match('/^[0-9+\s()-]+$/', $telefono)) {
+            return false;
+        }
+
+        $digitos = preg_replace('/\D/', '', $telefono);
+        $cantidad = strlen($digitos);
+
+        return $cantidad >= 8 && $cantidad <= 15;
     }
 
     private static function fechaValida(string $fecha): bool

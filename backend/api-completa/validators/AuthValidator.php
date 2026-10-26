@@ -65,12 +65,70 @@ class AuthValidator
         }
 
         if (array_key_exists('telefono', $data)) {
-            if (
-                $data['telefono'] !== null &&
-                !is_string($data['telefono'])
-            ) {
+            $telefono = $data['telefono'];
+
+            if ($telefono !== null && !is_string($telefono)) {
                 $errors[] = 'El teléfono debe ser texto.';
+            } elseif (is_string($telefono) && trim($telefono) !== '') {
+                $telefono = trim($telefono);
+                $cantidadDigitos = preg_match_all('/[0-9]/', $telefono);
+
+                if (!preg_match('/^\+?[0-9\s-]+$/', $telefono)) {
+                    $errors[] = 'El teléfono solo puede contener números, espacios, guiones y un + al inicio.';
+                } elseif ($cantidadDigitos < 8 || $cantidadDigitos > 15) {
+                    $errors[] = 'El teléfono debe tener entre 8 y 15 dígitos.';
+                }
             }
+        }
+
+        return $errors;
+    }
+
+
+    /** Valida PATCH /perfil/clave. */
+    public static function validatePasswordChange(array $data): array
+    {
+        $errors = [];
+
+        $permitidos = ['clave_actual', 'clave_nueva'];
+
+        foreach ($data as $campo => $valor) {
+            if (!in_array($campo, $permitidos, true)) {
+                $errors[] = "El campo '{$campo}' no está permitido.";
+            }
+        }
+
+        if (
+            !isset($data['clave_actual']) ||
+            !is_string($data['clave_actual']) ||
+            $data['clave_actual'] === ''
+        ) {
+            $errors[] = 'La contraseña actual es obligatoria.';
+        }
+
+        if (
+            !isset($data['clave_nueva']) ||
+            !is_string($data['clave_nueva']) ||
+            $data['clave_nueva'] === ''
+        ) {
+            $errors[] = 'La nueva contraseña es obligatoria.';
+        } elseif (
+            strlen($data['clave_nueva']) < 8
+        ) {
+            $errors[] = 'La nueva contraseña debe tener al menos 8 caracteres.';
+        } elseif (
+            strlen($data['clave_nueva']) > 128
+        ) {
+            $errors[] = 'La nueva contraseña es demasiado larga.';
+        }
+
+        if (
+            isset($data['clave_actual'], $data['clave_nueva']) &&
+            is_string($data['clave_actual']) &&
+            is_string($data['clave_nueva']) &&
+            $data['clave_actual'] === $data['clave_nueva']
+        ) {
+            $errors[] = 'La nueva contraseña debe ser diferente de la actual.';
         }
 
         return $errors;

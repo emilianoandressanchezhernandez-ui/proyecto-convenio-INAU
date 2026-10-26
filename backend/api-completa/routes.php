@@ -88,6 +88,15 @@ $router->add(
     'auth'
 );
 
+// Cambiar la contraseña del usuario actualmente autenticado.
+
+$router->add(
+    'PATCH',
+    '/perfil/clave',
+    'AuthController',
+    'changePassword',
+    'auth'
+);
 
 // ---- Alumnos -----------------------------------------------------
 
@@ -324,6 +333,16 @@ $router->add(
 // El administrador y el tallerista pueden consultar y registrar.
 // El Service controla que el tallerista pertenezca al taller.
 // ------------------------------------------------------------------
+
+// El alumno consulta únicamente sus propias asistencias.
+
+$router->add(
+    'GET',
+    '/mis-asistencias',
+    'AsistenciaController',
+    'misAsistencias',
+    'alumno'
+);
 
 $router->add(
     'GET',

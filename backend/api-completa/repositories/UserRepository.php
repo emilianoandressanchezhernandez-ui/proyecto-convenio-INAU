@@ -135,6 +135,30 @@ class UserRepository extends Repository
         return $stmt->execute($parametros);
     }
 
+
+    /**
+     * Actualiza únicamente el hash de contraseña de un usuario.
+     *
+     * El hash debe generarse previamente en AuthService.
+     * Nunca recibe ni almacena contraseñas en texto plano.
+     */
+    public function actualizarClave(int $usuarioId, string $nuevoHash): bool
+    {
+        $sql = "
+            UPDATE usuarios
+            SET clave_hash = :clave_hash
+            WHERE id = :id
+        ";
+
+        $stmt = $this->db->prepare($sql);
+
+        return $stmt->execute([
+            'clave_hash' => $nuevoHash,
+            'id' => $usuarioId
+        ]);
+    }
+
+
     /**
      * Convierte una fila de la base de datos en un objeto User.
      */
