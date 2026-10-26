@@ -502,6 +502,10 @@ async function guardarNuevoTallerista() {
         "nuevo-tallerista-clave"
     ).value;
 
+    const confirmarClave = document.getElementById(
+        "nuevo-tallerista-confirmar-clave"
+    ).value;
+
     const datos = {
         nombre,
         apellido,
@@ -509,7 +513,8 @@ async function guardarNuevoTallerista() {
         correo,
         telefono,
         especialidad,
-        clave
+        clave,
+        confirmarClave
     };
 
     const error = validarNuevoTallerista(datos);
@@ -564,6 +569,10 @@ async function guardarNuevoTallerista() {
             "nuevo-tallerista-clave"
         ).value = "";
 
+        document.getElementById(
+            "nuevo-tallerista-confirmar-clave"
+        ).value = "";
+
         bootstrap.Modal.getOrCreateInstance(
             document.getElementById("modal-nuevo-tallerista")
         ).hide();
@@ -603,63 +612,89 @@ async function guardarNuevoTallerista() {
 
 function validarNuevoTallerista(datos) {
 
+    // 1. Campos obligatorios
     if (
         !datos.nombre ||
         !datos.apellido ||
         !datos.cedula ||
         !datos.correo
     ) {
-        return (
-            "Nombre, apellido, cédula y correo " +
-            "son obligatorios."
-        );
+        return "Nombre, apellido, cédula y correo son obligatorios.";
     }
 
-    const cedulaDuplicada = talleristasActuales.some(
-        tallerista => tallerista.cedula === datos.cedula
-    );
+    // 2. Cédula: exactamente 8 dígitos
+    const cedulaSinFormato = datos.cedula.replace(/[.-]/g, "");
+
+    if (!/^(?:[0-9]{8}|[0-9]\.[0-9]{3}\.[0-9]{3}-[0-9])$/.test(datos.cedula)) {
+        return "La cédula debe contener exactamente 8 dígitos.";
+    }
+
+    // 3. Cédula duplicada, con o sin formato
+    const cedulaDuplicada = talleristasActuales.some(tallerista => {
+        const cedulaExistente = String(tallerista.cedula || "")
+            .replace(/[.-]/g, "");
+
+        return cedulaExistente === cedulaSinFormato;
+    });
 
     if (cedulaDuplicada) {
-        return (
-            "Ya existe un tallerista registrado " +
-            "con esa cédula."
-        );
+        return "Ya existe un tallerista registrado con esa cédula.";
     }
 
-    const correoDuplicado = talleristasActuales.some(
-        tallerista =>
-            tallerista.correo.toLowerCase() ===
-            datos.correo.toLowerCase()
-    );
-
-    if (correoDuplicado) {
-        return (
-            "Ya existe un tallerista registrado " +
-            "con ese correo."
-        );
-    }
-
-    if (
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo)
-    ) {
+    // 4. Correo válido
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo)) {
         return "El correo electrónico no es válido.";
     }
 
+    // 5. Correo duplicado
+    const correoDuplicado = talleristasActuales.some(tallerista =>
+        String(tallerista.correo || "").toLowerCase() ===
+        datos.correo.toLowerCase()
+    );
+
+    if (correoDuplicado) {
+        return "Ya existe un tallerista registrado con ese correo.";
+    }
+
+    // 6. Teléfono opcional, pero validado si se ingresa
+    if (datos.telefono) {
+
+        if (!/^[0-9+\s()-]+$/.test(datos.telefono)) {
+            return "El teléfono solo puede contener números y separadores válidos.";
+        }
+
+        const digitosTelefono = datos.telefono.replace(/\D/g, "");
+
+        if (
+            digitosTelefono.length < 8 ||
+            digitosTelefono.length > 15
+        ) {
+            return "El teléfono debe contener entre 8 y 15 dígitos.";
+        }
+    }
+
+    // 7. Contraseña obligatoria
     if (!datos.clave) {
         return "La contraseña es obligatoria.";
     }
 
-    // Coincide con la validación mínima del backend.
+    // 8. Longitud de contraseña
     if (datos.clave.length < 8) {
-        return (
-            "La contraseña debe tener al menos 8 caracteres."
-        );
+        return "La contraseña debe tener al menos 8 caracteres.";
+    }
+
+    // 9. Confirmación obligatoria
+    if (!datos.confirmarClave) {
+        return "Debés confirmar la contraseña.";
+    }
+
+    // 10. Las dos contraseñas deben coincidir
+    if (datos.clave !== datos.confirmarClave) {
+        return "Las contraseñas no coinciden.";
     }
 
     return null;
 }
-
-
 // ==============================
 // ALERTAS GENERALES
 // ==============================

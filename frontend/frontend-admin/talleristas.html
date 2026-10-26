@@ -225,7 +225,13 @@
                             </label>
 
                             <input type="text" id="nuevo-tallerista-cedula" class="form-control"
-                                placeholder="1.234.567-8" required>
+                                placeholder="1.234.567-8" inputmode="numeric" maxlength="11"
+                                pattern="([0-9]{8}|[0-9]\.[0-9]{3}\.[0-9]{3}-[0-9])"
+                                title="Ingresá una cédula de exactamente 8 dígitos." required>
+
+                            <div class="form-text">
+                                Ingresá 8 dígitos. Ejemplo: 12345678 o 1.234.567-8.
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -242,7 +248,13 @@
                                 Teléfono
                             </label>
 
-                            <input type="text" id="nuevo-tallerista-telefono" class="form-control">
+                            <input type="tel" id="nuevo-tallerista-telefono" class="form-control"
+                                placeholder="099 123 456" inputmode="tel" maxlength="25" pattern="[0-9+() \-]+"
+                                title="Ingresá solamente números y separadores habituales.">
+
+                            <div class="form-text">
+                                Entre 8 y 15 dígitos, si ingresás un teléfono. No se permiten letras.
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -267,6 +279,19 @@
                                 Mínimo 8 caracteres. El tallerista
                                 utilizará esta contraseña para
                                 iniciar sesión.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="nuevo-tallerista-confirmar-clave" class="form-label">
+                                Confirmar contraseña
+                            </label>
+
+                            <input type="password" id="nuevo-tallerista-confirmar-clave" class="form-control"
+                                minlength="8" autocomplete="new-password" required>
+
+                            <div class="form-text">
+                                Repetí la contraseña inicial para confirmar que está escrita correctamente.
                             </div>
                         </div>
 

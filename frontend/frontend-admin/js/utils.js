@@ -69,21 +69,56 @@ function colocarTexto(elementoId, contenido) {
 
 // Muestra una alerta Bootstrap dentro de un contenedor existente en el HTML.
 // tipo: "success" | "danger" | "info" | "warning"
+
 function mostrarAlerta(elementoId, mensaje, tipo = "info") {
     const contenedor = document.getElementById(elementoId);
     if (!contenedor) return;
-    contenedor.className = `alert alert-${tipo}`;
+
+    if (contenedor._temporizadorAlerta) {
+        clearTimeout(contenedor._temporizadorAlerta);
+        contenedor._temporizadorAlerta = null;
+    }
+
+    if (contenedor._animacionEntrada) {
+        cancelAnimationFrame(contenedor._animacionEntrada);
+        contenedor._animacionEntrada = null;
+    }
+
+    contenedor.className = `alert alert-${tipo} alerta-animada`;
     contenedor.textContent = mensaje;
-    contenedor.classList.remove("d-none");
+
+    // Asegurar que el navegador dibuje primero
+    // el estado inicial de la alerta.
+    contenedor._animacionEntrada = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            contenedor.classList.add("alerta-visible");
+            contenedor._animacionEntrada = null;
+        });
+    });
 }
 
-// Oculta la alerta mostrada por mostrarAlerta
 function ocultarAlerta(elementoId) {
     const contenedor = document.getElementById(elementoId);
-    if (contenedor) {
-        contenedor.classList.add("d-none");
+    if (!contenedor) return;
+
+    if (contenedor._temporizadorAlerta) {
+        clearTimeout(contenedor._temporizadorAlerta);
+        contenedor._temporizadorAlerta = null;
     }
+
+    // Si está oculta, no necesitamos animar.
+    if (contenedor.classList.contains("d-none")) {
+        return;
+    }
+
+    contenedor.classList.remove("alerta-visible");
+
+    contenedor._temporizadorAlerta = setTimeout(() => {
+        contenedor.classList.add("d-none");
+        contenedor._temporizadorAlerta = null;
+    }, 250);
 }
+
 
 
 // ==============================

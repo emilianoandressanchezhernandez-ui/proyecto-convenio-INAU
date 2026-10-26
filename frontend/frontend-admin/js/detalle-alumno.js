@@ -862,10 +862,7 @@ function validarEdicionAlumno(datos) {
         !datos.apellido ||
         !datos.fecha_nacimiento
     ) {
-        return (
-            "Nombre, apellido y fecha de nacimiento " +
-            "son obligatorios."
-        );
+        return "Nombre, apellido y fecha de nacimiento son obligatorios.";
     }
 
     if (
@@ -873,6 +870,24 @@ function validarEdicionAlumno(datos) {
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo)
     ) {
         return "El correo electrónico no es válido.";
+    }
+
+    // El teléfono es opcional, pero debe tener
+    // un formato válido si se completa.
+    if (datos.telefono) {
+
+        if (!/^[0-9+\s()-]+$/.test(datos.telefono)) {
+            return "El teléfono solo puede contener números y separadores válidos.";
+        }
+
+        const digitosTelefono = datos.telefono.replace(/\D/g, "");
+
+        if (
+            digitosTelefono.length < 8 ||
+            digitosTelefono.length > 15
+        ) {
+            return "El teléfono debe contener entre 8 y 15 dígitos.";
+        }
     }
 
     return null;

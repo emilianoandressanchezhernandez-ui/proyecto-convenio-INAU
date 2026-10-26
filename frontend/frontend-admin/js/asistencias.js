@@ -485,9 +485,9 @@ function renderizarTablaAsistencias(registros) {
                         data-alumno-id="${registro.alumnoId}"
                         ${puedeCorregir ? "" : "disabled"}
                         title="${puedeCorregir
-                ? "Corregir asistencia"
+                ? "Editar asistencia"
                 : "No se pueden modificar asistencias de talleres finalizados"}">
-                        Corregir
+                        Editar
                     </button>
                 </td>
             </tr>
@@ -740,7 +740,7 @@ async function guardarCorreccion() {
 
         if (!respuesta.ok || resultado.ok === false) {
             let mensaje = resultado.mensaje ||
-                "No se pudo corregir la asistencia.";
+                "No se pudo editar la asistencia."
 
             if (resultado.errores) {
                 const detalles = Array.isArray(resultado.errores)

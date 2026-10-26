@@ -1047,7 +1047,9 @@ async function agregarAlumnoAlTaller() {
 // QUITAR ALUMNO
 // ======================================================
 
+
 async function quitarAlumnoDelTaller(alumnoId) {
+
     if (
         !tallerActual ||
         tallerActual.estado !== "Activo" ||
@@ -1065,42 +1067,108 @@ async function quitarAlumnoDelTaller(alumnoId) {
         return;
     }
 
-    const confirmado = confirm(
-        `¿Desea quitar a ${alumno.nombre} ${alumno.apellido} de este taller?`
+    const modalElemento = document.getElementById(
+        "modal-quitar-alumno"
     );
 
-    if (!confirmado) {
+    const nombreElemento = document.getElementById(
+        "nombre-alumno-quitar"
+    );
+
+    const botonConfirmar = document.getElementById(
+        "btn-confirmar-quitar-alumno"
+    );
+
+    const botonCancelar = document.getElementById(
+        "btn-cancelar-quitar-alumno"
+    );
+
+    if (!modalElemento || !nombreElemento || !botonConfirmar) {
+        console.error("Faltan elementos del modal para quitar alumnos.");
         return;
     }
 
-    modificandoInscripcion = true;
+    nombreElemento.textContent =
+        `${alumno.nombre} ${alumno.apellido}`;
 
-    try {
-        await enviarCambioTaller(
-            `/talleres/${tallerActual.id}/alumnos/${alumnoId}`,
-            "DELETE"
-        );
+    ocultarAlerta("alerta-quitar-alumno");
 
-        await cargarDetalleTaller(
-            Number(tallerActual.id)
-        );
+    botonConfirmar.disabled = false;
 
-    } catch (error) {
-        console.error(
-            "Error al quitar alumno:",
-            error
-        );
+    const modal = bootstrap.Modal.getOrCreateInstance(
+        modalElemento
+    );
 
-        mostrarAlerta(
-            "alerta-asignar-alumno",
-            error.message,
-            "danger"
-        );
+    // Sustituir la acción anterior para no acumular listeners.
+    botonConfirmar.onclick = async () => {
 
-    } finally {
-        modificandoInscripcion = false;
-    }
+        if (modificandoInscripcion) {
+            return;
+        }
+
+        modificandoInscripcion = true;
+
+        botonConfirmar.disabled = true;
+        botonConfirmar.textContent = "Quitando...";
+
+        if (botonCancelar) {
+            botonCancelar.disabled = true;
+        }
+
+        const botonCerrar = modalElemento.querySelector(".btn-close");
+
+        if (botonCerrar) {
+            botonCerrar.disabled = true;
+        }
+
+        try {
+
+            await enviarCambioTaller(
+                `/talleres/${tallerActual.id}/alumnos/${alumnoId}`,
+                "DELETE"
+            );
+
+            modal.hide();
+
+            await cargarDetalleTaller(
+                Number(tallerActual.id)
+            );
+
+        } catch (error) {
+
+            console.error("Error al quitar alumno:", error);
+
+            mostrarAlerta(
+                "alerta-quitar-alumno",
+                error.message || "No se pudo quitar al alumno.",
+                "danger"
+            );
+
+        } finally {
+
+            modificandoInscripcion = false;
+
+            botonConfirmar.disabled = false;
+            botonConfirmar.innerHTML = `
+                <i class="bi bi-person-dash-fill me-1"></i>
+                Quitar inscripción
+            `;
+
+            if (botonCancelar) {
+                botonCancelar.disabled = false;
+            }
+
+            if (botonCerrar) {
+                botonCerrar.disabled = false;
+            }
+
+            actualizarEstadoAcciones();
+        }
+    };
+
+    modal.show();
 }
+
 
 // ======================================================
 // TALLERISTAS ASIGNADOS
