@@ -1,10 +1,21 @@
-# Proyecto Sistema de Gestión de Talleres en Convenio con INAU
+# Proyecto Sistema de Gestión de Talleres en Convenio con INAU - TheNewfutures.
 
 <br>
 
 ## 1. Situación inicial del cliente.
 
-Organismo público vinculado a actividades socioeducativas (INAU) que gestiona talleres mediante convenio. Actualmente, la gestión de talleres, participantes y asistencias requiere una herramienta digital que centralice la información y mejore la coordinación entre talleristas y la administración.
+**Organismo:** INAU (Instituto del Niño y Adolescente del Uruguay), a través de talleres socioeducativos en convenio.
+
+**Cliente / patrocinador:** En convenio con INAU.\
+**Usuario experto consultado:** Lemuel Szwec González, tallerista.\
+**Rubro:** Actividades socioeducativas: talleres dictados en convenio, con alumnos, talleristas y administración.\
+**Tamaño:** [completar: cantidad de centros o talleres en funcionamiento]\
+**Cantidad aproximada de usuarios:** [completar: alumnos y talleristas aproximados]\
+**Servicio:** Talleres en los que el tallerista publica material y tareas, registra la asistencia y evalúa las entregas, y la administración supervisa la actividad de todos los talleres.\
+**Nivel tecnológico actual:** [completar: bajo / medio-bajo / medio]\
+**Registro actual:** La información de talleres, participantes y asistencias no está centralizada: el cliente señala falta de organización y accesibilidad en la plataforma que usa actualmente. [completar: qué se usa hoy, por ejemplo planillas, papel, mensajería o una plataforma general]\
+**Necesidad:** Un espacio unificado, accesible desde computadora, tablet o teléfono, con funciones específicas para alumnos, talleristas y administradores, similar a la plataforma CREA.\
+**Plazo esperado:** Primera versión funcionando para fines de año.
 
 ---
 
@@ -554,7 +565,7 @@ Al finalizar el sprint, el sistema permitirá:
 
 Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
 
-#### Resultado del sprint:
+#### Resultado del sprint: *Completado.*
 
 ---
 
@@ -582,7 +593,7 @@ Al finalizar el sprint, el sistema permitirá:
 
 Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
 
-#### Resultado del sprint:
+#### Resultado del sprint: *Completado.*
 
 ---
 
@@ -611,7 +622,7 @@ Al finalizar el sprint, el sistema permitirá:
 
 Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
 
-#### Resultado del sprint:
+#### Resultado del sprint: *Completado parcialmente.*
 
 ---
 
@@ -640,7 +651,7 @@ Al finalizar el sprint, el sistema permitirá:
 
 Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
 
-#### Resultado del sprint
+#### Resultado del sprint: 	*Completado parcialmente.* 
 
 ---
 
@@ -668,7 +679,7 @@ Al finalizar el sprint, el sistema permitirá:
 
 Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
 
-#### Resultado del sprint
+#### Resultado del sprint: *En proceso.*
 
 ---
 
@@ -697,7 +708,7 @@ Al finalizar el sprint, el sistema permitirá:
 
 Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
 
-#### Resultado del sprint
+#### Resultado del sprint: *En proceso.*
 
 ---
 
@@ -709,12 +720,12 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 
 | Sprint | Objetivo | Incremento entregado | Puntos | Resultado |
 | --- | --- | --- | --- | --- |
-| Sprint 1 | Acceso al sistema y asignación a talleres | Inicio de sesión por rol y asignación de alumnos y talleristas a talleres | 11 | Completado |
-| Sprint 2 | Gestión de usuarios, talleres y asistencia | Gestión de alumnos, talleristas y talleres; registro y corrección de asistencia | 11 | Completado |
-| Sprint 3 | Material, tareas y entregas | Publicación de material y tareas, consulta y entrega del alumno, gestión de perfil | 10 | Completado |
-| Sprint 4 | Corrección, calificación y depuración | Corrección de entregas, asignación y eliminación de notas, eliminación de material | 11 | Completado. |
-| Sprint 5 | Informes y exportación | Informes de asistencia y de talleres, exportación a PDF o Excel | 11 | En proceso |
-| Sprint 6 | Consultas complementarias y cierre | Consulta de datos sensibles, listados de alumnos e informe de talleristas | 9 | En proceso |
+| Sprint 1 | Acceso al sistema y asignación a talleres | Inicio de sesión por rol y asignación de alumnos y talleristas a talleres | 11 | Completado. |
+| Sprint 2 | Gestión de usuarios, talleres y asistencia | Gestión de alumnos, talleristas y talleres; registro y corrección de asistencia | 11 | Completado. |
+| Sprint 3 | Material, tareas y entregas | Publicación de material y tareas, consulta y entrega del alumno, gestión de perfil | 10 | Completado parcialmente. |
+| Sprint 4 | Corrección, calificación y depuración | Corrección de entregas, asignación y eliminación de notas, eliminación de material | 11 | Completado parcialmente. |
+| Sprint 5 | Informes y exportación | Informes de asistencia y de talleres, exportación a PDF o Excel | 11 | En proceso. |
+| Sprint 6 | Consultas complementarias y cierre | Consulta de datos sensibles, listados de alumnos e informe de talleristas | 9 | En proceso. |
 | **Total** | | | **63** | |
 
 ---
@@ -730,30 +741,46 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 | Después del Sprint 1 | Existe una base funcional con acceso por rol y asignación a talleres. |
 | Después del Sprint 2 | Se gestionan usuarios y talleres, y se registra la asistencia. |
 | Después del Sprint 3 | Funciona el circuito de material, tareas y entregas. |
-| Después del Sprint 4 | Se completa el ciclo de corrección y calificación. |
-| Después del Sprint 5 | La administración dispone de informes exportables. |
-| Después del Sprint 6 | Se cierra el alcance de la primera versión. |
+| Después del Sprint 4 | Se corrigen entregas y se asignan notas; eliminar una nota desde la interfaz queda pendiente. |
+| Después del Sprint 5 | La administración genera informes de asistencia y de talleres; la exportación a PDF o Excel queda en proceso. |
+| Después del Sprint 6 | El tallerista consulta el listado de su taller; el listado general, el informe de talleristas y la consulta de datos sensibles quedan en proceso. |
 | Cierre | Las seis funciones postergadas por plazo (RF15, RF18, RF20, RF21, RF23 y RF26) quedan para etapas futuras. |
 
 ---
 
 <br>
 
-## 23. Requerimientos cumplidos al cierre
+## 23. Estado de los requerimientos al cierre
 
-| Área | Requerimientos | Estado |
-| --- | --- | --- |
-| Autenticación y acceso por rol | RF01 | Cumplido. |
-| Gestión de usuarios y talleres | RF02, RF03 | Cumplido. |
-| Registro y corrección de asistencia | RF04, RF05 | Cumplido. |
-| Material, tareas y entregas | RF06, RF07, RF08 | Cumplido. |
-| Corrección y calificación | RF09, RF10, RF16, RF17 | Completado. |
-| Informes y exportación | RF11, RF12, RF13, RF19, RF22 | En proceso. |
-| Gestión de perfil | RF14 | Cumplido. |
-| Datos sensibles y listado por taller | RF24, RF25 | En proceso. |
-| Funciones postergadas por plazo | RF15, RF18, RF20, RF21, RF23, RF26 | Pendiente para fase futura. |
-| Foros, notificaciones y mensajería interna | Alcance excluido | Pendiente para fase futura. |
-| Soporte multiformato y asistencia avanzada | Alcance excluido | Pendiente para fase futura. |
+Estado verificado en las pruebas del sistema del 24/10/2026 (`docs/04-implementacion/Testing/Testing-01.md`).
+
+| Área | Requerimiento | Estado | Observación | Prueba |
+| --- | --- | --- | --- | --- |
+| Autenticación y acceso por rol | RF01 — Inicio de sesión diferenciado por rol | Cumplido | Acceso por correo y contraseña; cada rol es redirigido a su panel. | CP-01, CP-02, CP-03 |
+| Gestión de usuarios y talleres | RF02 — Gestión de alumnos, talleristas y talleres | Cumplido | Alta y edición verificadas; la eliminación no se probó. | CP-04, CP-05 |
+| Gestión de usuarios y talleres | RF03 — Asignación de alumnos y talleristas a talleres | Cumplido | — | CP-06 |
+| Registro y corrección de asistencia | RF04 — Registrar asistencia | Cumplido | Los cuatro estados se guardan correctamente. | CP-07 |
+| Registro y corrección de asistencia | RF05 — Consultar y modificar asistencia | Cumplido | El tallerista consulta y modifica la asistencia. La vista de asistencia del alumno muestra datos simulados. | CP-07, CP-08 |
+| Material, tareas y entregas | RF06 — Subir material y tareas | Parcial | Material y tareas se publican, pero el formulario del tallerista no permite adjuntar archivos; solo es posible mediante la API. | CP-09 |
+| Material, tareas y entregas | RF07 — El alumno visualiza material y tareas | Cumplido | — | CP-10 |
+| Material, tareas y entregas | RF08 — El alumno envía archivos de una tarea | Cumplido | Entrega con PDF y comentario. | CP-10 |
+| Corrección y calificación | RF09 — Corregir tareas | Cumplido | — | CP-11 |
+| Corrección y calificación | RF10 — Asignar nota | Cumplido | Se rechazan notas fuera del rango 1 a 10. | CP-11 |
+| Corrección y calificación | RF16 — Eliminar material | Cumplido | — | CP-09 |
+| Corrección y calificación | RF17 — Eliminar nota | Parcial | La interfaz no ofrece la opción; solo es posible mediante la API. | CP-11 |
+| Informes y exportación | RF11 — Informe de asistencia por taller | Cumplido | — | CP-12 |
+| Informes y exportación | RF12 — Informe de talleres con sus talleristas | Cumplido | — | CP-12 |
+| Informes y exportación | RF13 — Exportar informes en PDF o Excel | Pendiente | La descarga genera un archivo JSON. | CP-13 |
+| Informes y exportación | RF19 — Listado de alumnos | Pendiente | No existe la opción para generarlo. | CP-14 |
+| Informes y exportación | RF22 — Informe de talleristas | Pendiente | No existe la opción para generarlo. | CP-14 |
+| Gestión de perfil | RF14 — Gestionar el perfil | Parcial | Se modifican los datos de contacto; el cambio de contraseña no está disponible en ningún rol. | CP-15 |
+| Datos sensibles y listado por taller | RF24 — Consultar datos sensibles | Pendiente | No existe la funcionalidad. | CP-16 |
+| Datos sensibles y listado por taller | RF25 — Listado de alumnos del taller | Cumplido | — | CP-06 |
+| Funciones postergadas por plazo | RF15, RF18, RF20, RF21, RF23, RF26 | Postergado | Pendiente para una fase futura (Control de Cambios, CC-01). | — |
+| Alcance excluido | Foros, notificaciones y mensajería interna | Excluido | Pendiente para una fase futura. | — |
+| Alcance excluido | Soporte multiformato y asistencia avanzada | Excluido | Pendiente para una fase futura. | — |
+
+**Resumen:** de los 20 requerimientos de la primera versión, 13 están cumplidos, 3 parciales (RF06, RF14 y RF17) y 4 pendientes (RF13, RF19, RF22 y RF24).
 
 ---
 
@@ -769,6 +796,7 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 | No todo entra en la primera versión | Seis funciones se postergaron para respetar el plazo de doce semanas. |
 | El modelado revela requerimientos faltantes | Al derivar el modelo de clases se detectaron requerimientos presentes en la entrevista que la especificación no había recogido. |
 | El cierre no significa que el producto no pueda evolucionar | El sistema queda operativo y se identifican mejoras futuras. |
+| Actuar a tiempo ante el incumplimiento de tareas | Durante el proyecto, dos integrantes (Maximiliano Leal e Ignacio Viera) dejaron de cumplir las tareas asignadas y fueron retirados del equipo, que continuó con tres integrantes (ver Control de Cambios, CC-03). La decisión debió tomarse antes, porque la demora afectó la distribución del trabajo y el cronograma. |
 
 ---
 
