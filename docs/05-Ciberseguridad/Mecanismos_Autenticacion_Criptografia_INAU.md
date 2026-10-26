@@ -3,7 +3,7 @@
 **Proyecto:** TheNewfutures — Sistema de Gestión de Talleres en Convenio con INAU  
 **Área:** Ciberseguridad  
 **Fecha de elaboración:** 10 de octubre de 2026  
-**Última actualización:** 21 de octubre de 2026  
+**Última actualización:** 25 de octubre de 2026  
 
 ---
 
@@ -271,9 +271,9 @@ La configuración evita arrancar si `SECRET_KEY` falta o coincide con una cadena
 - Las plantillas `backend/api-completa/.env.example` y `.env.docker.example` dejan `SECRET_KEY` vacía, con la instrucción para generarla.
 - `backend/api-completa/compose.yaml`, en cambio, proporciona una clave fija como valor predeterminado si no hay `SECRET_KEY` configurada.
 - La validación de `config.php` no rechaza ese valor de respaldo.
-- En el repositorio no aparece un `.gitignore` en la raíz ni en `backend/api-completa/` que excluya el archivo real `.env`. `backend/api-completa/.dockerignore` sí excluye `.env` de la imagen, pero **Docker ignore y Git ignore son mecanismos distintos**.
+- El `.gitignore` de la raíz excluye `.env` y `.env.*` (salvo las plantillas `.env.example` y `.env.docker.example`), por lo que el archivo real con secretos no se sube a Git por error. `backend/api-completa/.dockerignore` lo excluye además de la imagen: **Docker ignore y Git ignore son mecanismos distintos y complementarios**.
 
-Por lo tanto, no debe asumirse que las claves de ejemplo son secretos seguros ni que `.env` está protegido frente a un commit accidental.
+Por lo tanto, no debe asumirse que las claves de ejemplo son secretos seguros.
 
 ### 7.2 Pasos para preparar las variables
 
@@ -292,17 +292,7 @@ php -r "echo bin2hex(random_bytes(32));"
 
 Copiar el resultado únicamente en `SECRET_KEY` del `.env` local. Definir también contraseñas propias para `DB_PASSWORD` y `MYSQL_ROOT_PASSWORD`. No incluir esos valores en capturas, entregas públicas ni mensajes de commit.
 
-Antes de usarlo, corregir la configuración de Docker para que no tenga una clave fija de respaldo y falle si falta una clave válida. Además, crear un `.gitignore` adecuado antes de crear o guardar secretos. Una opción es `backend/api-completa/.gitignore` con:
-
-```gitignore
-.env
-.env.*
-!.env.example
-!.env.docker.example
-vendor/
-storage/cache/*
-!storage/cache/.gitignore
-```
+Antes de usarlo, corregir la configuración de Docker para que no tenga una clave fija de respaldo y falle si falta una clave válida. El `.gitignore` de la raíz ya excluye `.env`; antes de guardar secretos, conviene comprobar con `git status` que `.env` no aparece como archivo a subir.
 
 La plantilla versionada debe contener marcadores vacíos o instrucciones, no una clave utilizable. Si una clave ya quedó publicada en el historial de Git, se debe considerar comprometida y generar una nueva; eliminarla del archivo actual no borra la versión anterior del historial.
 
@@ -367,6 +357,19 @@ Autenticarse con una cuenta de tallerista e intentar acceder a una ruta que `rou
 
 En un entorno de prueba, consultar `usuarios.clave_hash` en MySQL. Debe tener un hash, no la contraseña original. No incluir hashes o contraseñas de prueba en capturas públicas ni en la documentación de uso.
 
+
+### Resultados de la ejecución (24 de octubre de 2026)
+
+Las pruebas del sistema registradas en `docs/04-implementacion/Testing/Testing-01.md`, ejecutadas desde la interfaz sobre el servidor de prueba, cubren estos pasos:
+
+| Paso | Resultado observado | Caso |
+|---|---|---|
+| 2. Login válido | Los tres roles ingresaron y fueron redirigidos a su panel. | CP-01 |
+| 3. Credenciales incorrectas | Se mostró el mismo mensaje, "Correo o contraseña incorrectos.", para un correo inexistente y para una contraseña errónea. | CP-02 |
+| 4 y 5. Ruta protegida y cierre de sesión | Tras cerrar sesión, al abrir una página del panel la interfaz volvió a la pantalla de acceso y la API respondió `401` ("Tenes que iniciar sesion."). | CP-03 |
+| 6. Autorización por rol | No se probó la ruta del ejemplo (`GET /talleristas` con un tallerista). Se comprobó el mismo control con otros casos: la API respondió `403` a una alumna en `GET /alumnos`, ruta reservada al administrador, y a un tallerista al consultar un taller al que no está asignado. | NF-02 y NF-03 |
+| 7. Datos persistidos | No se ejecutó en esas pruebas. | — |
+
 ---
 
 <br>
@@ -375,8 +378,8 @@ En un entorno de prueba, consultar `usuarios.clave_hash` en MySQL. Debe tener un
 
 | Prioridad | Hallazgo verificado | Por qué importa | Acción recomendada |
 |---|---|---|---|
-| Crítica | `compose.yaml` define una `SECRET_KEY` fija como valor de respaldo. Las plantillas `.env` ya no incluyen clave. | Si se conserva una clave conocida, una persona que la conozca podría fabricar JWT con claims modificados. | Eliminar valores utilizables de las plantillas, exigir una variable configurada y rotar cualquier clave expuesta. |
-| Crítica | No se encuentra `.gitignore` raíz ni de `backend/api-completa` para excluir `.env`. | Un archivo local con credenciales podría añadirse accidentalmente a Git. | Crear reglas de ignorado, comprobar `git status` y revisar que `.env` no esté versionado. |
+| Crítica | `compose.yaml` define una `SECRET_KEY` fija como valor de respaldo. Las plantillas `.env` ya no incluyen clave. | Si se conserva una clave conocida, una persona que la conozca podría fabricar JWT con claims modificados. | Quitar el valor por defecto de `SECRET_KEY` en `compose.yaml`, para que el sistema no arranque sin una clave configurada, y rotar cualquier clave expuesta. |
+| Resuelto | El `.gitignore` de la raíz excluye `.env` (antes no existía un `.gitignore` que lo hiciera). | Evita que un archivo local con credenciales se suba a Git por error. | Comprobar periódicamente con `git status` que `.env` no esté versionado. |
 | Alta | `Token::clearCookie()` solo elimina la cookie; no revoca un JWT previamente copiado. | Un token robado puede seguir válido hasta `exp`. | Evaluar un registro de sesiones/revocación, `jti` con lista de revocación o versión de token por usuario. |
 | Alta | No hay protección CSRF completa. La cookie `SameSite=Lax` y CORS no constituyen por sí solos una defensa completa para todas las operaciones. | Una petición no deseada podría intentar aprovechar credenciales que el navegador envía automáticamente. | Incorporar una defensa CSRF para operaciones de escritura y probarla con solicitudes de origen cruzado. |
 | Alta | `RateLimiter.php` existe, pero `index.php` no lo incluye ni llama a `RateLimiter::check()`. | No hay límite efectivo aplicado en el punto de entrada; quedan expuestos intentos repetidos de login. | Conectar el limiter, aplicar un límite adecuado especialmente a `/login` y probar el código HTTP `429`. |
@@ -385,6 +388,8 @@ En un entorno de prueba, consultar `usuarios.clave_hash` en MySQL. Debe tener un
 | Media | `AuthValidator` verifica campos presentes en login, pero no implementa un límite de intentos por sí mismo. | La validación de entrada no sustituye la defensa frente a fuerza bruta. | Aplicar rate limiting y registrar intentos fallidos sin almacenar contraseñas. |
 | Media | No existe un endpoint de cambio de contraseña del propio usuario. | La interfaz y la API no ofrecen el flujo completo de cambio seguro por autoservicio. | Definir un endpoint que pida contraseña actual, valide la nueva y guarde su hash; invalidar otros tokens si corresponde. |
 
+
+> **Relacionado:** la descarga oficial de adjuntos (`/adjuntos/{id}/archivo`) exige sesión, pero los archivos también pueden descargarse por una ruta directa sin autenticación. Está documentado y comprobado en `Hardening de Infraestructura y Contenedores.md`, hallazgo H-02.
 ---
 
 <br>
@@ -393,6 +398,6 @@ En un entorno de prueba, consultar `usuarios.clave_hash` en MySQL. Debe tener un
 
 El proyecto tiene una base real para autenticación: hash de contraseñas con funciones específicas de PHP, verificación con `password_verify()`, JWT firmado, cookie `HttpOnly`, expiración y middleware por rol. La separación entre controller, service, repository y modelo facilita que un desarrollador externo siga cada responsabilidad.
 
-Antes de presentar esta solución como lista para producción, es obligatorio resolver como mínimo los secretos predeterminados, el `.gitignore`, HTTPS y las protecciones contra CSRF y fuerza bruta. También debe documentarse que el logout actual expira la cookie del navegador, pero no invalida server-side un token copiado.
+Antes de presentar esta solución como lista para producción, es obligatorio resolver como mínimo los secretos predeterminados, HTTPS y las protecciones contra CSRF y fuerza bruta. También debe documentarse que el logout actual expira la cookie del navegador, pero no invalida server-side un token copiado.
 
-**autenticación implementada para desarrollo y pruebas, con endurecimientos pendientes antes de usar información real**.
+**Estado:** autenticación implementada para desarrollo y pruebas, con endurecimientos pendientes antes de usar información real.
