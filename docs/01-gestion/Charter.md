@@ -140,8 +140,8 @@
    10. - Justificacion tecnologica revisar. > **Completado.**
    11. - Revisar el documento de doker. > **Completado.**
    12. - Revision de Coherencia de ultimo(Ultimo documento a actualizar).
-   13. - Revisar los documentos de Ciberseguridad. > **En proceso.**
+   13. - Revisar los documentos de Ciberseguridad. > **Completado.**
    14. - Hacer Terminos y condiciones.
    15. - La conclucion del DOC. > **Completado.**
-   16. - Usar el NMAP, durante la prueba de la paguina. > **Parcialmente(Falta NMAP)**
+   16. - Usar el NMAP, durante la prueba de la paguina. > **Completado.**
    17. - Verificar la capacidad maxima de usuarios simultaneos en el sistema(Servidor web y database).

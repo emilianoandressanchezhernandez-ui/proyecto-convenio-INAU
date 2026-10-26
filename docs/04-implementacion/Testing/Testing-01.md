@@ -2,7 +2,7 @@
 
 ## Sistema de Gestión de Talleres en Convenio con INAU
 
-> **Qué es este documento.** Registra las pruebas de la primera verción del sistema, cada una vinculada al requerimiento que verifica, con el resultado obtenido al ejecutarlas. Los resultados esperados se toman de los requerimientos (`docs/02-analisis/requerimientos.md`), no del comportamiento actual del código; cuando no coinciden, la diferencia se registra como defecto.
+> **Qué es este documento.** Registra las pruebas de la primera versión del sistema, cada una vinculada al requerimiento que verifica, con el resultado obtenido al ejecutarlas. Los resultados esperados se toman de los requerimientos (`docs/02-analisis/requerimientos.md`), no del comportamiento actual del código; cuando no coinciden, la diferencia se registra como defecto.
 
 ---
 
@@ -19,7 +19,7 @@ Se prueban los requerimientos de la primera versión desde la interfaz de cada r
 | Servidor | Máquina virtual con Ubuntu Server en VirtualBox, desplegada según `Documento de Reconstruccion - Servidor.md` (API y MySQL 8.4 en Docker; frontend servido por Nginx) |
 | Sitio | `http://192.168.1.14` (red local) |
 | Navegador y dispositivos | Google Chrome en Windows; vista de teléfono simulada con un ancho de 375 px |
-| Ejecutado por | Ejecución asistida por IA (Claude, mediante la extensión Claude en Chrome), supervisada por Subcoordinador(Gabriel Rendon). |
+| Ejecutado por | Ejecución asistida por IA (Claude, mediante la extensión Claude en Chrome), supervisada por Gabriel Rendon (subcoordinador). |
 
 **Datos de prueba** (cargados por `backend/api-completa/DataBase/inau_talleres.sql`; las contraseñas no se publican):
 
@@ -71,7 +71,7 @@ Se prueban los requerimientos de la primera versión desde la interfaz de cada r
 | NF-01 | NRF01 | Recorrer los tres paneles con ancho de teléfono | El contenido se adapta a la pantalla, sin desplazamiento horizontal | Se cargaron las 27 páginas de los tres paneles con 375 px de ancho: en ninguna el contenido superó el ancho de la pantalla. Prueba en vista simulada, no en un teléfono físico | Aprobado |
 | NF-02 | NRF07 | Como alumna, abrir una página del panel del administrador | No muestra datos; la API responde "No tenes permisos para hacer esto." | Al abrir `frontend-admin/alumnos.html`, redirigió al panel de la alumna. La API respondió 403 "No tenes permisos para hacer esto." | Aprobado |
 | NF-03 | NRF07 | Como tallerista, abrir el detalle de un taller al que no está asignado (`detalle-taller.html?id=2`) | La API rechaza la petición | La pantalla mostró "Este taller no está asignado a tu usuario." La API respondió 403 "No tenés permisos para consultar este taller." También se rechazó a la alumna el contenido del taller 3, en el que no está inscripta (403) | Aprobado |
-| NF-04 | NRF11 | Subir un `.exe` y un `.docx` como adjuntos | El `.exe` se rechaza; el `.docx` se acepta, porque NRF11 incluye documentos de oficina | El `.exe` se rechazó en el formulario ("Formato no permitido. Elegí un archivo PDF o JPG.") y en la API (422, "Solo se permiten archivos PDF o JPG."). El `.docx` también se rechazó, con los mismos mensajes | Fallido |
+| NF-04 | NRF11 | Subir un `.exe` y un `.docx` como adjuntos | El `.exe` se rechaza; el `.docx` se acepta, porque NRF11 incluye documentos de oficina | El `.exe` se rechazó en el formulario ("Formato no permitido. Elegí un archivo PDF o JPG.") y en la API (422, "Solo se permiten archivos PDF o JPG."). El `.docx` también se rechazó, con los mismos mensajes. *Nota: NRF11 se modificó después de esta prueba (Control de Cambios CC-13); con el requisito vigente, que admite solo PDF y JPG, este resultado corresponde a Aprobado.* | Fallido |
 | NF-05 | NRF12 | Subir un PDF de más de 10 MB | "El archivo no puede superar los 10 MB." | El formulario de la alumna mostró "El archivo no puede superar los 10 MB." y no permitió enviarlo. La API también lo rechazó (422, "El archivo supera el tamaño permitido.") | Aprobado |
 | NF-06 | Seguridad (XSS) | Escribir `<script>alert(1)</script>` como título de un material | Se muestra como texto, sin ejecutarse | El título `<script>alert(1)</script><img src=x onerror=alert(2)>` se mostró como texto en el panel del tallerista y en el de la alumna; no se ejecutó ningún código | Aprobado |
 | NF-07 | NRF09 | Ejecutar `docker compose down` y `docker compose up -d`, y volver a entrar | Los datos creados durante las pruebas se conservan | Tras reiniciar los contenedores, siguieron presentes el tallerista, la alumna y el taller creados, la asistencia del 24/10, la entrega corregida, los dos reportes y el PDF entregado (se descargó correctamente) | Aprobado |
@@ -88,10 +88,10 @@ Se prueban los requerimientos de la primera versión desde la interfaz de cada r
 | DEF-02 | CP-13 | La exportación de informes genera un archivo JSON, no PDF ni Excel | Alta | Abierto | Control de Cambios CC-11 |
 | DEF-03 | CP-14 | No existe opción para generar el listado de alumnos ni el informe de talleristas | Media | Abierto | Revisión de Coherencia §5 (RF19 y RF22) |
 | DEF-04 | CP-16 | No existe la consulta de datos sensibles | Media | Abierto | Control de Cambios CC-12 |
-| DEF-05 | NF-04 | El formulario y la API rechazan los documentos de oficina que NRF11 admite | Media | Cerrado | por cambio de requisito (CC-13) |
-| DEF-06 | CP-09 | El formulario del tallerista no permite adjuntar archivos al material; la API sí lo admite | Media | Abierto | — |
-| DEF-07 | CP-11 | La interfaz del tallerista no ofrece eliminar una nota (RF17); la API sí lo admite | Media | Abierto | — |
-| DEF-08 | CP-10 | El adjunto de ejemplo del script SQL está registrado en la base, pero el archivo no existe en el servidor | Baja | Abierto | — |
+| DEF-05 | NF-04 | El formulario y la API rechazan los documentos de oficina que NRF11 admitía al momento de la prueba | Media | Cerrado (requisito modificado) | Control de Cambios CC-13 |
+| DEF-06 | CP-09 | El formulario del tallerista no permite adjuntar archivos al material; la API sí lo admite | Media | Abierto | Justificación Tecnológica §7 |
+| DEF-07 | CP-11 | La interfaz del tallerista no ofrece eliminar una nota (RF17); la API sí lo admite | Media | Abierto | Justificación Tecnológica §7 |
+| DEF-08 | CP-10 | El adjunto de ejemplo del script SQL está registrado en la base, pero el archivo no existe en el servidor | Baja | Abierto | Plan de Contingencia PC-12 |
 
 ---
 
@@ -110,8 +110,8 @@ Se prueban los requerimientos de la primera versión desde la interfaz de cada r
 **Observaciones de la ejecución:**
 - Las confirmaciones del navegador ("¿Desea quitar…?", "¿Querés eliminar…?", "¿Desea cerrar sesión?") se aceptaron automáticamente durante la ejecución asistida.
 - En el formulario de edición de alumnos del administrador, la cédula aparece como solo lectura.
-- En el entorno probado, los puertos de la API (8002) y de MySQL (3308) quedaron publicados en todas las interfaces de la máquina virtual (`0.0.0.0`), porque el `.env` del servidor no los restringe a `127.0.0.1` como indica la guía de despliegue.
+- En el entorno probado, los puertos de la API (8002) y de MySQL (3308) quedaron publicados en todas las interfaces de la máquina virtual (`0.0.0.0`), porque el `.env` del servidor no los restringe a `127.0.0.1` como indica la guía de despliegue. Corregido después de las pruebas: los puertos se limitaron a `127.0.0.1` y se verificó con Nmap (`Doc NMAP.md`, sección 10).
 
 **Limitaciones:** las pruebas fueron manuales y asistidas, sin pruebas automatizadas; no se probaron rendimiento (NRF03) ni disponibilidad continua (NRF02); la vista de teléfono fue simulada; se usaron los datos de prueba del script, no datos reales de INAU.
 
-**Documentos relacionados:** `requerimientos.md`, `Documento de Reconstruccion - Servidor.md`, `Revision_Coherencia_INAU.md` y `Control_de_Cambios.md`.
+**Documentos relacionados:** `requerimientos.md`, `Documento de Reconstruccion - Servidor.md`, `Revision_Coherencia_INAU.md`, `Control_de_Cambios.md`, `Doc NMAP.md` y `Hardening de Infraestructura y Contenedores.md`.
