@@ -4,9 +4,9 @@
 -- Motor: MySQL 8.0 o superior (requiere soporte de CHECK constraints)
 -- =====================================================================
  
-DROP DATABASE IF EXISTS inau_talleres;
+SET NAMES utf8mb4;
 
-SET NAMES
+DROP DATABASE IF EXISTS inau_talleres;
 
 CREATE DATABASE inau_talleres
     CHARACTER SET utf8mb4
