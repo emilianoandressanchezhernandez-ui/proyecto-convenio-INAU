@@ -22,6 +22,8 @@ Aplicación web para la gestión de talleres socioeducativos realizados en conve
 proyecto-convenio-INAU/
 │
 ├── README.md
+├── .gitignore                       → reglas de exclusión de Git (excluye .env)
+├── .gitattributes                   → normalización de saltos de línea
 │
 ├── backend/
 │   ├── .gitignore                   → reglas de exclusión de Git (vacío)
@@ -75,12 +77,17 @@ proyecto-convenio-INAU/
 │   │   └── Testing/
 │   │       └── Testing-01.md
 │   │
-│   └── 05-Ciberseguridad/
-│       ├── Doc NMAP.md
-│       ├── Hardening de Infraestructura y Contenedores.md
-│       ├── Identificación de amenazas.md
-│       ├── Mecanismos_Autenticacion_Criptografia_INAU.md
-│       └── Plan de Contingencia.md
+│   ├── 05-Ciberseguridad/
+│   │   ├── Doc NMAP.md
+│   │   ├── Hardening de Infraestructura y Contenedores.md
+│   │   ├── Identificación de amenazas.md
+│   │   ├── Mecanismos_Autenticacion_Criptografia_INAU.md
+│   │   └── Plan de Contingencia.md
+│   │
+│   └── 06-Emprendedurismo/
+│       └── Plan de Negocios.md
+│
+│
 │
 └── frontend/
     ├── index.html                   → pantalla de acceso
@@ -176,7 +183,7 @@ proyecto-convenio-INAU/
 
 | Carpeta | Contenido | Archivos |
 | --- | --- | --- |
-| Raíz | `README.md` | 1 |
+| Raíz | `README.md`, `.gitignore`, `.gitattributes` | 3 |
 | `backend/` | Reglas de exclusión de Git (archivo vacío) | 1 |
 | `backend/api-completa/` | API REST en PHP, configuración Docker y script de la base de datos con datos de prueba | 74 |
 | `docs/` | Índice de la estructura del repositorio | 1 |
@@ -187,12 +194,13 @@ proyecto-convenio-INAU/
 | `docs/03-diseño/Modelado/` | Modelo de clases y MER, anexo de derivación y análisis del modelo | 3 |
 | `docs/04-implementacion/` | Reconstrucción en servidor, estado inicial, infraestructura y documentación de la API | 4 |
 | `docs/04-implementacion/Testing/` | Plan y registro de pruebas | 1 |
-| `docs/05-Ciberseguridad/` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening de infraestructura y contenedores, escaneo con Nmap y plan de contingencia (asignatura electiva) | 5 |
+| `docs/05-Ciberseguridad/` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening de infraestructura y contenedores, escaneo con Nmap y plan de contingencia | 5 |
+| `docs/06-Emprendedurismo/` | Plan de negocios | 1 |
 | `frontend/` | Pantalla de acceso y scripts compartidos (`api.js`, `auth.js`) | 3 |
 | `frontend/frontend-admin/` | Panel del administrador: 11 páginas, 1 hoja de estilos, 15 scripts | 28 |
 | `frontend/frontend-tallerista/` | Panel del tallerista: 9 páginas, 1 hoja de estilos, 12 scripts | 23 |
 | `frontend/frontend-alumno/` | Panel del alumno: 7 páginas, 1 hoja de estilos, 10 scripts | 18 |
-| **Total** | | **174** |
+| **Total** | | **177** |
 
 
 <br>
@@ -233,3 +241,4 @@ La documentación se organiza en carpetas numeradas según la etapa del proyecto
 | `03-diseño` | Modelo de clases, modelo entidad-relación, identidad visual y justificación tecnológica |
 | `04-implementacion` | Estado inicial del desarrollo, entorno de ejecución, reconstrucción y despliegue, API y pruebas |
 | `05-Ciberseguridad` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening, escaneo con Nmap y plan de contingencia |
+| `06-Emprendedurismo` | Plan de negocios del producto |

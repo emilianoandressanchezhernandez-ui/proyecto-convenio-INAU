@@ -76,11 +76,7 @@ El `compose` funciona sin archivo `.env`, con valores por defecto de desarrollo.
 
 > La `SECRET_KEY` por defecto está publicada en el repositorio, por lo que **solo sirve para desarrollo**. Fuera de la máquina local debe generarse una nueva (por ejemplo, con `php -r "echo bin2hex(random_bytes(32));"`).
 
-El archivo `.env` no debe versionarse. El repositorio todavía no cuenta con un `.gitignore`; al crearlo debe incluir:
-
-```gitignore
-.env
-```
+El archivo `.env` no debe versionarse. El `.gitignore` de la raíz del repositorio lo excluye, junto con los patrones `.env.*`, salvo las plantillas `.env.example` y `.env.docker.example`.
 
 ---
 
