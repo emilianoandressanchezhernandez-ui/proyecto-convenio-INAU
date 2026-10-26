@@ -91,4 +91,35 @@ class AuthController extends Controller
             'Perfil actualizado.'
         );
     }
+
+    /**
+     * PATCH /perfil/clave
+     * Cambia la contraseña del usuario autenticado.
+     */
+    public function changePassword($id = null)
+    {
+        $data = $this->getJsonBody();
+
+        $errors = AuthValidator::validatePasswordChange($data);
+
+        if (count($errors) > 0) {
+            Response::error(
+                'Revisá los datos.',
+                400,
+                $errors
+            );
+            return;
+        }
+
+        $this->service->changePassword(
+            (int) $this->user()['id'],
+            $data['clave_actual'],
+            $data['clave_nueva']
+        );
+
+        Response::success(
+            null,
+            'Contraseña actualizada correctamente.'
+        );
+    }
 }

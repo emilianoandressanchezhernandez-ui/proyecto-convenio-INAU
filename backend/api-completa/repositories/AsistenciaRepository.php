@@ -202,4 +202,41 @@ class AsistenciaRepository extends Repository
             'alumno_id' => $alumnoId
         ]);
     }
+
+
+    /**
+     * Obtiene el historial de asistencias de un alumno.
+     *
+     * Solo devuelve registros correspondientes al alumno indicado.
+     * El ID debe obtenerse desde la sesión autenticada en el Service.
+     */
+    public function findByAlumno(int $alumnoId): array
+    {
+        $sql = "
+            SELECT
+                ra.id,
+                ra.alumno_id,
+                a.id AS asistencia_id,
+                a.taller_id,
+                t.nombre AS taller_nombre,
+                a.fecha,
+                ra.estado,
+                ra.observaciones
+            FROM registros_asistencia ra
+            INNER JOIN asistencias a
+                ON a.id = ra.asistencia_id
+            INNER JOIN talleres t
+                ON t.id = a.taller_id
+            WHERE ra.alumno_id = :alumno_id
+            ORDER BY a.fecha DESC, a.id DESC
+        ";
+
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->execute([
+            'alumno_id' => $alumnoId
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

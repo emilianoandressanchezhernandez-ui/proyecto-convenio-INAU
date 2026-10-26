@@ -579,27 +579,41 @@ function validarNuevoAlumno(datos) {
         datos.telefono
     ];
 
-    const hayCampoVacio = camposObligatorios.some(
-        campo => !campo
-    );
-
-    if (hayCampoVacio) {
+    if (camposObligatorios.some(campo => !campo)) {
         return "Todos los campos son obligatorios.";
     }
 
-    const cedulaDuplicada = alumnosActuales.some(
-        alumno => alumno.cedula === datos.cedula
-    );
+    // Permitir cedulas con o sin puntos y guion.
+    // Ejemplos: 51234567 o 5.123.456-7.
+    const cedulaSinFormato = datos.cedula.replace(/[.-]/g, "");
+
+    if (!/^\d{8}$/.test(cedulaSinFormato)) {
+        return "La cédula debe contener exactamente 8 dígitos.";
+    }
+
+    // Comparar cedulas ignorando puntos y guiones.
+    const cedulaDuplicada = alumnosActuales.some(alumno => {
+        const cedulaExistente = alumno.cedula.replace(/[.-]/g, "");
+        return cedulaExistente === cedulaSinFormato;
+    });
 
     if (cedulaDuplicada) {
         return "Ya existe un alumno registrado con esa cédula.";
     }
 
-    if (
-        datos.correo &&
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo)
-    ) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo)) {
         return "El correo electrónico no es válido.";
+    }
+
+    // Permitir numeros y separadores habituales, pero no letras.
+    if (!/^[0-9+\s()-]+$/.test(datos.telefono)) {
+        return "El teléfono solo puede contener números y separadores válidos.";
+    }
+
+    const digitosTelefono = datos.telefono.replace(/\D/g, "");
+
+    if (digitosTelefono.length < 8 || digitosTelefono.length > 15) {
+        return "El teléfono debe contener entre 8 y 15 dígitos.";
     }
 
     return null;

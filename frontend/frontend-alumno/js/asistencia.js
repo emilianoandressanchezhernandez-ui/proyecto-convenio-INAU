@@ -3,16 +3,14 @@
     ASISTENCIA.JS - FRONTEND ALUMNO
 
     Responsabilidades:
-    - Mostrar solo los registros del alumno actual en sus talleres inscriptos.
-    - Calcular el porcentaje, las presencias y las ausencias.
+    - Consultar GET /mis-asistencias.
+    - Mostrar únicamente las asistencias del alumno autenticado.
+    - Calcular presencias, ausencias y porcentaje.
     - Filtrar el historial por taller.
     - Mostrar observaciones registradas por el tallerista.
 
-    Esta pantalla es de solo lectura. Los datos actuales son simulados y no
-    se consulta la API real: sus rutas de asistencia están restringidas en
-    routes.php a administrador y tallerista.
+    Pantalla de solo lectura conectada a la API real.
 */
-
 "use strict";
 
 let registrosAsistenciaAlumno = [];
@@ -24,57 +22,87 @@ let registrosAsistenciaFiltrados = [];
 // INICIALIZACIÓN
 // ==============================
 
-function inicializarAsistencia() {
+async function inicializarAsistencia() {
     const tabla = document.getElementById("tabla-asistencia");
 
     if (!tabla) {
         return;
     }
 
+    ocultarErrorAsistencia();
+
     try {
-        validarDatosAsistenciaAlumno();
+        // Consultar las asistencias reales del alumno autenticado.
+        const respuesta = await fetch(
+            "http://localhost:8002/mis-asistencias",
+            {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Accept": "application/json"
+                }
+            }
+        );
 
-        const datos = window.DATOS_SIMULADOS;
-        const usuario = typeof obtenerUsuarioActual === "function"
-            ? obtenerUsuarioActual()
-            : datos.usuarioActual;
-        const alumnoId = obtenerIdAlumnoAsistencia(usuario);
+        const resultado = await respuesta.json();
 
-        if (!Number.isFinite(alumnoId)) {
-            throw new Error("No se pudo identificar al alumno actual.");
+        if (!respuesta.ok || !resultado.ok) {
+            throw new Error(
+                resultado.mensaje ||
+                "No se pudieron obtener tus asistencias."
+            );
         }
 
-        const talleres = obtenerListadoAsistencia("talleres", datos.talleres);
-        const inscripciones = obtenerListadoAsistencia("inscripciones", datos.inscripciones);
-        const asistenciasBase = obtenerListadoAsistencia("asistencias", datos.asistencias);
-        const asistenciasLocales = leerAsistenciasSimuladasGuardadas();
+        if (!Array.isArray(resultado.datos)) {
+            throw new Error(
+                "La API devolvió un formato de asistencias inválido."
+            );
+        }
 
-        const idsTalleresAlumno = obtenerIdsTalleresAsistencia(alumnoId, inscripciones);
-        talleresAsistenciaAlumno = talleres.filter((taller) =>
-            taller && idsTalleresAlumno.has(Number(taller.id))
-        );
+        // Adaptar los campos de MySQL al formato del frontend.
+        registrosAsistenciaAlumno = resultado.datos.map((registro) => ({
+            jornadaId: registro.asistencia_id,
+            tallerId: Number(registro.taller_id),
+            tallerNombre: registro.taller_nombre || "Taller",
+            fecha: registro.fecha,
+            estado: registro.estado,
+            observaciones: registro.observaciones || ""
+        }));
 
-        const todasLasJornadas = combinarJornadasAsistencia(
-            asistenciasBase,
-            asistenciasLocales
-        );
+        // Construir el listado de talleres para el filtro.
+        const talleresUnicos = new Map();
 
-        registrosAsistenciaAlumno = aplanarRegistrosAsistencia(
-            todasLasJornadas,
-            alumnoId,
-            idsTalleresAlumno,
-            talleresAsistenciaAlumno
+        registrosAsistenciaAlumno.forEach((registro) => {
+            talleresUnicos.set(registro.tallerId, {
+                id: registro.tallerId,
+                nombre: registro.tallerNombre
+            });
+        });
+
+        talleresAsistenciaAlumno = Array.from(
+            talleresUnicos.values()
         );
 
         configurarFiltroTallerAsistencia();
         aplicarFiltroAsistencia();
+
         ocultarErrorAsistencia();
 
     } catch (error) {
-        console.error("Error al cargar la asistencia del alumno:", error);
-        mostrarErrorAsistenciaAlumno(
-            error.message || "No se pudo cargar tu historial de asistencia."
+        console.error(
+            "Error al cargar la asistencia del alumno:",
+            error
         );
+
+        mostrarErrorAsistenciaAlumno(
+            error.message ||
+            "No se pudo cargar tu historial de asistencia."
+        );
+
+        registrosAsistenciaAlumno = [];
+        talleresAsistenciaAlumno = [];
+
+        configurarFiltroTallerAsistencia();
         mostrarResumenAsistencia([]);
         renderizarTablaAsistencia([]);
     }
@@ -355,11 +383,11 @@ function obtenerClaseEstadoAsistencia(estado) {
     const clases = {
         presente: "text-bg-success",
         ausente: "text-bg-danger",
-        justificado: "text-bg-info",
-        tardanza: "text-bg-warning"
+        justificado: "text-bg-info"
     };
 
-    return clases[normalizarEstadoAsistencia(estado)] || "text-bg-secondary";
+    return clases[normalizarEstadoAsistencia(estado)] ||
+        "text-bg-secondary";
 }
 
 

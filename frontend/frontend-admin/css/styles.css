@@ -200,7 +200,7 @@ a.text-decoration-none .taller-card:hover {
     gap: 1rem;
 }
 
-.accesos-admin > div {
+.accesos-admin>div {
     width: auto;
 }
 
@@ -211,11 +211,11 @@ a.text-decoration-none .taller-card:hover {
 
 /* Tarjetas de estadísticas del dashboard */
 
-body[data-page="dashboard"] main > .row.mt-5 .card {
+body[data-page="dashboard"] main>.row.mt-5 .card {
     border-top: 3px solid var(--acento);
 }
 
-body[data-page="dashboard"] main > .row.mt-5 .card-body {
+body[data-page="dashboard"] main>.row.mt-5 .card-body {
     display: grid;
     grid-template-columns: 50px minmax(0, 1fr);
     grid-template-rows: auto auto;
@@ -224,13 +224,13 @@ body[data-page="dashboard"] main > .row.mt-5 .card-body {
     text-align: left !important;
 }
 
-body[data-page="dashboard"] main > .row.mt-5 .display-5 {
+body[data-page="dashboard"] main>.row.mt-5 .display-5 {
     grid-row: 1 / 3;
     margin: 0;
     font-size: 2rem;
 }
 
-body[data-page="dashboard"] main > .row.mt-5 h3 {
+body[data-page="dashboard"] main>.row.mt-5 h3 {
     margin: 0 !important;
     font-size: 1.85rem;
 }
@@ -297,7 +297,7 @@ body[data-page="dashboard"] main > .row.mt-5 h3 {
     border-color: #e3e0d9;
 }
 
-.table-hover tbody tr:hover > * {
+.table-hover tbody tr:hover>* {
     background-color: #f0ede7;
 }
 
@@ -465,4 +465,24 @@ main {
     .btn {
         font-size: 0.92rem;
     }
+}
+
+
+/* =========================================
+   ANIMACIONES DE ALERTAS
+   ========================================= */
+
+.alerta-animada {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 250ms ease, transform 250ms ease;
+}
+
+.alerta-animada.alerta-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.alerta-animada.d-none {
+    display: none !important;
 }

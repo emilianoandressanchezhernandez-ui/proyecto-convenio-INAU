@@ -182,4 +182,66 @@ class AuthService
 
         return $this->getProfile($id);
     }
+
+
+    /**
+     * Cambia la contraseña del usuario autenticado.
+     *
+     * Verifica la contraseña actual y almacena únicamente
+     * el hash de la nueva contraseña.
+     */
+    public function changePassword(
+        int $usuarioId,
+        string $claveActual,
+        string $claveNueva
+    ): void {
+        // Obtener el usuario desde MySQL.
+        $user = $this->repository->findById($usuarioId);
+
+        if ($user === null) {
+            Response::error(
+                'El usuario ya no existe.',
+                404
+            );
+            return;
+        }
+
+        // Verificar la contraseña actual.
+        if (!$user->checkPassword($claveActual)) {
+            Response::error(
+                'La contraseña actual es incorrecta.',
+                400
+            );
+            return;
+        }
+
+        // Comprobar que la nueva contraseña sea diferente.
+        if ($claveActual === $claveNueva) {
+            Response::error(
+                'La nueva contraseña debe ser diferente de la actual.',
+                400
+            );
+            return;
+        }
+
+        // Generar un hash seguro.
+        $nuevoHash = password_hash(
+            $claveNueva,
+            PASSWORD_DEFAULT
+        );
+
+        // Actualizar únicamente la contraseña del usuario.
+        $actualizado = $this->repository->actualizarClave(
+            $usuarioId,
+            $nuevoHash
+        );
+
+        if (!$actualizado) {
+            Response::error(
+                'No se pudo cambiar la contraseña.',
+                500
+            );
+            return;
+        }
+    }
 }

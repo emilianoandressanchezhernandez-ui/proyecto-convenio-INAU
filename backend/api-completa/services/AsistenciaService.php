@@ -15,6 +15,37 @@ class AsistenciaService
         $this->asignacionRepository = new AsignacionRepository();
     }
 
+    /**
+     * Obtiene las asistencias del alumno autenticado.
+     */
+    public function getMisAsistencias(array $usuario): array
+    {
+        if (
+            !isset($usuario['id'], $usuario['rol']) ||
+            $usuario['rol'] !== 'alumno'
+        ) {
+            throw new RuntimeException(
+                'Esta consulta está disponible únicamente para alumnos.',
+                403
+            );
+        }
+
+        $alumno = $this->alumnoRepository->obtenerPorUsuarioId(
+            (int) $usuario['id']
+        );
+
+        if ($alumno === null) {
+            throw new RuntimeException(
+                'No se encontró el perfil de alumno asociado a tu cuenta.',
+                404
+            );
+        }
+
+        return $this->repository->findByAlumno(
+            (int) $alumno['id']
+        );
+    }
+
     public function getByTaller(
         int $tallerId,
         array $usuario

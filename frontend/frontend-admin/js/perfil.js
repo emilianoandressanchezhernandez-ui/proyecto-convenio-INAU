@@ -27,11 +27,10 @@ let perfilGuardando = false;
 
 async function inicializarPerfil() {
     configurarEdicionPerfilReal();
-    deshabilitarPasswordPerfil();
+    configurarCambioPasswordPerfil();
 
     await cargarPerfilReal();
 }
-
 
 // ======================================
 // PETICIONES A LA API
@@ -437,50 +436,100 @@ function salirModoEdicionPerfil() {
 // ======================================
 
 function validarEdicionPerfilReal(correo, telefono) {
-    if (!correo) {
-        return "Debés completar el correo electrónico.";
+    if (telefono) {
+        const telefonoLimpio = telefono.trim();
+        const cantidadDigitos = (telefonoLimpio.match(/\d/g) || []).length;
+
+        if (!/^\+?[0-9\s-]+$/.test(telefonoLimpio)) {
+            return "El teléfono solo puede contener números, espacios, guiones y un + al inicio.";
+        }
+
+        if (cantidadDigitos < 8 || cantidadDigitos > 15) {
+            return "El teléfono debe tener entre 8 y 15 dígitos.";
+        }
     }
-
-    const correoValido =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
-
-    if (!correoValido) {
-        return "El correo electrónico no tiene un formato válido.";
-    }
-
-    if (correo.length > 255) {
-        return "El correo electrónico es demasiado largo.";
-    }
-
-    if (telefono.length > 30) {
-        return "El teléfono es demasiado largo.";
-    }
-
-    return null;
 }
 
 
-// ======================================
-// CAMBIO DE CONTRASEÑA PENDIENTE
-// ======================================
 
-function deshabilitarPasswordPerfil() {
-    const ids = [
-        "password-actual",
-        "password-nueva",
-        "password-confirmar",
-        "btn-guardar-password"
-    ];
+/**
+ * CAMBIO DE CONTRASEÑA
+ * PATCH /perfil/clave
+ */
 
-    ids.forEach(id => {
-        const elemento = document.getElementById(id);
+let cambiandoPasswordPerfil = false;
 
-        if (elemento) {
-            elemento.disabled = true;
-            elemento.title =
-                "Funcionalidad pendiente de implementación";
-        }
-    });
+function configurarCambioPasswordPerfil() {
+    const boton = document.getElementById("btn-guardar-password");
+
+    boton?.addEventListener("click", cambiarPasswordPerfil);
+}
+
+async function cambiarPasswordPerfil() {
+    if (cambiandoPasswordPerfil || !usuarioPerfilActual) return;
+
+    const inputActual = document.getElementById("password-actual");
+    const inputNueva = document.getElementById("password-nueva");
+    const inputConfirmar = document.getElementById("password-confirmar");
+    const boton = document.getElementById("btn-guardar-password");
+
+    const claveActual = inputActual.value;
+    const claveNueva = inputNueva.value;
+    const confirmarClave = inputConfirmar.value;
+
+    if (!claveActual || !claveNueva || !confirmarClave) {
+        mostrarMensajePerfil("Completá los tres campos de contraseña.", "danger");
+        return;
+    }
+
+    if (claveNueva.length < 8) {
+        mostrarMensajePerfil("La nueva contraseña debe tener al menos 8 caracteres.", "danger");
+        return;
+    }
+
+    if (claveNueva !== confirmarClave) {
+        mostrarMensajePerfil("Las contraseñas nuevas no coinciden.", "danger");
+        return;
+    }
+
+    if (claveNueva === claveActual) {
+        mostrarMensajePerfil("La nueva contraseña debe ser diferente de la actual.", "danger");
+        return;
+    }
+
+    cambiandoPasswordPerfil = true;
+    boton.disabled = true;
+    boton.textContent = "Cambiando...";
+
+    try {
+        await solicitarPerfilAPI("/perfil/clave", {
+            method: "PATCH",
+            body: JSON.stringify({
+                clave_actual: claveActual,
+                clave_nueva: claveNueva
+            })
+        });
+
+        inputActual.value = "";
+        inputNueva.value = "";
+        inputConfirmar.value = "";
+
+        mostrarMensajePerfil(
+            "Contraseña actualizada correctamente. Usá la nueva contraseña en tu próximo inicio de sesión.",
+            "success"
+        );
+
+    } catch (error) {
+        mostrarMensajePerfil(
+            error.message || "No se pudo cambiar la contraseña.",
+            "danger"
+        );
+
+    } finally {
+        cambiandoPasswordPerfil = false;
+        boton.disabled = false;
+        boton.innerHTML = '<i class="bi bi-shield-lock-fill"></i> Cambiar Contraseña';
+    }
 }
 
 

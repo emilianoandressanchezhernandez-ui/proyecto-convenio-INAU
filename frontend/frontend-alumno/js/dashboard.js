@@ -15,75 +15,144 @@
 
 "use strict";
 
-function inicializarDashboard() {
+
+async function inicializarDashboard() {
+    ocultarAlertaDashboard();
+
     try {
-        validarDatosDashboard();
+        const apiBase = "http://localhost:8002";
 
-        const datos = window.DATOS_SIMULADOS;
-        const usuario = obtenerUsuarioActual();
-        const alumnoId = obtenerIdAlumnoDashboard(usuario);
+        async function consultarAPI(ruta) {
+            const respuesta = await fetch(apiBase + ruta, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Accept": "application/json"
+                }
+            });
 
-        if (!Number.isFinite(alumnoId)) {
-            throw new Error("No se pudo determinar el ID del alumno actual.");
+            const resultado = await respuesta.json();
+
+            if (!respuesta.ok || !resultado.ok) {
+                throw new Error(
+                    resultado.mensaje ||
+                    "No se pudieron consultar los datos."
+                );
+            }
+
+            return resultado.datos;
         }
 
-        const inscripciones = obtenerListadoDashboard(
-            "inscripciones",
-            datos.inscripciones
-        );
-        const talleres = obtenerListadoDashboard("talleres", datos.talleres);
-        const contenidos = obtenerListadoDashboard("contenidos", datos.contenidos);
-        const entregas = obtenerListadoDashboard("entregas", datos.entregas);
-        const asistencias = obtenerListadoDashboard("asistencias", datos.asistencias);
+        // Obtener información real del alumno y sus talleres.
+        const [usuario, talleres, asistencias] = await Promise.all([
+            consultarAPI("/perfil"),
+            consultarAPI("/mis-talleres"),
+            consultarAPI("/mis-asistencias")
+        ]);
 
-        const idsTalleresAlumno = obtenerIdsTalleresAlumnoDashboard(
-            alumnoId,
-            inscripciones
-        );
-
-        const talleresAlumno = talleres.filter((taller) =>
-            idsTalleresAlumno.has(Number(taller.id))
-        );
-
-        const tareasAlumno = contenidos.filter((contenido) =>
-            normalizarTextoDashboard(contenido.tipo) === "tarea" &&
-            idsTalleresAlumno.has(Number(contenido.tallerId))
-        );
-
-        const entregasAlumno = entregas.filter((entrega) =>
-            Number(entrega.alumnoId) === alumnoId
-        );
+        if (!Array.isArray(talleres) || !Array.isArray(asistencias)) {
+            throw new Error("La API devolvió datos inválidos.");
+        }
 
         mostrarSaludoDashboard(usuario);
-        colocarTextoDashboard("cantidad-talleres-dashboard", talleresAlumno.length);
+
         colocarTextoDashboard(
-            "tareas-pendientes-dashboard",
-            contarTareasPendientesDashboard(tareasAlumno, entregasAlumno)
+            "cantidad-talleres-dashboard",
+            talleres.length
         );
 
-        const porcentajeAsistencia = calcularAsistenciaPromedioDashboard(
-            asistencias,
-            alumnoId,
-            idsTalleresAlumno
-        );
+        // Calcular asistencia usando únicamente registros reales.
+        const totalAsistencias = asistencias.length;
+
+        const presentes = asistencias.filter(
+            registro =>
+                normalizarTextoDashboard(registro.estado) === "presente"
+        ).length;
+
+        const porcentaje = totalAsistencias > 0
+            ? `${Math.round(presentes / totalAsistencias * 100)}%`
+            : "—";
 
         colocarTextoDashboard(
             "asistencia-promedio-dashboard",
-            porcentajeAsistencia === null ? "—" : `${porcentajeAsistencia}%`
+            porcentaje
         );
 
+        // Consultar los contenidos de todos los talleres.
+        const contenidosPorTaller = await Promise.all(
+            talleres.map(async taller => {
+                const contenidos = await consultarAPI(
+                    `/talleres/${encodeURIComponent(taller.id)}/contenidos`
+                );
+
+                if (!Array.isArray(contenidos)) {
+                    throw new Error("La lista de contenidos es inválida.");
+                }
+
+                return contenidos;
+            })
+        );
+
+        const tareas = contenidosPorTaller
+            .flat()
+            .filter(contenido =>
+                normalizarTextoDashboard(contenido.tipo) === "tarea"
+            );
+
+        // Consultar la entrega propia de cada tarea.
+        const tareasConEntrega = await Promise.all(
+            tareas.map(async tarea => {
+                const entrega = await consultarAPI(
+                    `/contenidos/${encodeURIComponent(tarea.id)}/mi-entrega`
+                );
+
+                return {
+                    id: tarea.id,
+                    titulo: tarea.titulo,
+                    tallerId: Number(tarea.taller_id),
+                    fechaLimite: tarea.fecha_limite,
+                    entregaAlumno: entrega
+                };
+            })
+        );
+
+        // Pendiente significa que no existe una entrega.
+        const tareasPendientes = tareasConEntrega.filter(
+            tarea => tarea.entregaAlumno === null
+        );
+
+        colocarTextoDashboard(
+            "tareas-pendientes-dashboard",
+            tareasPendientes.length
+        );
+
+        const talleresNormalizados = talleres.map(taller => ({
+            id: Number(taller.id),
+            nombre: taller.nombre
+        }));
+
+        // La función existente construye las próximas entregas.
         mostrarProximasTareasDashboard(
-            tareasAlumno,
-            entregasAlumno,
-            talleresAlumno
+            tareasPendientes,
+            [],
+            talleresNormalizados
         );
 
         ocultarAlertaDashboard();
+
     } catch (error) {
-        console.error("Error al inicializar el dashboard del alumno:", error);
-        mostrarErrorDashboard("No se pudieron cargar los datos del panel. Recargá la página e intentá nuevamente.");
+        console.error(
+            "Error al cargar el dashboard del alumno:",
+            error
+        );
+
+        mostrarErrorDashboard(
+            error.message ||
+            "No se pudieron cargar los datos del panel."
+        );
     }
 }
+
 
 
 // ==============================
