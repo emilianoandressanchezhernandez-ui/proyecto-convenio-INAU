@@ -752,15 +752,15 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 
 ## 23. Estado de los requerimientos al cierre
 
-Estado verificado en las pruebas del sistema del 24/10/2026 (`docs/04-implementacion/Testing/Testing-01.md`).
+Estado verificado en las pruebas del sistema del 24/10/2026 (`docs/04-implementacion/Testing/Testing-01.md`) y del 26/10/2026 (`Testing-02.md, casos citados como “T2”`).
 
 | Área | Requerimiento | Estado | Observación | Prueba |
 | --- | --- | --- | --- | --- |
 | Autenticación y acceso por rol | RF01 — Inicio de sesión diferenciado por rol | Cumplido | Acceso por correo y contraseña; cada rol es redirigido a su panel. | CP-01, CP-02, CP-03 |
-| Gestión de usuarios y talleres | RF02 — Gestión de alumnos, talleristas y talleres | Cumplido | Alta y edición verificadas; la eliminación no se probó. | CP-04, CP-05 |
-| Gestión de usuarios y talleres | RF03 — Asignación de alumnos y talleristas a talleres | Cumplido | — | CP-06 |
-| Registro y corrección de asistencia | RF04 — Registrar asistencia | Cumplido | Los cuatro estados se guardan correctamente. | CP-07 |
-| Registro y corrección de asistencia | RF05 — Consultar y modificar asistencia | Cumplido | El tallerista consulta y modifica la asistencia. La vista de asistencia del alumno muestra datos simulados. | CP-07, CP-08 |
+| Gestión de usuarios y talleres | RF02 — Gestión de alumnos, talleristas y talleres | Cumplido |Alta y edición verificadas; la eliminación no se probó. La cédula (8 dígitos) y el teléfono (8 a 15 dígitos) se validan en el formulario y en la API. La misma cédula escrita con o sin puntos se acepta dos veces (DEF-09).|CP-04, CP-05; T2 CP-06 a CP-08|
+| Gestión de usuarios y talleres | RF03 — Asignación de alumnos y talleristas a talleres | Cumplido | — |CP-06; T2 CP-09|
+| Registro y corrección de asistencia | RF04 — Registrar asistencia | Cumplido | Los cuatro estados se guardan correctamente. |CP-07; T2 CP-02|
+| Registro y corrección de asistencia | RF05 — Consultar y modificar asistencia | Cumplido | El tallerista consulta y modifica la asistencia, y el alumno consulta sus registros reales (DEF-01 corregido). |CP-07, CP-08; T2 CP-01|
 | Material, tareas y entregas | RF06 — Subir material y tareas | Parcial | Material y tareas se publican, pero el formulario del tallerista no permite adjuntar archivos; solo es posible mediante la API. | CP-09 |
 | Material, tareas y entregas | RF07 — El alumno visualiza material y tareas | Cumplido | — | CP-10 |
 | Material, tareas y entregas | RF08 — El alumno envía archivos de una tarea | Cumplido | Entrega con PDF y comentario. | CP-10 |
@@ -773,7 +773,7 @@ Estado verificado en las pruebas del sistema del 24/10/2026 (`docs/04-implementa
 | Informes y exportación | RF13 — Exportar informes en PDF o Excel | Pendiente | La descarga genera un archivo JSON. | CP-13 |
 | Informes y exportación | RF19 — Listado de alumnos | Pendiente | No existe la opción para generarlo. | CP-14 |
 | Informes y exportación | RF22 — Informe de talleristas | Pendiente | No existe la opción para generarlo. | CP-14 |
-| Gestión de perfil | RF14 — Gestionar el perfil | Parcial | Se modifican los datos de contacto; el cambio de contraseña no está disponible en ningún rol. | CP-15 |
+| Gestión de perfil | RF14 — Gestionar el perfil | Parcial | Se modifican los datos de contacto. El cambio de contraseña está implementado en la API para los tres roles, pero solo el administrador lo tiene en la interfaz (DEF-10). | CP-15; T2 CP-03 a CP-05 |
 | Datos sensibles y listado por taller | RF24 — Consultar datos sensibles | Pendiente | No existe la funcionalidad. | CP-16 |
 | Datos sensibles y listado por taller | RF25 — Listado de alumnos del taller | Cumplido | — | CP-06 |
 | Funciones postergadas por plazo | RF15, RF18, RF20, RF21, RF23, RF26 | Postergado | Pendiente para una fase futura (Control de Cambios, CC-01). | — |
@@ -804,6 +804,6 @@ Estado verificado en las pruebas del sistema del 24/10/2026 (`docs/04-implementa
 
 El proyecto partió de una necesidad general del cliente: organizar la gestión de los talleres que se dictan en convenio con INAU. La entrevista permitió convertirla en un alcance concreto, con tres roles diferenciados y veintiséis requerimientos funcionales, y el equipo organizó el trabajo con Scrum en seis sprints quincenales. El plan se ajustó de 91 a 63 puntos para respetar el plazo de doce semanas y la capacidad de un equipo de tres integrantes, y seis funciones se postergaron de forma explícita para una fase futura, según consta en el Control de Cambios.
 
-Como resultado, se cerró el alcance de la primera versión: una API REST en PHP organizada en capas, una base de datos MySQL derivada del modelo de clases, autenticación con JWT y control de acceso por rol, y tres paneles web responsive conectados a la API. El administrador gestiona usuarios y talleres y dispone de informes exportables; el tallerista registra la asistencia, publica material y tareas y corrige las entregas; y el alumno consulta el material y entrega sus trabajos. Todo el entorno se levanta con Docker y su despliegue en un servidor quedó documentado.
+Como resultado, se cerró el alcance de la primera versión: una API REST en PHP organizada en capas, una base de datos MySQL derivada del modelo de clases, autenticación con JWT y control de acceso por rol, y tres paneles web responsive conectados a la API. El administrador gestiona usuarios y talleres y dispone de informes exportables; el tallerista registra la asistencia, publica material y tareas y corrige las entregas; y el alumno consulta el material y su asistencia, y entrega sus trabajos. Todo el entorno se levanta con Docker y su despliegue en un servidor quedó documentado.
 
 La principal limitación fue la ausencia del cliente durante el desarrollo: sin Sprint Reviews, el alcance dependió por completo de la entrevista inicial. Aun así, la trazabilidad entre entrevista, requerimientos, historias de usuario, modelo y código permite verificar que lo construido responde a lo que el cliente pidió. El sistema queda como una primera versión funcional, con mejoras identificadas en la Revisión de Coherencia y preparada para incorporar las funciones postergadas.
