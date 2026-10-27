@@ -3,7 +3,7 @@
 **Proyecto:** TheNewfutures — Sistema de Gestión de Talleres en Convenio con INAU  
 **Área:** Ciberseguridad  
 **Fecha de elaboración:** 10 de octubre de 2026  
-**Última actualización:** 25 de octubre de 2026  
+**Última actualización:** 27 de octubre de 2026 
 
 ---
 
@@ -30,12 +30,12 @@ La existencia de una función de seguridad no implica que la API esté lista par
 
 | Fuente del repositorio | Información utilizada |
 |---|---|
-| `backend/api-completa/controllers/AuthController.php` | Endpoints de login, logout y perfil; creación y eliminación de cookie. |
-| `backend/api-completa/services/AuthService.php` | Verificación de credenciales, estado de la cuenta y actualización de perfil. |
-| `backend/api-completa/validators/AuthValidator.php` | Validación de los datos recibidos por login y perfil. |
+| `backend/api-completa/controllers/AuthController.php` | Endpoints de login, logout, perfil y cambio de contraseña; creación y eliminación de cookie. |
+| `backend/api-completa/services/AuthService.php` | Verificación de credenciales, estado de la cuenta, actualización de perfil y cambio de contraseña. |
+| `backend/api-completa/validators/AuthValidator.php` | Validación de los datos recibidos por login, perfil y cambio de contraseña. |
 | `backend/api-completa/dtos/LoginDTO.php` | Estructura de los datos de inicio de sesión. |
 | `backend/api-completa/models/User.php` | Verificación de contraseña y datos que se devuelven al cliente. |
-| `backend/api-completa/repositories/UserRepository.php` | Búsqueda por correo, lectura de `clave_hash` y actualización del último acceso. |
+| `backend/api-completa/repositories/UserRepository.php` | Búsqueda por correo, lectura y actualización de `clave_hash` y actualización del último acceso. |
 | `backend/api-completa/services/TalleristaService.php` | Generación de hashes cuando se crea o se cambia la contraseña de un tallerista. |
 | `backend/api-completa/repositories/TalleristaRepository.php` | Persistencia del campo `clave_hash` en la tabla de usuarios. |
 | `backend/api-completa/core/Token.php` | Creación, lectura, firma y vencimiento de JWT; atributos de la cookie. |
@@ -80,7 +80,7 @@ Las contraseñas no se comparan como texto plano. Se almacena un hash en la colu
 | Revocación server-side de un JWT ya emitido | No implementada | Pendiente |
 | Protección CSRF completa | No implementada | Pendiente |
 | Limitación efectiva de intentos en la API | La clase existe, pero no está conectada a `index.php` | `core/RateLimiter.php`, `index.php` |
-| Cambio de contraseña propio desde `PATCH /perfil` | No implementado; la ruta permite correo y teléfono | `AuthController.php`, `AuthValidator.php` |
+| Cambio de contraseña propio (`PATCH /perfil/clave`) | Implementado en la API para los tres roles; en la interfaz, solo en el panel del administrador | `AuthController.php`, `AuthService.php`, `AuthValidator.php` |
 
 ---
 
@@ -109,7 +109,7 @@ unset($tallerista['clave']);
 
 El service crea el hash antes de llamar al repositorio y quita la contraseña en texto plano del arreglo utilizado para persistir los datos.
 
-Cuando el administrador actualiza la contraseña de un tallerista, el mismo service genera un nuevo hash mediante `password_hash(..., PASSWORD_DEFAULT)` y elimina la propiedad `clave` antes de guardar. El repositorio inserta o actualiza `clave_hash`, no una columna de contraseña en texto plano. `TalleristaValidator` exige una longitud mínima de ocho caracteres al crear o cambiar esa contraseña; en el código revisado no se encuentra una política adicional de complejidad o un proceso de cambio de contraseña por parte del propio usuario.
+Cuando el administrador actualiza la contraseña de un tallerista, el mismo service genera un nuevo hash mediante `password_hash(..., PASSWORD_DEFAULT)` y elimina la propiedad `clave` antes de guardar. El repositorio inserta o actualiza `clave_hash`, no una columna de contraseña en texto plano. `TalleristaValidator` exige una longitud mínima de ocho caracteres al crear o cambiar esa contraseña; en el código revisado no se encuentra una política adicional de complejidad. El cambio de contraseña por parte del propio usuario se describe en la sección 4.5.
 
 **Fundamentación:** `password_hash()` está pensado para almacenamiento de contraseñas y gestiona los detalles del algoritmo y la sal dentro del propio hash. No corresponde reemplazarlo por un hash rápido genérico ni cifrar la contraseña para luego descifrarla: el sistema solo necesita verificarla.
 
@@ -136,7 +136,15 @@ Además, `User::toArray()` no incluye la propiedad `claveHash`. Esto evita que e
 
 ### 4.5 Limitación actual del cambio de contraseña
 
-El endpoint `PATCH /perfil` solo acepta `correo` y `telefono`. `AuthValidator::validateProfileUpdate()` rechaza los demás campos. Por eso el cambio de contraseña no está implementado como una operación de autoservicio del usuario. En el estado actual, el service de talleristas sí contempla generar un nuevo hash cuando se actualiza `clave` por el flujo administrativo.
+### 4.5 Cambio de contraseña del propio usuario
+
+El endpoint `PATCH /perfil` sigue aceptando solo `correo` y `telefono`. El cambio de contraseña tiene una ruta propia, `PATCH /perfil/clave`, disponible para cualquier usuario con sesión iniciada:
+
+1. `AuthValidator::validatePasswordChange()` acepta solo los campos `clave_actual` y `clave_nueva`, y rechaza cualquier otro (por ejemplo, `rol`). Exige que la nueva contraseña tenga entre 8 y 128 caracteres y que sea distinta de la actual.
+2. `AuthService::changePassword()` busca al usuario de la sesión y verifica la contraseña actual con `checkPassword()`. Si no coincide, responde "La contraseña actual es incorrecta.".
+3. La nueva contraseña se guarda como hash con `password_hash(..., PASSWORD_DEFAULT)`, mediante `UserRepository::actualizarClave()`, que modifica únicamente `clave_hash`.
+
+Pedir la contraseña actual impide que alguien que encuentre una sesión abierta cambie la contraseña sin conocerla. Según el código, el cambio no invalida los tokens ya emitidos, una sesión abierta en otro dispositivo sigue activa hasta que vence. En la interfaz, solo el panel del administrador ofrece el cambio; en los paneles del tallerista y del alumno los campos están deshabilitados.
 
 ---
 
@@ -306,7 +314,9 @@ Los valores de demostración del `compose.yaml` hacen más fácil el primer arra
 
 ## 8. Prueba guiada de la autenticación
 
-Estas pruebas están pensadas para un entorno de desarrollo y con usuarios de prueba. No deben ejecutarse contra datos reales sin autorización.
+### Resultados de la ejecución (24 y 26 de octubre de 2026)
+
+Las pruebas del sistema registradas en `docs/04-implementacion/Testing/Testing-01.md` y `Testing-02.md`, ejecutadas desde la interfaz sobre el servidor de prueba, cubren estos pasos:
 
 ### Paso 1. Iniciar la API
 
@@ -357,6 +367,20 @@ Autenticarse con una cuenta de tallerista e intentar acceder a una ruta que `rou
 
 En un entorno de prueba, consultar `usuarios.clave_hash` en MySQL. Debe tener un hash, no la contraseña original. No incluir hashes o contraseñas de prueba en capturas públicas ni en la documentación de uso.
 
+### Paso 8. Probar el cambio de contraseña
+
+Conservando la cookie de login, enviar `PATCH http://localhost:8002/perfil/clave` con el body JSON:
+
+```json
+{
+  "clave_actual": "CONTRASENA_DE_PRUEBA",
+  "clave_nueva": "NUEVA_CONTRASENA_DE_PRUEBA"
+}
+```
+
+Con una contraseña actual incorrecta, una nueva de menos de 8 caracteres, una nueva igual a la actual o un campo adicional (por ejemplo, `rol`), se espera `400` con el mensaje correspondiente. Sin la cookie, se espera `401`. Con datos válidos, se espera una respuesta exitosa; a partir de ese momento, el login con la contraseña anterior debe devolver `401` y con la nueva debe funcionar. Al terminar, restaurar la contraseña original.
+
+
 
 ### Resultados de la ejecución (24 de octubre de 2026)
 
@@ -369,6 +393,7 @@ Las pruebas del sistema registradas en `docs/04-implementacion/Testing/Testing-0
 | 4 y 5. Ruta protegida y cierre de sesión | Tras cerrar sesión, al abrir una página del panel la interfaz volvió a la pantalla de acceso y la API respondió `401` ("Tenes que iniciar sesion."). | CP-03 |
 | 6. Autorización por rol | No se probó la ruta del ejemplo (`GET /talleristas` con un tallerista). Se comprobó el mismo control con otros casos: la API respondió `403` a una alumna en `GET /alumnos`, ruta reservada al administrador, y a un tallerista al consultar un taller al que no está asignado. | NF-02 y NF-03 |
 | 7. Datos persistidos | No se ejecutó en esas pruebas. | — |
+| 8. Cambio de contraseña | Se rechazaron la contraseña actual errónea, la nueva de menos de 8 caracteres, la nueva igual a la actual y el campo extra `rol` (`400`), y el pedido sin sesión (`401`). Tras un cambio válido, la contraseña anterior dejó de funcionar (`401`) y la nueva funcionó; después se restauró la original. | Testing-02: CP-03, CP-04 y NF-01 |
 
 ---
 
@@ -386,7 +411,7 @@ Las pruebas del sistema registradas en `docs/04-implementacion/Testing/Testing-0
 | Alta | El atributo `secure` de la cookie depende de `$_SERVER['HTTPS']`; en el entorno local HTTP queda desactivado. | En producción debe asegurarse de que la cookie viaje únicamente por HTTPS. | Publicar detrás de HTTPS y configurar correctamente la detección de HTTPS si hay proxy inverso. |
 | Media | El middleware autoriza usando el rol del JWT sin consultar en cada petición el estado actual del usuario. | Un cambio de rol o baja de cuenta no necesariamente invalida inmediatamente un token ya emitido. | Verificar estado/rol actual o implementar revocación/versión de sesión. |
 | Media | `AuthValidator` verifica campos presentes en login, pero no implementa un límite de intentos por sí mismo. | La validación de entrada no sustituye la defensa frente a fuerza bruta. | Aplicar rate limiting y registrar intentos fallidos sin almacenar contraseñas. |
-| Media | No existe un endpoint de cambio de contraseña del propio usuario. | La interfaz y la API no ofrecen el flujo completo de cambio seguro por autoservicio. | Definir un endpoint que pida contraseña actual, valide la nueva y guarde su hash; invalidar otros tokens si corresponde. |
+| Media | El cambio de contraseña propio (`PATCH /perfil/clave`) existe, pero no invalida los tokens ya emitidos, y solo el panel del administrador lo ofrece en la interfaz. | Si alguien obtuvo una sesión, cambiar la contraseña no la cierra. El tallerista y el alumno no pueden cambiar su contraseña desde la pantalla. | Invalidar los demás tokens del usuario al cambiar la contraseña y habilitar el cambio en los paneles del tallerista y del alumno (DEF-10 de `Testing-02.md`). |
 
 
 > **Relacionado:** la descarga oficial de adjuntos (`/adjuntos/{id}/archivo`) exige sesión, pero los archivos también pueden descargarse por una ruta directa sin autenticación. Está documentado y comprobado en `Hardening de Infraestructura y Contenedores.md`, hallazgo H-02.
@@ -396,7 +421,7 @@ Las pruebas del sistema registradas en `docs/04-implementacion/Testing/Testing-0
 
 ## 10. Conclusión
 
-El proyecto tiene una base real para autenticación: hash de contraseñas con funciones específicas de PHP, verificación con `password_verify()`, JWT firmado, cookie `HttpOnly`, expiración y middleware por rol. La separación entre controller, service, repository y modelo facilita que un desarrollador externo siga cada responsabilidad.
+El proyecto tiene una base real para autenticación: hash de contraseñas con funciones específicas de PHP, verificación con `password_verify()`, cambio de contraseña que exige la contraseña actual, JWT firmado, cookie `HttpOnly`, expiración y middleware por rol. La separación entre controller, service, repository y modelo facilita que un desarrollador externo siga cada responsabilidad.
 
 Antes de presentar esta solución como lista para producción, es obligatorio resolver como mínimo los secretos predeterminados, HTTPS y las protecciones contra CSRF y fuerza bruta. También debe documentarse que el logout actual expira la cookie del navegador, pero no invalida server-side un token copiado.
 

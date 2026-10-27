@@ -133,7 +133,7 @@ Estado verificado en el código y en las pruebas del sistema al 26 de octubre de
 
 | Práctica | Estado | Evidencia |
 |---|---|---|
-| 1. Validar los datos ingresados | Implementado | Validación en el frontend y clases validadoras por entidad en la API. Pruebas CP-05 y CP-11 de `docs/04-implementacion/Testing/Testing-01.md.` La cédula (8 dígitos) y el teléfono (8 a 15 dígitos) se rechazan también cuando se envían directamente a la API, sin pasar por el formul0ario (pruebas CP-05 a CP-07 de `Testing-02.md`). |
+| 1. Validar los datos ingresados | Implementado | Validación en el frontend y clases validadoras por entidad en la API. Pruebas CP-05 y CP-11 de `docs/04-implementacion/Testing/Testing-01.md`. La cédula (8 dígitos) y el teléfono (8 a 15 dígitos) se rechazan también cuando se envían directamente a la API, sin pasar por el formulario (pruebas CP-05 a CP-07 de `Testing-02.md`). |
 | 2. Sanitizar antes de mostrar | Implementado | Funciones de escape en los módulos del frontend. Prueba NF-06: un título con `<script>` se mostró como texto, sin ejecutarse. |
 | 3. Evitar `innerHTML` | Parcial | Se usa `textContent` (184 usos), pero quedan 71 usos de `innerHTML`, acompañados de funciones de escape. |
 | 4. Usar `textContent` | Implementado | Ver la práctica 3. Prueba NF-06. |

@@ -27,7 +27,7 @@ proyecto-convenio-INAU/
 │
 ├── backend/
 │   ├── .gitignore                   → reglas de exclusión de Git (vacío)
-│   └── api-completa/                → API REST en PHP (53 rutas)
+│   └── api-completa/                → API REST en PHP (55 rutas)
 │       ├── index.php · routes.php · config.php · README.md
 │       ├── compose.yaml · composer.json · composer.lock
 │       ├── .env.example · .env.docker.example · .htaccess · .dockerignore
@@ -75,7 +75,8 @@ proyecto-convenio-INAU/
 │   │   ├── api.md
 │   │   ├── inau-infraestructura-docker.md
 │   │   └── Testing/
-│   │       └── Testing-01.md
+│   │       ├── Testing-01.md
+│   │       └── Testing-02.md
 │   │
 │   ├── 05-Ciberseguridad/
 │   │   ├── Doc NMAP.md
@@ -192,7 +193,7 @@ proyecto-convenio-INAU/
 | `docs/02-analisis/` | Documento principal del proyecto, entrevista y requerimientos | 3 |
 | `docs/03-diseño/` | Identidad visual y justificación tecnológica | 2 |
 | `docs/03-diseño/Modelado/` | Modelo de clases y MER, anexo de derivación y análisis del modelo | 3 |
-| `docs/04-implementacion/` | Reconstrucción en servidor, estado inicial, infraestructura y documentación de la API | 4 |
+| `docs/04-implementacion/Testing/` | Registros de pruebas, uno por ejecución | 2 |
 | `docs/04-implementacion/Testing/` | Plan y registro de pruebas | 1 |
 | `docs/05-Ciberseguridad/` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening de infraestructura y contenedores, escaneo con Nmap y plan de contingencia | 5 |
 | `docs/06-Emprendedurismo/` | Plan de negocios | 1 |
@@ -200,7 +201,7 @@ proyecto-convenio-INAU/
 | `frontend/frontend-admin/` | Panel del administrador: 11 páginas, 1 hoja de estilos, 15 scripts | 28 |
 | `frontend/frontend-tallerista/` | Panel del tallerista: 9 páginas, 1 hoja de estilos, 12 scripts | 23 |
 | `frontend/frontend-alumno/` | Panel del alumno: 7 páginas, 1 hoja de estilos, 10 scripts | 18 |
-| **Total** | | **177** |
+| **Total** | | **178** |
 
 
 <br>
@@ -223,10 +224,10 @@ proyecto-convenio-INAU/
 | --- | --- |
 | Panel del administrador | Completo y conectado a la API |
 | Panel del tallerista | Completo y conectado a la API. Incluye la gestión de material y tareas y la corrección de entregas |
-| Panel del alumno | Completo y conectado a la API, salvo la asistencia, que conserva datos simulados |
+| Panel del alumno | Completo y conectado a la API, incluida la asistencia |
 | Pantalla de acceso (`frontend/index.html`) | Acceso por correo y contraseña, autenticación contra la API y redirección por rol |
 | Base de datos | Script con las trece tablas y datos de prueba en `backend/api-completa/DataBase/inau_talleres.sql`, ejecutado en el entorno Docker |
-| Backend | Implementado: API REST con 53 rutas, organizada en capas, con autenticación JWT y control de acceso por rol |
+| Backend | Implementado: API REST con 55 rutas, organizada en capas, con autenticación JWT y control de acceso por rol |
 
 <br>
 

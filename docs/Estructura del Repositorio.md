@@ -11,7 +11,7 @@ proyecto-convenio-INAU/
 │
 ├── backend/
 │   ├── .gitignore                   → reglas de exclusión de Git (vacío)
-│   └── api-completa/                → API REST en PHP (53 rutas)
+│   └── api-completa/                → API REST en PHP (55 rutas)
 │       ├── index.php · routes.php · config.php · README.md
 │       ├── compose.yaml · composer.json · composer.lock
 │       ├── .env.example · .env.docker.example · .htaccess · .dockerignore
@@ -59,7 +59,8 @@ proyecto-convenio-INAU/
 │   │   ├── api.md
 │   │   ├── inau-infraestructura-docker.md
 │   │   └── Testing/
-│   │       └── Testing-01.md
+│   │       ├── Testing-01.md
+│   │       └── Testing-02.md
 │   │
 │   ├── 05-Ciberseguridad/
 │   │   ├── Doc NMAP.md
@@ -70,6 +71,8 @@ proyecto-convenio-INAU/
 │   │
 │   └── 06-Emprendedurismo/
 │       └── Plan de Negocios.md
+│
+│
 │
 └── frontend/
     ├── index.html                   → pantalla de acceso
@@ -175,14 +178,14 @@ proyecto-convenio-INAU/
 | `docs/03-diseño/` | Identidad visual y justificación tecnológica | 2 |
 | `docs/03-diseño/Modelado/` | Modelo de clases y MER, anexo de derivación y análisis del modelo | 3 |
 | `docs/04-implementacion/` | Reconstrucción en servidor, estado inicial, infraestructura y documentación de la API | 4 |
-| `docs/04-implementacion/Testing/` | Plan y registro de pruebas | 1 |
+| `docs/04-implementacion/Testing/` | Registros de pruebas, uno por ejecución | 2 |
 | `docs/05-Ciberseguridad/` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening de infraestructura y contenedores, escaneo con Nmap y plan de contingencia (asignatura electiva) | 5 |
 | `docs/06-Emprendedurismo/` | Plan de negocios (asignatura Emprendedurismo) | 1 |
 | `frontend/` | Pantalla de acceso y scripts compartidos (`api.js`, `auth.js`) | 3 |
 | `frontend/frontend-admin/` | Panel del administrador: 11 páginas, 1 hoja de estilos, 15 scripts | 28 |
 | `frontend/frontend-tallerista/` | Panel del tallerista: 9 páginas, 1 hoja de estilos, 12 scripts | 23 |
 | `frontend/frontend-alumno/` | Panel del alumno: 7 páginas, 1 hoja de estilos, 10 scripts | 18 |
-| **Total** | | **177** |
+| **Total** | | **178** |
 
 <br>
 
@@ -192,7 +195,7 @@ La documentación se agrupa en seis carpetas numeradas: las cuatro primeras refl
 
 Los documentos de modelado se ubican en una subcarpeta propia dentro de `03-diseño`, dado que constituyen un conjunto de tres piezas que se referencian entre sí: el modelo, su derivación justificada y el análisis de cómo resuelve la operativa.
 
-Las pruebas se ubican en una subcarpeta propia dentro de `04-implementacion`, `Testing/`, con un documento por cada ejecución (`Testing-01.md`), de modo que las pruebas posteriores se agreguen sin modificar el registro de las anteriores.
+Las pruebas se ubican en una subcarpeta propia dentro de `04-implementacion`, `Testing/`, con un documento por cada ejecución (`Testing-01.md`, `Testing-02.md`), de modo que las pruebas posteriores se agreguen sin modificar el registro de las anteriores.
 
 La revisión de coherencia y el control de cambios se ubican en `01-gestion` por tratarse de registros sobre el conjunto del proyecto, y no de artefactos técnicos de una etapa determinada. Dentro de esa carpeta, la subcarpeta `Documentos del equipo/` agrupa los registros propios del equipo: las actas de reuniones, la declaración sobre las Sprint Review y la declaración de uso ético de IA.
 
@@ -210,7 +213,7 @@ El script de base de datos que se utiliza se ubica en `backend/api-completa/Data
 | --- | --- |
 | Panel del administrador | Completo y conectado a la API |
 | Panel del tallerista | Completo y conectado a la API. Incluye la gestión de material y tareas y la corrección de entregas |
-| Panel del alumno | Completo y conectado a la API, salvo la asistencia, que conserva datos simulados |
+| Panel del alumno | Completo y conectado a la API, incluida la asistencia |
 | Pantalla de acceso (`frontend/index.html`) | Acceso por correo y contraseña, autenticación contra la API y redirección por rol |
 | Base de datos | Script con las trece tablas y datos de prueba en `backend/api-completa/DataBase/inau_talleres.sql`, ejecutado en el entorno Docker |
-| Backend | Implementado: API REST con 53 rutas, organizada en capas, con autenticación JWT y control de acceso por rol |
+| Backend | Implementado: API REST con 55 rutas, organizada en capas, con autenticación JWT y control de acceso por rol |
