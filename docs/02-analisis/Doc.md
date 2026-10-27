@@ -10,9 +10,9 @@
 **Usuario experto consultado:** Lemuel Szwec González, tallerista.\
 **Rubro:** Actividades socioeducativas: talleres dictados en convenio, con alumnos, talleristas y administración.\
 **Tamaño:** [completar: cantidad de centros o talleres en funcionamiento]\
-**Cantidad aproximada de usuarios:** [completar: alumnos y talleristas aproximados]\
+**Cantidad aproximada de usuarios:** [Pendiente_Consultar]\
 **Servicio:** Talleres en los que el tallerista publica material y tareas, registra la asistencia y evalúa las entregas, y la administración supervisa la actividad de todos los talleres.\
-**Nivel tecnológico actual:** [completar: bajo / medio-bajo / medio]\
+**Nivel tecnológico actual:** [Pendiente_Consultar]\
 **Registro actual:** La información de talleres, participantes y asistencias no está centralizada: el cliente señala falta de organización y accesibilidad en la plataforma que usa actualmente. [completar: qué se usa hoy, por ejemplo planillas, papel, mensajería o una plataforma general]\
 **Necesidad:** Un espacio unificado, accesible desde computadora, tablet o teléfono, con funciones específicas para alumnos, talleristas y administradores, similar a la plataforma CREA.\
 **Plazo esperado:** Primera versión funcionando para fines de año.
