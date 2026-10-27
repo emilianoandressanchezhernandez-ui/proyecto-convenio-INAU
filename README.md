@@ -88,8 +88,6 @@ proyecto-convenio-INAU/
 │   └── 06-Emprendedurismo/
 │       └── Plan de Negocios.md
 │
-│
-│
 └── frontend/
     ├── index.html                   → pantalla de acceso
     ├── js/
@@ -193,8 +191,8 @@ proyecto-convenio-INAU/
 | `docs/02-analisis/` | Documento principal del proyecto, entrevista y requerimientos | 3 |
 | `docs/03-diseño/` | Identidad visual y justificación tecnológica | 2 |
 | `docs/03-diseño/Modelado/` | Modelo de clases y MER, anexo de derivación y análisis del modelo | 3 |
+| `docs/04-implementacion/` | Reconstrucción en servidor, estado inicial, infraestructura y documentación de la API | 4 |
 | `docs/04-implementacion/Testing/` | Registros de pruebas, uno por ejecución | 2 |
-| `docs/04-implementacion/Testing/` | Plan y registro de pruebas | 1 |
 | `docs/05-Ciberseguridad/` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening de infraestructura y contenedores, escaneo con Nmap y plan de contingencia | 5 |
 | `docs/06-Emprendedurismo/` | Plan de negocios | 1 |
 | `frontend/` | Pantalla de acceso y scripts compartidos (`api.js`, `auth.js`) | 3 |

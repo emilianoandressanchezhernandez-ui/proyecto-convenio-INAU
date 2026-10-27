@@ -72,8 +72,6 @@ proyecto-convenio-INAU/
 │   └── 06-Emprendedurismo/
 │       └── Plan de Negocios.md
 │
-│
-│
 └── frontend/
     ├── index.html                   → pantalla de acceso
     ├── js/

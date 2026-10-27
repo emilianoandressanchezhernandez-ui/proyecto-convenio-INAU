@@ -314,9 +314,7 @@ Los valores de demostración del `compose.yaml` hacen más fácil el primer arra
 
 ## 8. Prueba guiada de la autenticación
 
-### Resultados de la ejecución (24 y 26 de octubre de 2026)
-
-Las pruebas del sistema registradas en `docs/04-implementacion/Testing/Testing-01.md` y `Testing-02.md`, ejecutadas desde la interfaz sobre el servidor de prueba, cubren estos pasos:
+Estas pruebas están pensadas para un entorno de desarrollo y con usuarios de prueba. No deben ejecutarse contra datos reales sin autorización.
 
 ### Paso 1. Iniciar la API
 
@@ -382,9 +380,9 @@ Con una contraseña actual incorrecta, una nueva de menos de 8 caracteres, una n
 
 
 
-### Resultados de la ejecución (24 de octubre de 2026)
+### Resultados de la ejecución (24 y 26 de octubre de 2026)
 
-Las pruebas del sistema registradas en `docs/04-implementacion/Testing/Testing-01.md`, ejecutadas desde la interfaz sobre el servidor de prueba, cubren estos pasos:
+Las pruebas del sistema registradas en `docs/04-implementacion/Testing/Testing-01.md` y `Testing-02.md`, ejecutadas desde la interfaz sobre el servidor de prueba, cubren estos pasos:
 
 | Paso | Resultado observado | Caso |
 |---|---|---|
