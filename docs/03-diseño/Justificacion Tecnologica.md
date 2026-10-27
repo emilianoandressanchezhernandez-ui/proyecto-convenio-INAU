@@ -15,7 +15,7 @@
 | **Bootstrap 5.3** | Diseño responsive y componentes | La propuesta del proyecto admitía Tailwind o Bootstrap; se optó por Bootstrap por su curva de aprendizaje más accesible y su sistema de componentes predefinidos, que reduce el tiempo de desarrollo — factor crítico dado el plazo de 12 semanas. Resuelve directamente NRF01. |
 | **Bootstrap Icons** | Iconografía | Consistencia visual sin necesidad de gestionar íconos sueltos, integrado con el mismo framework. |
 | **JavaScript Vanilla** | Comportamiento dinámico | Establecido en la propuesta original del proyecto. Evita la curva de aprendizaje de un framework, priorizando que el equipo comprenda y mantenga su propio código. |
-| **Mock data** | Simulación de datos | Permitió construir y validar las tres interfaces antes de contar con la API. Fue reemplazado por llamadas reales, salvo un resto en la asistencia del alumno (ver sección 7). |
+| **Mock data** |Simulación de datos | Permitió construir y validar las tres interfaces antes de contar con la API. Fue reemplazado por llamadas reales; el archivo `mock-data.js` todavía se carga en las páginas (ver sección 2).|
 
 <br>
 
@@ -178,12 +178,12 @@ La composición del equipo y la asignación de roles se detallan en el Project C
 
 | Componente | Estado |
 |---|---|
-| Panel administrador | Conectado a la API. Pendientes: exportación de informes en PDF o Excel, listado de alumnos, informe de talleristas y consulta de datos sensibles |
-| Panel tallerista | Conectado a la API. Incluye la gestión de material y tareas y la corrección de entregas; pendientes: adjuntar archivos al material y eliminar notas desde la interfaz |
-| Panel alumno | Completo y conectado a la API, salvo la asistencia, que conserva datos simulados |
-| Login (`frontend/index.html`) | Acceso por correo y contraseña, autenticación contra la API y redirección por rol |
-| Base de datos | Script con las trece tablas y datos de prueba en `backend/api-completa/DataBase/inau_talleres.sql`, ejecutado en el entorno Docker |
+| Panel administrador | Conectado a la API. Pendientes: exportación de informes en PDF o Excel, listado de alumnos, informe de talleristas y consulta de datos sensibles. |
+| Panel tallerista | Conectado a la API. Incluye la gestión de material y tareas y, la corrección de entregas. Adjuntar archivos al material, eliminar notas y cambiar la contraseña desde la interfaz queda pendiente. |
+| Panel alumno | Conectado a la API, incluida la asistencia. Cambiar la contraseña desde la interfaz queda pendiente. |
+| Login (`frontend/index.html`) | Acceso por correo y contraseña, autenticación contra la API y redirección por rol. |
+| Base de datos | Script con las trece tablas y datos de prueba en `backend/api-completa/DataBase/inau_talleres.sql`, ejecutado en el entorno Docker. |
 | Backend | Implementado: API REST con 53 rutas, organizada en capas, con autenticación JWT y control de acceso por rol |
-| Documentación técnica | Análisis, diseño, modelado y pruebas completos (`Testing/Testing-01.md`, ejecutado el 24/10/2026 en un servidor Ubuntu). `api.md` pendiente de contenido |
+| Documentación técnica | Análisis, diseño, modelado y pruebas completos (`Testing/Testing-01.md` y `Testing/Testing-02.md`, ejecutados el 24 y el 26/10/2026 en un servidor Ubuntu). `api.md` pendiente de contenido |
 
 El backend se desarrolló con las herramientas previstas, por lo que las decisiones de esta justificación se mantienen.

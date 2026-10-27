@@ -752,7 +752,7 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 
 ## 23. Estado de los requerimientos al cierre
 
-Estado verificado en las pruebas del sistema del 24/10/2026 (`docs/04-implementacion/Testing/Testing-01.md`) y del 26/10/2026 (`Testing-02.md, casos citados como “T2”`).
+Estado verificado en las pruebas del sistema del 24/10/2026 (`docs/04-implementacion/Testing/Testing-01.md`) y del 26/10/2026 (`Testing-02.md`, casos citados como "T2").
 
 | Área | Requerimiento | Estado | Observación | Prueba |
 | --- | --- | --- | --- | --- |

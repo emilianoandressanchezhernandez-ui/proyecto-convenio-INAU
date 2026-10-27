@@ -129,19 +129,19 @@ Estas buenas prácticas se definieron en la primera entrega, cuando el sistema s
 
 ## 4. Estado de las medidas en el sistema
 
-Estado verificado en el código y en las pruebas del sistema al 25 de octubre de 2026.
+Estado verificado en el código y en las pruebas del sistema al 26 de octubre de 2026.
 
 | Práctica | Estado | Evidencia |
 |---|---|---|
-| 1. Validar los datos ingresados | Implementado | Validación en el frontend y clases validadoras por entidad en la API. Pruebas CP-05 y CP-11 de `docs/04-implementacion/Testing/Testing-01.md`. |
+| 1. Validar los datos ingresados | Implementado | Validación en el frontend y clases validadoras por entidad en la API. Pruebas CP-05 y CP-11 de `docs/04-implementacion/Testing/Testing-01.md.` La cédula (8 dígitos) y el teléfono (8 a 15 dígitos) se rechazan también cuando se envían directamente a la API, sin pasar por el formul0ario (pruebas CP-05 a CP-07 de `Testing-02.md`). |
 | 2. Sanitizar antes de mostrar | Implementado | Funciones de escape en los módulos del frontend. Prueba NF-06: un título con `<script>` se mostró como texto, sin ejecutarse. |
-| 3. Evitar `innerHTML` | Parcial | Se usa `textContent` (181 usos), pero quedan 69 usos de `innerHTML`, acompañados de funciones de escape. |
+| 3. Evitar `innerHTML` | Parcial | Se usa `textContent` (184 usos), pero quedan 71 usos de `innerHTML`, acompañados de funciones de escape. |
 | 4. Usar `textContent` | Implementado | Ver la práctica 3. Prueba NF-06. |
-| 5. Autenticación segura | Implementado, con pendientes | Acceso por correo y contraseña, contraseñas almacenadas con hash y token de sesión en una cookie `HttpOnly`. Mensaje genérico ante credenciales incorrectas (prueba CP-02). Pendiente: limitar los intentos de inicio de sesión. Detalle en `Mecanismos_Autenticacion_Criptografia_INAU.md`. |
+| 5. Autenticación segura | Implementado, con pendientes | Acceso por correo y contraseña, contraseñas almacenadas con hash y token de sesión en una cookie `HttpOnly`. Mensaje genérico ante credenciales incorrectas (prueba CP-02). Cambio de contraseña propio que exige la contraseña actual (pruebas CP-03 y CP-04 de `Testing-02.md`). Pendientes: limitar los intentos de inicio de sesión y ofrecer el cambio de contraseña en la interfaz del tallerista y del alumno. Detalle en `Mecanismos_Autenticacion_Criptografia_INAU.md`. |
 | 6. Usar HTTPS | Documentado, no aplicado en el servidor de prueba | La guía `Documento de Reconstruccion - Servidor.md` incluye HTTPS con Certbot. El servidor de prueba funciona sin HTTPS (puerto 443 cerrado según `Doc NMAP.md`). |
-| 7. Controlar permisos por rol | Implementado | Cada ruta de la API declara el rol permitido y se verifica la pertenencia al taller. Pruebas NF-02 y NF-03. |
+| 7. Controlar permisos por rol | Implementado | Cada ruta de la API declara el rol permitido y se verifica la pertenencia al taller. Pruebas NF-02 y NF-03 de `Testing-01.md`. La ruta de cambio de contraseña rechaza pedidos sin sesión y campos no permitidos, como `rol` (prueba NF-01 de `Testing-02.md`). |
 | 8. Mantener actualizadas las dependencias | Parcial | Dependencias fijadas en `composer.lock`; PHP 8.3 y MySQL 8.4. No hay un procedimiento de actualización definido. El escaneo con Nmap mostró las versiones exactas de los servicios publicados. |
-| 9. Pruebas de seguridad | Realizadas | `Testing/Testing-01.md` (24/10/2026) y escaneo con Nmap (`Doc NMAP.md`, 24 y 25/10/2026). |
+| 9. Pruebas de seguridad | Realizadas | `Testing/Testing-01.md` (24/10/2026), `Testing/Testing-02.md` (26/10/2026) y escaneo con Nmap (`Doc NMAP.md`, 24 y 25/10/2026). |
 | 10. Documentar las medidas | Implementado | Carpeta `docs/05-Ciberseguridad`. |
 
 ### Medidas frente al phishing (riesgo crítico)
