@@ -4,8 +4,10 @@
 -- Motor: MySQL 8.0 o superior (requiere soporte de CHECK constraints)
 -- =====================================================================
  
+SET NAMES utf8mb4;
+
 DROP DATABASE IF EXISTS inau_talleres;
- 
+
 CREATE DATABASE inau_talleres
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;

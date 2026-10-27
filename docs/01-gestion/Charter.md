@@ -22,8 +22,20 @@
 
 ---
 
-### Situación inicial del cliente: 
-   **Organismo público vinculado a actividades socioeducativas (INAU) que gestiona talleres mediante convenio. Actualmente, la gestión de talleres, participantes y asistencias requiere una herramienta digital que centralice la información y mejore la coordinación entre talleristas y la administración.**
+### Situación inicial del cliente.
+
+**Organismo:** INAU (Instituto del Niño y Adolescente del Uruguay), a través de talleres socioeducativos en convenio.
+
+**Cliente / patrocinador:** En convenio con INAU.\
+**Usuario experto consultado:** Lemuel Szwec González, tallerista.\
+**Rubro:** Actividades socioeducativas: talleres dictados en convenio, con alumnos, talleristas y administración.\
+**Tamaño:** [completar: cantidad de centros o talleres en funcionamiento]\
+**Cantidad aproximada de usuarios:** [Pendiente_Consultar]\
+**Servicio:** Talleres en los que el tallerista publica material y tareas, registra la asistencia y evalúa las entregas, y la administración supervisa la actividad de todos los talleres.\
+**Nivel tecnológico actual:** [Pendiente_Consultar]\
+**Registro actual:** La información de talleres, participantes y asistencias no está centralizada: el cliente señala falta de organización y accesibilidad en la plataforma que usa actualmente. [completar: qué se usa hoy, por ejemplo planillas, papel, mensajería o una plataforma general]\
+**Necesidad:** Un espacio unificado, accesible desde computadora, tablet o teléfono, con funciones específicas para alumnos, talleristas y administradores, similar a la plataforma CREA.\
+**Plazo esperado:** Primera versión funcionando para fines de año.
 
 ---
 
@@ -113,12 +125,12 @@
 ---
 
 ### Esfuerzo estimado: 
-**76 Puntos, distribuidos en seis épicas principales de desarrollo, correspondientes al alcance ajustado de la primera versión.**
+**63 puntos, distribuidos en seis épicas principales de desarrollo, correspondientes al alcance ajustado de la primera versión.**
 
 ---
 
 ### Costos estimados:
-**USD 4.395 el primer año (recursos humanos e infraestructura), con un costo de mantenimiento posterior de USD 75 anuales correspondiente a hosting y dominio.**
+**USD 2.667 el primer año (recursos humanos e infraestructura), con un costo de mantenimiento posterior de USD 75 anuales correspondiente a hosting y dominio.**
 
 ---
 

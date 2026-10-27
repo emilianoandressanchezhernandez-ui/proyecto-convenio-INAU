@@ -90,7 +90,7 @@
 | **NRF08** | El sistema debe proteger los datos personales de los usuarios. |
 | **NRF09** | El sistema debe garantizar la persistencia confiable de los datos en una base de datos relacional. |
 | **NRF10** | El sistema debe registrar la trazabilidad de las acciones importantes realizadas por los usuarios. |
-| **NRF11** | El sistema debe restringir los formatos de archivos adjuntos a PDF, imágenes JPG y documentos de oficina (DOCX, XLSX, PPTX), acorde a los tipos soportados en v1. |
+| **NRF11** | El sistema debe restringir los formatos de archivos adjuntos a PDF e imágenes JPG, acorde a los tipos soportados en v1. |
 | **NRF12** | El sistema debe restringir el tamaño de los archivos adjuntos permitidos. |
 | **NRF13** | El código del sistema debe estar organizado, ser reutilizable y mantenible. |
 | **NRF14** | El sistema debe contar con documentación técnica dentro del repositorio. |

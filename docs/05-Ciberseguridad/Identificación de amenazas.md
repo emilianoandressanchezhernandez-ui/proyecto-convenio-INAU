@@ -1,5 +1,8 @@
 # Proyecto: TheNewfutures – Plataforma de gestión de talleres en convenio con INAU - Rama de Ciberseguridad
 
+**Fecha de elaboración:** 5 de agosto de 2026  
+**Última actualización:** 25 de octubre de 2026
+
 <br>
 
 ### Estudiantes:
@@ -45,11 +48,17 @@ El ransomware es un tipo de malware que cifra los archivos de un equipo o sistem
 
 | Amenaza | Escenario | Probabilidad (1-5) | Impacto (1-4) | Riesgo (P × I) | Clasificación |
 |---|---|---|---|---|---|
-| Phishing | Usuarios del sistema | 4 (Probable) | 3 (Grave) | 12 | Crítico |
-| Cross-Site Scripting (XSS) | Formularios y páginas web | 3 (Ocasional) | 3 (Grave) | 9 | Tolerable |
-| Ransomware | Equipos donde se desarrolla o utiliza el sistema | 2 (Remota) | 4 (Catastrófica) | 8 | Tolerable |
+| Phishing | Usuarios del sistema | 4 (Probable) | 3 (Grave) | 12 | 🔴 Crítico |
+| Cross-Site Scripting (XSS) | Formularios y páginas web | 3 (Ocasional) | 3 (Grave) | 9 | 🟡 Tolerable |
+| Ransomware | Equipos donde se desarrolla o utiliza el sistema | 2 (Remota) | 4 (Catastrófica) | 8 | 🟡 Tolerable |
 
-**Leyenda:** 🟢 Bajo · 🟡 Medio · 🔴 Alto / crítico
+**Criterio de clasificación:**
+
+| Riesgo (P × I) | Clasificación |
+|---|---|
+| 1 a 4 | 🟢 Aceptable |
+| 5 a 9 | 🟡 Tolerable |
+| 10 a 20 | 🔴 Crítico |
 
 ---
 
@@ -78,11 +87,11 @@ El ransomware es un tipo de malware que cifra los archivos de un equipo o sistem
 
 <br>
 
-## 4. Buenas prácticas de seguridad en desarrollo web
+## 3. Buenas prácticas de seguridad en desarrollo web
 
 <br>
 
-La primera entrega utiliza HTML, CSS y JavaScript, por lo que se aplicarán las siguientes buenas prácticas de seguridad:
+Estas buenas prácticas se definieron en la primera entrega, cuando el sistema solo tenía frontend (HTML, CSS y JavaScript). Con la incorporación de la API y la base de datos, se aplicaron también en el backend. Su estado actual se resume en la sección 4.
 
 1. **Validar todos los datos ingresados por el usuario.**
    Se verificará que la información ingresada tenga el formato esperado antes de ser procesada, evitando datos incorrectos o potencialmente maliciosos.
@@ -103,7 +112,7 @@ La primera entrega utiliza HTML, CSS y JavaScript, por lo que se aplicarán las 
    Cuando el sistema sea desplegado, se utilizará el protocolo HTTPS para cifrar la comunicación entre el navegador y el servidor, evitando la interceptación de información.
 
 7. **Controlar permisos según el rol del usuario.**
-   Cada usuario tendrá acceso únicamente a las funciones correspondientes a su rol (por ejemplo, administrador o funcionario), evitando accesos no autorizados.
+   Cada usuario tendrá acceso únicamente a las funciones correspondientes a su rol (administrador, tallerista o alumno), evitando accesos no autorizados.
 
 8. **Mantener actualizado el código y las dependencias.**
    Se procurará utilizar versiones actualizadas de las bibliotecas, herramientas y dependencias para corregir vulnerabilidades conocidas y mejorar la seguridad del sistema.
@@ -113,3 +122,28 @@ La primera entrega utiliza HTML, CSS y JavaScript, por lo que se aplicarán las 
 
 10. **Documentar las medidas de seguridad aplicadas.**
     Todas las medidas de seguridad implementadas durante el desarrollo serán registradas en la documentación del proyecto, facilitando su mantenimiento, revisión y futuras mejoras.
+
+---
+
+<br>
+
+## 4. Estado de las medidas en el sistema
+
+Estado verificado en el código y en las pruebas del sistema al 26 de octubre de 2026.
+
+| Práctica | Estado | Evidencia |
+|---|---|---|
+| 1. Validar los datos ingresados | Implementado | Validación en el frontend y clases validadoras por entidad en la API. Pruebas CP-05 y CP-11 de `docs/04-implementacion/Testing/Testing-01.md`. La cédula (8 dígitos) y el teléfono (8 a 15 dígitos) se rechazan también cuando se envían directamente a la API, sin pasar por el formulario (pruebas CP-05 a CP-07 de `Testing-02.md`). |
+| 2. Sanitizar antes de mostrar | Implementado | Funciones de escape en los módulos del frontend. Prueba NF-06: un título con `<script>` se mostró como texto, sin ejecutarse. |
+| 3. Evitar `innerHTML` | Parcial | Se usa `textContent` (184 usos), pero quedan 71 usos de `innerHTML`, acompañados de funciones de escape. |
+| 4. Usar `textContent` | Implementado | Ver la práctica 3. Prueba NF-06. |
+| 5. Autenticación segura | Implementado, con pendientes | Acceso por correo y contraseña, contraseñas almacenadas con hash y token de sesión en una cookie `HttpOnly`. Mensaje genérico ante credenciales incorrectas (prueba CP-02). Cambio de contraseña propio que exige la contraseña actual (pruebas CP-03 y CP-04 de `Testing-02.md`). Pendientes: limitar los intentos de inicio de sesión y ofrecer el cambio de contraseña en la interfaz del tallerista y del alumno. Detalle en `Mecanismos_Autenticacion_Criptografia_INAU.md`. |
+| 6. Usar HTTPS | Documentado, no aplicado en el servidor de prueba | La guía `Documento de Reconstruccion - Servidor.md` incluye HTTPS con Certbot. El servidor de prueba funciona sin HTTPS (puerto 443 cerrado según `Doc NMAP.md`). |
+| 7. Controlar permisos por rol | Implementado | Cada ruta de la API declara el rol permitido y se verifica la pertenencia al taller. Pruebas NF-02 y NF-03 de `Testing-01.md`. La ruta de cambio de contraseña rechaza pedidos sin sesión y campos no permitidos, como `rol` (prueba NF-01 de `Testing-02.md`). |
+| 8. Mantener actualizadas las dependencias | Parcial | Dependencias fijadas en `composer.lock`; PHP 8.3 y MySQL 8.4. No hay un procedimiento de actualización definido. El escaneo con Nmap mostró las versiones exactas de los servicios publicados. |
+| 9. Pruebas de seguridad | Realizadas | `Testing/Testing-01.md` (24/10/2026), `Testing/Testing-02.md` (26/10/2026) y escaneo con Nmap (`Doc NMAP.md`, 24 y 25/10/2026). |
+| 10. Documentar las medidas | Implementado | Carpeta `docs/05-Ciberseguridad`. |
+
+### Medidas frente al phishing (riesgo crítico)
+
+El phishing es la única amenaza clasificada como crítica. El sistema la mitiga en parte: el inicio de sesión responde con el mismo mensaje cuando el correo no existe o la contraseña es incorrecta, lo que no revela qué cuentas están registradas; las contraseñas se guardan con hash, y la sesión vence después de un tiempo configurado. Quedan pendientes medidas que reducirían el impacto de una credencial robada: limitar los intentos de inicio de sesión, incorporar una verificación en dos pasos y capacitar a los usuarios para reconocer correos y sitios falsos.
