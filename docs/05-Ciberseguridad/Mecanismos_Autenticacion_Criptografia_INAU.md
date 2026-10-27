@@ -134,7 +134,6 @@ Además, `User::toArray()` no incluye la propiedad `claveHash`. Esto evita que e
 
 `backend/api-completa/DataBase/inau_talleres.sql` incluye cuentas de demostración con hashes en `clave_hash`. Esos datos solo sirven para desarrollo y pruebas. Antes de usar el sistema con información real deben crearse cuentas nuevas, definir contraseñas de manera controlada y retirar las credenciales de demostración de los entornos públicos.
 
-### 4.5 Limitación actual del cambio de contraseña
 
 ### 4.5 Cambio de contraseña del propio usuario
 
