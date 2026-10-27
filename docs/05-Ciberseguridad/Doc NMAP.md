@@ -4,6 +4,7 @@
 
 **Rama:** Ciberseguridad  
 **Fecha:** 22 de octubre de 2026
+
 **Última actualización:** 24 de octubre de 2026 (ejecución del escaneo sobre el servidor de prueba; resultados en la sección 10)
 
 ## 1. Objetivo
