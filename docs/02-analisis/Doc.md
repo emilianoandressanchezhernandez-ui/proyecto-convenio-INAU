@@ -377,7 +377,7 @@ Se planifica con los **63 puntos**, por ser la estimación más detallada. Adem�
 | **Hosting** | Plan compartido con soporte PHP y MySQL, USD 5 mensuales | USD 60 / año |
 | **Dominio** | Registro anual `.uy` o `.com` | USD 15 / año |
 | **Certificado SSL** | Incluido en el hosting (Let's Encrypt) | USD 0 |
-| **Herramientas y licencias** | Git/GitHub, VS Code, XAMPP, Bootstrap, PHP y MySQL: todas libres o gratuitas | USD 0 |
+| **Herramientas y licencias** | Git/GitHub, VS Code, Docker, Bootstrap, PHP y MySQL: todas libres o gratuitas | USD 0 |
 | **Total primer año** | | **USD 2.667** |
 | **Mantenimiento anual posterior** | Hosting + dominio | **USD 75 / año** |
 

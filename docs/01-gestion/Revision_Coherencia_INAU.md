@@ -242,19 +242,9 @@ Las rutas de alumnos, talleristas y adjuntos responden `422` ante datos inválid
 
 **Acción recomendada:** unificar el código de respuesta para los errores de validación.
 
-### 4.21 El Plan de Negocios conserva datos desactualizados
+### 4.21 El Plan de Negocios conserva datos desactualizados — **Resuelto**
 
-`06-Emprendedurismo/Plan de Negocios.md` no coincide con el resto de la documentación:
-
-| Dato en el Plan de Negocios | Dato vigente |
-|---|---|
-| Costo del primer año: USD 4.395 | USD 2.667, recalculado con tres integrantes (CC-03; Charter y `Doc.md`) |
-| "La revisión de coherencia del 22/09/2026 registra 47 rutas" | 55 rutas |
-| "El panel del alumno sigue pendiente de completar" | Panel conectado a la API |
-| "XAMPP/servidor local para desarrollo" | Docker (CC-06) |
-| Vínculo a `docs/01-gestion/Acta de Reuniones.md` | El archivo está en `docs/01-gestion/Documentos del equipo/` |
-
-Además, la misión de la empresa afirma brindar "seguridad absoluta", mientras que el análisis FODA del mismo documento reconoce que la solución no la presenta.
+El Plan de Negocios se actualizó: el costo del primer año es de USD 2.667 (CC-03), la API tiene 55 rutas, los tres paneles figuran conectados a la API, las herramientas incluyen Docker en lugar de XAMPP (CC-06) y los vínculos de los anexos apuntan a las ubicaciones actuales. La misión de la empresa ya no afirma brindar "seguridad absoluta", por lo que no contradice el análisis FODA.
 
 ### 4.22 La Declaración de Ética no coincide con otros documentos — **Resuelto**
 
@@ -264,7 +254,6 @@ La Declaración de Ética se actualizó:
 - Las fechas coinciden con los demás documentos: la primera ronda de pruebas figura el 24/10/2026 (`Testing-01.md`), el trabajo de frontend comienza con el proyecto (17/07/2026, según el Charter) y la documentación de Docker es posterior a la decisión de adoptarlo (CC-06).
 - Se registró el uso de IA del 25/10/2026 (`Doc NMAP.md`) y la redacción de `api.md`.
 - Las firmas se actualizaron al 28/10/2026.
-- `Doc NMAP.md` registra una verificación asistida por IA el 25/10/2026 que la tabla no incluye.
 
 ---
 

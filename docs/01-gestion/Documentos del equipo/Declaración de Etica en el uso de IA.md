@@ -27,7 +27,6 @@
 > Entendemos que el uso no ético de IA, de ser detectado, tiene consecuencias académicas que asumimos como equipo.
 
 ---
----
 
 <br>
 
