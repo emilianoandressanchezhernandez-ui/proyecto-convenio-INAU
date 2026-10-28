@@ -1,21 +1,17 @@
-# Proyecto Sistema de Gestión de Talleres en Convenio con INAU - TheNewfutures.
+# Proyecto: Sistema de Gestión de Talleres en Convenio con INAU — TheNewfutures
 
 <br>
 
-## 1. Situación inicial del cliente.
+## 1. Situación inicial del cliente
 
-**Organismo:** INAU (Instituto del Niño y Adolescente del Uruguay), a través de talleres socioeducativos en convenio.
-
-**Cliente / patrocinador:** En convenio con INAU.\
-**Usuario experto consultado:** Lemuel Szwec González, tallerista.\
-**Rubro:** Actividades socioeducativas: talleres dictados en convenio, con alumnos, talleristas y administración.\
-**Tamaño:** [completar: cantidad de centros o talleres en funcionamiento]\
-**Cantidad aproximada de usuarios:** [Pendiente_Consultar]\
-**Servicio:** Talleres en los que el tallerista publica material y tareas, registra la asistencia y evalúa las entregas, y la administración supervisa la actividad de todos los talleres.\
-**Nivel tecnológico actual:** [Pendiente_Consultar]\
-**Registro actual:** La información de talleres, participantes y asistencias no está centralizada: el cliente señala falta de organización y accesibilidad en la plataforma que usa actualmente. [completar: qué se usa hoy, por ejemplo planillas, papel, mensajería o una plataforma general]\
-**Necesidad:** Un espacio unificado, accesible desde computadora, tablet o teléfono, con funciones específicas para alumnos, talleristas y administradores, similar a la plataforma CREA.\
-**Plazo esperado:** Primera versión funcionando para fines de año.
+**Organismo cliente:** Instituto del Niño y Adolescente del Uruguay (INAU).\
+**Usuario experto consultado:** Lemuel Szwec González (tallerista).\
+**Rubro:** actividades socioeducativas, mediante talleres dictados en convenio con la participación de alumnos, talleristas y personal de administración.\
+**Servicio:** dictado de talleres en los que el tallerista publica material y tareas, registra la asistencia y evalúa las entregas, mientras que la administración supervisa la actividad del conjunto de los talleres.\
+**Nivel tecnológico actual:** bajo.\
+**Registro actual:** la información sobre talleres, participantes y asistencias no se encuentra centralizada. El cliente señala falta de organización y de accesibilidad en la plataforma que utiliza actualmente.\
+**Necesidad:** disponer de un espacio unificado, accesible desde computadoras, tabletas y teléfonos, con funciones específicas para alumnos, talleristas y administradores, similar a la plataforma CREA.\
+**Plazo esperado:** primera versión en funcionamiento a fines de noviembre del 2026.
 
 ---
 

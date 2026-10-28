@@ -15,7 +15,7 @@ Se prueban los requerimientos de la primera versión desde la interfaz de cada r
 | Elemento | Valor |
 |---|---|
 | Fecha de ejecución | 24/10/2026 |
-| Rama / commit | `cambios-frontend` / `<commit>` |
+| Rama / commit | `cambios-frontend` / `ff403b5` |
 | Servidor | Máquina virtual con Ubuntu Server en VirtualBox, desplegada según `Documento de Reconstruccion - Servidor.md` (API y MySQL 8.4 en Docker; frontend servido por Nginx) |
 | Sitio | `http://192.168.1.14` (red local) |
 | Navegador y dispositivos | Google Chrome en Windows; vista de teléfono simulada con un ancho de 375 px |
