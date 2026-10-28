@@ -31,7 +31,7 @@
 **Nivel tecnológico actual:** bajo.\
 **Registro actual:** la información sobre talleres, participantes y asistencias no se encuentra centralizada. El cliente señala falta de organización y de accesibilidad en la plataforma que utiliza actualmente.\
 **Necesidad:** disponer de un espacio unificado, accesible desde computadoras, tabletas y teléfonos, con funciones específicas para alumnos, talleristas y administradores.\
-**Plazo esperado:** primera versión en funcionamiento a fines de noviembre de 2026.
+**Plazo esperado:** primera versión en funcionamiento a fines de noviembre del 2026.
 
 ---
 
