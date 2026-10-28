@@ -10,7 +10,7 @@
 **Servicio:** dictado de talleres en los que el tallerista publica material y tareas, registra la asistencia y evalúa las entregas, mientras que la administración supervisa la actividad del conjunto de los talleres.\
 **Nivel tecnológico actual:** bajo.\
 **Registro actual:** la información sobre talleres, participantes y asistencias no se encuentra centralizada. El cliente señala falta de organización y de accesibilidad en la plataforma que utiliza actualmente.\
-**Necesidad:** disponer de un espacio unificado, accesible desde computadoras, tabletas y teléfonos, con funciones específicas para alumnos, talleristas y administradores, similar a la plataforma CREA.\
+**Necesidad:** disponer de un espacio unificado, accesible desde computadoras, tabletas y teléfonos, con funciones específicas para alumnos, talleristas y administradores.\
 **Plazo esperado:** primera versión en funcionamiento a fines de noviembre del 2026.
 
 ---

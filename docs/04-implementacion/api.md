@@ -8,7 +8,7 @@
 **Fecha de elaboración:** 27 de octubre de 2026  
 **Última actualización:** 27 de octubre de 2026  
 
-**Qué es este documento.** Constituye la referencia técnica de la API REST(por sus siglas en inglés: Representational State Transfer) del sistema. Describe las rutas disponibles, los niveles de acceso requeridos, el formato de las peticiones y respuestas, y las reglas de validación aplicadas.
+**Qué es este documento.** Constituye la referencia técnica de la API REST (sigla en inglés de *Representational State Transfer*) del sistema. Describe las rutas disponibles, los niveles de acceso requeridos, el formato de las peticiones y respuestas, y las reglas de validación aplicadas.
 
 ---
 
