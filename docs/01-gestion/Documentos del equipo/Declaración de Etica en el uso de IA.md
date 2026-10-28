@@ -4,7 +4,7 @@
 
 ### Nombre del proyecto: *TheNewfutures - Proyecto Sistema de Gestión de Talleres en Convenio con INAU*
 
-### Fecha: 04/08/26
+### Fecha: 04/08/26 — Última actualización: 28/10/26
 
 ---
 
@@ -20,18 +20,22 @@
 
 ### Declaración:
 
->Declaramos que el contenido de la documentación entregada es de nuestra autoría exclusiva como equipo. Las herramientas de Inteligencia Artificial (IA) fueron utilizadas únicamente como apoyo a la redacción, la investigación teórica y la creación de ilustraciones, según el detalle indicado abajo, y no fueron utilizadas para generar los contenidos del proyecto en nuestro lugar.
->Posteriormente. Las herramientas de Inteligencia Artificial (IA), tubieron que ser utilizada para la generacion de codigo, debido a falta de tiempo. Todo el proceso fue supervisado y verificadon por el equipo.
->Entendemos que el uso no ético de IA, de ser detectado, tiene consecuencias académicas que asumimos como equipo.
+> Declaramos que el proyecto fue desarrollado por el equipo, que es responsable de su contenido. En las primeras etapas, las herramientas de Inteligencia Artificial (IA) se utilizaron como apoyo a la redacción, la revisión de formato y ortografía, la investigación teórica y la creación de ilustraciones.
+>
+> Posteriormente, debido a la falta de tiempo, la IA también se utilizó para generar código del frontend y del backend, elaborar una reconstrucción de la entrevista a partir de las notas del equipo, redactar documentación técnica y ejecutar las pruebas del sistema. En todos los casos, el uso fue supervisado y el resultado fue revisado y verificado por el integrante responsable y por el equipo, según el detalle de la tabla siguiente.
+>
+> Entendemos que el uso no ético de IA, de ser detectado, tiene consecuencias académicas que asumimos como equipo.
+
+---
 ---
 
 <br>
 
-## Detalle de uso de IA utilizadas:
+## Detalle del uso de herramientas de IA:
 
 | Código | Herramienta de IA | Fecha y actividad | Descripción del uso | Responsable |
 |---|---|---|---|---|
-| IA-01 | ChatGPT (GPT-5.5 Instant) | `07/06 – 30/07/2026` - Frontend (HTML y CSS) | Código: se utilizó la IA para revisar el código y brindar apoyo en la estructuración. El resultado fue revisado por el subcoordinador. | Emiliano Sánchez |
+| IA-01 | ChatGPT (GPT-5.5 Instant) | `17/07 – 30/07/2026` - Frontend (HTML y CSS) | Código: se utilizó la IA para revisar el código y brindar apoyo en la estructuración. El resultado fue revisado por el subcoordinador. | Emiliano Sánchez |
 | IA-02 | Gemini 3 Flash | `27/07/2026` - Redacción (Project Charter) | Redacción: ajustes de formato para adoptar un tono formal y corrección de errores ortográficos y de formato previos. | Gabriel Rendon |
 | IA-03 | Claude Sonnet 5 | `30/07/2026` - Documentación | Investigación: definición de conceptos del proyecto. Redacción: ajustes de formato para adoptar un tono formal y corrección de errores ortográficos y de formato previos. Revisión: se utilizó para verificar la coherencia del documento, bajo la supervisión del subcoordinador y del líder. | Gabriel Rendon |
 | IA-04 | Claude Sonnet 5 | `24/07/2026` - Redacción (Anotaciones de la entrevista) | Redacción: ajustes de formato para adoptar un tono formal y corrección de errores ortográficos y de formato previos. | Gabriel Rendon |
@@ -54,8 +58,9 @@
 | IA-21 | GPT-5.6 Luna | `11/10 – 20/10/2026` - Generación de código (JavaScript y PHP) | Se utilizó para generar código mediante la técnica conocida como *vibe coding*, debido a la falta de tiempo. El código generado fue revisado y verificado tanto por el líder del proyecto, Emiliano Sánchez, como por el integrante responsable de generarlo con IA. | Thiago Ferragut |
 | IA-22 | Claude Opus 5.5 | `24/10/2026` - Primera prueba del sistema (Testing-01) | Se utilizó IA, mediante la extensión Claude en Chrome, para ejecutar las pruebas del sistema en un servidor Ubuntu. El proceso fue supervisado y los resultados fueron verificados por el subcoordinador, Gabriel Rendon. | Gabriel Rendon |
 | IA-23 | Claude Opus 5.5 | `24/10/2026` - Revisión y redacción de documentación (Control de Cambios, README y estructura del repositorio) | Se utilizó IA para revisar y redactar la documentación relacionada con el Control de Cambios, el archivo README y la estructura del repositorio. | Gabriel Rendon |
-| IA-24 | Claude Opus 5.5 | `26/10/2026` - Segunda prueba del sistema (Testing-02) | Se utilizó IA, mediante la extensión Claude en Chrome, para ejecutar la segunda ronda de pruebas del sistema en un servidor Ubuntu. El proceso fue supervisado y los resultados fueron verificados por el subcoordinador, Gabriel Rendon. | Gabriel Rendon |
-| IA-25 | Claude Opus 5.5 | `27/10/2026` - Revisión completa y preparación (Tercera entrega). | Se utilizó IA para realizar un análisis exhaustivo de todos los documentos, revisar su contenido en profundidad, corregir errores y verificar la coherencia general de la documentación. El proceso fue supervisado por el subcoordinador, Gabriel Rendon. | Gabriel Rendon |
+| IA-24 | Claude Opus 5.5 | `25/10/2026` - Escaneo con Nmap y documentos de Ciberseguridad | Se utilizó IA como guía para instalar Nmap y ejecutar los escaneos del servidor, para verificar los puertos desde otra computadora mediante la extensión Claude en Chrome, y para proponer la actualización de los documentos de Ciberseguridad (Doc NMAP, Identificación de amenazas, Hardening, Mecanismos y Plan de Contingencia). Las propuestas fueron revisadas y aprobadas por el subcoordinador, Gabriel Rendon. | Gabriel Rendon |
+| IA-25 | Claude Opus 5.5 | `26/10/2026` - Segunda prueba del sistema (Testing-02) | Se utilizó IA, mediante la extensión Claude en Chrome, para ejecutar la segunda ronda de pruebas del sistema en un servidor Ubuntu. El proceso fue supervisado y los resultados fueron verificados por el subcoordinador, Gabriel Rendon. | Gabriel Rendon |
+| IA-26 | Claude Opus 5.5 | `27/10 – 28/10/2026` - Revisión completa y preparación (Tercera entrega) | Se utilizó IA para revisar todos los documentos, verificar su coherencia con el código y con las pruebas, y proponer correcciones, que fueron revisadas y aprobadas por el subcoordinador antes de aplicarlas. Además, se utilizó para redactar el documento de la API (`api.md`) a partir del código fuente y la Revisión de Coherencia; su contenido fue revisado por el subcoordinador, Gabriel Rendon. | Gabriel Rendon |
 
 ---
 
@@ -66,6 +71,6 @@
 
 | Integrante | Firma / fecha |
 | --- | --- |
-| Emiliano Sánchez – Líder/Scrum Master. | Emiliano Sánchez - 04/08/26 |
-| Gabriel Rendon – Subcoordinador. | Gabriel Rendon - 04/08/26 |
-| Thiago Ferragut – Desarrollador Frontend/Backend. | Thiago Ferragut - 04/08/26 |
+| Emiliano Sánchez – Líder/Scrum Master. | Emiliano Sánchez - 04/08/26 (actualizada el 28/10/26) |
+| Gabriel Rendon – Subcoordinador. | Gabriel Rendon - 04/08/26 (actualizada el 28/10/26) |
+| Thiago Ferragut – Desarrollador Frontend/Backend. | Thiago Ferragut - 04/08/26 (actualizada el 28/10/26) |
