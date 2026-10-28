@@ -1,6 +1,6 @@
 # Revisión integral de coherencia — Proyecto TheNewfutures / INAU
 
-**Fecha de revisión:** 27 de octubre de 2026
+**Fecha de revisión:** 28 de octubre de 2026
 **Fuente:** rama `cambios-frontend` del repositorio `proyecto-convenio-INAU`.
 **Alcance:** documentación, estructura de repositorio, HTML, CSS, JavaScript, PHP y SQL presentes en el repositorio, y resultados de las pruebas del sistema (`Testing-01.md` y `Testing-02.md`).
 
@@ -36,8 +36,8 @@ Los problemas pendientes se concentran en tres frentes: **la seguridad del despl
 | Infraestructura | Implementada | Entorno Docker en `backend/api-completa`, desplegado en un servidor de prueba según `Documento de Reconstruccion - Servidor.md`. Hallazgos de endurecimiento en 4.19. |
 | Ciberseguridad (documentación) | Completa | Cinco documentos en `05-Ciberseguridad`: amenazas, mecanismos de autenticación, hardening, escaneo con Nmap y plan de contingencia. |
 | Identidad visual | Definida | Documentación completa y hojas de estilo por panel. |
-| Uso ético de IA | Documentado, con correcciones pendientes | Declaración con registro de herramientas y firmas; el párrafo inicial y algunas fechas no coinciden con otros documentos (ver 4.22). |
-| Emprendedurismo | Con datos desactualizados | El Plan de Negocios conserva cifras anteriores (ver 4.21). |
+| Uso ético de IA | Documentado | Declaración con registro de 26 usos de herramientas de IA, coherente con los demás documentos, y firmas actualizadas al 28/10/2026. |
+| Emprendedurismo | Completo | Plan de Negocios actualizado y coherente con el Charter, `Doc.md` y el Control de Cambios. |
 | Gestión | Avanzada | Actas de reuniones R-01 a R-13, Control de Cambios (CC-01 a CC-14) y declaración sobre las Sprint Review; el Acta de cierre está sin contenido. |
 
 ---
@@ -256,12 +256,14 @@ Las rutas de alumnos, talleristas y adjuntos responden `422` ante datos inválid
 
 Además, la misión de la empresa afirma brindar "seguridad absoluta", mientras que el análisis FODA del mismo documento reconoce que la solución no la presenta.
 
-### 4.22 La Declaración de Ética no coincide con otros documentos
+### 4.22 La Declaración de Ética no coincide con otros documentos — **Resuelto**
 
-- El párrafo de la declaración afirma que la IA no se utilizó para generar contenidos, mientras que la tabla registra generación de código, la reconstrucción de la entrevista y la ejecución de las pruebas.
-- La fila de la primera ronda de pruebas indica el 23/10/2026; `Testing-01.md` registra el 24/10/2026.
-- La fila del frontend (desde el 07/06/2026) es anterior a la fecha de inicio del proyecto que indica el Charter (17/07/2026).
-- La fila de la documentación de Docker (04/09/2026) es anterior a la decisión de adoptar Docker (CC-06, 11/09/2026).
+La Declaración de Ética se actualizó:
+
+- El párrafo de la declaración describe todos los usos registrados en la tabla, incluidos la generación de código, la reconstrucción de la entrevista, la redacción de documentación técnica y la ejecución de las pruebas.
+- Las fechas coinciden con los demás documentos: la primera ronda de pruebas figura el 24/10/2026 (`Testing-01.md`), el trabajo de frontend comienza con el proyecto (17/07/2026, según el Charter) y la documentación de Docker es posterior a la decisión de adoptarlo (CC-06).
+- Se registró el uso de IA del 25/10/2026 (`Doc NMAP.md`) y la redacción de `api.md`.
+- Las firmas se actualizaron al 28/10/2026.
 - `Doc NMAP.md` registra una verificación asistida por IA el 25/10/2026 que la tabla no incluye.
 
 ---
@@ -422,6 +424,7 @@ El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez com
 8. El entorno Docker es reproducible: se desplegó en un servidor de prueba siguiendo la guía del repositorio.
 9. El estado de los requerimientos coincide entre `Doc.md` (sección 23), esta revisión y los resultados de las pruebas.
 10. El conteo de archivos coincide entre el repositorio, el `README.md` y `Estructura del Repositorio.md`.
+11. El Plan de Negocios y la Declaración de Ética coinciden con el Charter, `Doc.md`, el Control de Cambios y los registros de pruebas.
 
 ### Lo que debe corregirse prioritariamente
 
@@ -436,7 +439,7 @@ El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez com
 9. Centralizar la dirección de la API en un solo archivo.
 10. Crear una hoja de estilos propia para el login.
 11. Implementar el registro de trazabilidad.
-12. Actualizar el README de la API, el Plan de Negocios y la Declaración de Ética.
+12. Actualizar el README de la API.
 13. Redactar el Acta de cierre.
 
 ---
@@ -462,7 +465,7 @@ El Charter establece a INAU como cliente y patrocinador, a Emiliano Sánchez com
         ↓
 8. Implementar la trazabilidad
         ↓
-9. Actualizar el README de la API, el Plan de Negocios y la Declaración de Ética
+9. Actualizar el README de la API
         ↓
 10. Nueva ronda de pruebas sobre lo corregido
         ↓
