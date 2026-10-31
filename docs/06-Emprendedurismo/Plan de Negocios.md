@@ -3,11 +3,16 @@
 <br>
 
 ## TheNewfutures – Sistema de Gestión de Talleres en Convenio con INAU
-**Asignatura:** Emprendedurismo  
-**Equipo:** Emiliano Sánchez, Gabriel Rendon y Thiago Ferragut  
-**Proyecto:** 3.º BT Informática 2026
+
+**Asignatura:** Emprendedurismo  
+
+**Equipo:** Emiliano Sánchez, Gabriel Rendon y Thiago Ferragut  
+
+**3.º BT Informática 2026**
 
 <br>
+
+FODA: Debilidades y Oportunidades
 
 ## 1. Resumen ejecutivo
 
@@ -25,7 +30,7 @@
 
 **Visión de la empresa:** consolidarse como una empresa de referencia en la creación, el mantenimiento y la modificación de software, sitios web, aplicaciones y espacios de trabajo, con capacidad para negociar con empresas de alcance internacional y ser reconocida por la calidad de sus prácticas y servicios.
 
-**Oportunidad de negocio:** la oportunidad parte de una necesidad reconocida en la entrevista del proyecto: contar con un espacio unificado donde se pueda consultar y gestionar la información de talleres, alumnos, asistencias, tareas e informes. El proyecto no incluye una validación comercial, ventas ni contratos que permitan afirmar que el servicio está comercializado.
+**Oportunidad de negocio:** la oportunidad parte de una necesidad reconocida en la entrevista (por medios digitales) con el cliente: contar con un espacio unificado donde se pueda consultar y gestionar la información de talleres, alumnos, asistencias, tareas e informes. El proyecto no incluye una validación comercial, ventas ni contratos que permitan afirmar que el servicio está comercializado.
 
 **Equipo emprendedor:** Emiliano Sánchez, líder del equipo y Scrum Master; Gabriel Rendon, subcoordinador, con tareas de documentación, modelado y apoyo al backend; y Thiago Ferragut, a cargo del desarrollo del frontend y del backend y de las tareas de integración.
 
@@ -47,18 +52,17 @@ El alcance inicial excluye los foros, la mensajería interna, las notificaciones
 ### Análisis FODA
 
 | Factor | Análisis |
-| --- | --- |
-| Fortalezas | La necesidad del proyecto se relevó mediante una entrevista. La solución define tres roles y las funciones necesarias para organizar talleres, asistencias, materiales, tareas e informes. Se documentaron los requerimientos, la arquitectura, la identidad visual y la estructura del sistema. |
-| Oportunidades | Existe una necesidad concreta en la gestión de los talleres en convenio con INAU. El diseño responsive permite el acceso desde computadoras, tablets y teléfonos. La centralización de varios procesos en una única plataforma constituye el principal beneficio planteado. |
-| Debilidades | La solución no garantiza una seguridad absoluta, quedan defectos por corregir y algunas funciones quedaron excluidas de la primera versión. |
-| Amenazas | La competencia está constituida por los proyectos de los compañeros de clase, planteada como un supuesto dado el carácter académico del proyecto. Se identifican, además, riesgos de tiempo insuficiente, dificultades de integración, cambios en los requerimientos y problemas de coordinación o de disponibilidad del equipo. |
+|---|---|
+| **Fortalezas** | La necesidad del proyecto fue identificada mediante una entrevista. La solución contempla tres roles de usuario y las funcionalidades necesarias para gestionar talleres, asistencias, materiales, tareas e informes. Asimismo, se encuentran documentados los requerimientos, la arquitectura, la identidad visual y la estructura del sistema. |
+| **Oportunidades** | Existe una necesidad concreta de mejorar la gestión de los talleres en convenio con INAU. El diseño adaptable (*responsive*) permite acceder a la plataforma desde computadoras, tabletas y teléfonos móviles. Además, la centralización de diversos procesos en un único sistema, junto con una interfaz intuitiva, amigable y fácil de utilizar, facilita la comprensión y el uso de sus funcionalidades. |
+| **Debilidades** | La solución no garantiza una seguridad absoluta y aún existen aspectos técnicos que requieren revisión y corrección. Además, algunas funcionalidades han quedado excluidas de la primera versión. Por otra parte, el sistema fue diseñado específicamente para las necesidades de INAU, por lo que su aplicación en otras instituciones educativas podría requerir adaptaciones. |
+| **Amenazas** | La competencia está constituida por los proyectos de los compañeros de clase, planteada como un supuesto dado el carácter académico del proyecto. Se identifican, además, riesgos de tiempo insuficiente, dificultades de integración, cambios en los requerimientos y problemas de coordinación o de disponibilidad del equipo. |
 
 **Competencia y diferenciación:** la competencia está constituida por los demás proyectos de los compañeros de clase. Dado que no se dispone de sus descripciones, no corresponde atribuirles características ni afirmar que TheNewfutures sea objetivamente superior. La diferenciación que sí puede fundamentarse es su enfoque específico en los talleres en convenio con INAU y la centralización de usuarios, talleres, asistencias, material, tareas, calificaciones e informes, con accesos según el rol.
 
 <br>
 
 ## 3. Plan de producción y operaciones
-
 
 ### Proceso de producción o prestación del servicio
 
@@ -71,21 +75,17 @@ El alcance inicial excluye los foros, la mensajería interna, las notificaciones
 | 5. Integración y pruebas | La integración del frontend y el backend fue realizada. Se ejecutaron dos rondas de pruebas en un servidor de prueba (24 y 26/10/2026): la mayoría de los requerimientos de la primera versión se cumplen, y quedan pendientes la exportación de informes en PDF o Excel, el listado de alumnos, el informe de talleristas y la consulta de datos sensibles. |
 | 6. Despliegue | El sistema se desplegó en un servidor de prueba (Ubuntu Server en una máquina virtual) con Docker y Nginx, siguiendo la guía del repositorio. El uso de HTTPS está documentado, pero no se aplicó en el servidor de prueba. |
 
-
 ### Tecnología y equipamiento
 
 Las tecnologías y herramientas utilizadas son HTML5, CSS3, Bootstrap 5.3, Bootstrap Icons, JavaScript sin framework, PHP para la API REST, MySQL, Git y GitHub, Visual Studio Code y Docker para los entornos de desarrollo y de prueba. No se especifica un inventario de equipos físicos ni se confirma un contrato de alojamiento.
-
 
 ### Materias primas y suministros
 
 Por tratarse de una solución de software, la producción se basa en el trabajo de análisis, diseño, programación, pruebas y documentación, junto con las herramientas informáticas descritas. No existieron proveedores comerciales, compras de materiales físicos ni cotizaciones; por lo tanto, no se incluyen nombres ni costos.
 
-
 ### Logística y distribución
 
 La distribución prevista es digital: una vez desplegada, la plataforma se utilizaría a través de un navegador web, con funciones disponibles de acuerdo con el rol de cada usuario. La guía de servidor describe una modalidad de publicación mediante Docker, Nginx y HTTPS, pero el despliegue en producción no está confirmado.
-
 
 ### Infraestructura
 
@@ -95,7 +95,6 @@ El proyecto se desarrolla en un entorno local y se desplegó en un servidor de p
 
 ## 4. Plan de recursos humanos y organización
 
-
 ### Estructura organizacional
 
 | Integrante | Cargo / responsabilidad |
@@ -104,16 +103,13 @@ El proyecto se desarrolla en un entorno local y se desplegó en un servidor de p
 | Gabriel Rendon | Subcoordinador. Responsable de la documentación y de los diagramas UML y MER, con participación en el backend. |
 | Thiago Ferragut | Desarrollador frontend y backend. Las actas le asignan tareas de frontend, base de datos y conexión entre el frontend y el backend. |
 
-
 ### Reclutamiento y selección
 
 El equipo fue conformado por asignación de los profesores. No se realizó un proceso de reclutamiento ni se prevé la contratación de personal adicional.
 
-
 ### Remuneraciones y beneficios
 
-El costo estimado del primer año es de USD 2.667 (recursos humanos e infraestructura), con un costo de mantenimiento posterior de USD 75 anuales, correspondiente al alojamiento y al dominio.
-
+El costo estimado de la primera versión es de USD 2.667 (recursos humanos e infraestructura), con un costo de mantenimiento posterior de USD 75 anuales, correspondiente al alojamiento y al dominio.
 
 ### Aspectos legales y normativos
 
@@ -126,11 +122,19 @@ Se identifica a INAU como cliente y patrocinador del proyecto. La documentación
 Los siguientes documentos del repositorio respaldan la descripción del problema, el alcance, las tecnologías y el estado del proyecto:
 
 - [README del repositorio: descripción general, integrantes, tecnologías y estado declarado.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/README.md)
+
 - [Documento principal del proyecto: entrevista, necesidad, visión y alcance.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/02-analisis/Doc.md)
+
 - [Requerimientos funcionales y no funcionales.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/02-analisis/requerimientos.md)
+
 - [Charter: cliente/patrocinador, equipo, visión, alcance y riesgos.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/01-gestion/Charter.md)
+
 - [Acta de reuniones: acuerdos y asignación de tareas.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/01-gestion/Documentos%20del%20equipo/Acta%20de%20Reuniones.md)
+
 - [Justificación tecnológica y arquitectura.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/03-dise%C3%B1o/Justificacion%20Tecnologica.md)
+
 - [Identidad visual.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/03-dise%C3%B1o/Identidad%20Visual.md)
+
 - [Revisión de coherencia del repositorio.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/01-gestion/Revision_Coherencia_INAU.md)
+
 - [Registros de pruebas del sistema (Testing-01 y Testing-02).](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/tree/main/docs/04-implementacion/Testing)
