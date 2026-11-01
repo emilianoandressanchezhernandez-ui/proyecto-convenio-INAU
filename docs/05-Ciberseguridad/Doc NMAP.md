@@ -4,7 +4,8 @@
 
 **Rama:** Ciberseguridad  
 **Fecha:** 22 de octubre de 2026
-**Aclaración:** Este documento se hizo como muestra ya que no pudimos aplicar nmap por problemas de maquinas virtuales, computadoras del equipo y su almacenamiento.
+
+**Última actualización:** 24 de octubre de 2026 (ejecución del escaneo sobre el servidor de prueba; resultados en la sección 10)
 
 ## 1. Objetivo
 
@@ -19,7 +20,7 @@ Las comprobaciones descritas se deben ejecutar únicamente sobre:
 - `127.0.0.1`, si se analiza el entorno Docker local del equipo.
 - Una dirección IP de laboratorio o del servidor del proyecto cuyo uso haya sido autorizado por el responsable.
 
-No se deben ejecutar escaneos contra direcciones públicas, redes de terceros o equipos ajenos al proyecto sin autorización expresa. Este documento no contiene resultados reales de escaneo: las instrucciones son un procedimiento reproducible que debe ejecutarse y documentarse en el entorno que corresponda.
+No se deben ejecutar escaneos contra direcciones públicas, redes de terceros o equipos ajenos al proyecto sin autorización expresa. Las secciones 4 a 9 describen el procedimiento reproducible; los resultados obtenidos al aplicarlo sobre el servidor de prueba del equipo se registran en la sección 10.
 
 ## 3. Componentes del proyecto que se comprobarán
 
@@ -103,7 +104,7 @@ No se debe ejecutar este comando con el marcador literal `<IP_AUTORIZADA>`. Prim
 
 ## 8. Matriz de comprobación de exposición
 
-Esta matriz define el resultado que debe verificarse; no representa resultados de un escaneo ya realizado.
+Esta matriz define el resultado que debe verificarse. Los resultados observados en el servidor de prueba, y su comparación con esta matriz, están en la sección 10.
 
 | Puerto | Servicio relacionado | En el entorno local | En un despliegue publicado según la guía del proyecto |
 |---:|---|---|---|
@@ -128,7 +129,97 @@ Por cada ejecución, registrar:
 
 El documento debe actualizarse con los resultados observados únicamente después de ejecutar la prueba. No se debe escribir que el sistema está seguro porque el escaneo no haya mostrado puertos inesperados: Nmap solo comprueba la superficie de red definida en el comando.
 
-## 10. Fuentes dentro del proyecto
+## 10. Resultados de la ejecución en el servidor de prueba
+
+### 10.1 Contexto
+
+| Elemento | Valor |
+|---|---|
+| Fecha | 24 de octubre de 2026, entre las 20:34 y las 21:08 (hora de Uruguay) |
+| Objetivo | Máquina virtual del equipo con Ubuntu Server, en la red local, desplegada según `Documento de Reconstruccion - Servidor.md` (API y MySQL en Docker; frontend servido por Nginx) |
+| Autorización | Servidor propio del equipo, en su red local |
+| Origen del escaneo | El propio servidor (Nmap 7.94SVN, instalado con `sudo apt install -y nmap`) |
+| Comando | `sudo nmap -Pn -sT -sV -p 22,80,443,8002,3308 <IP>` |
+| Comprobación complementaria | `sudo ss -tlnp` (puertos en escucha) y `sudo ufw status verbose` (reglas del firewall) |
+
+Firewall del servidor durante todas las ejecuciones: `ufw` activo, con política por defecto `deny (incoming)` y entradas permitidas solo para 22/TCP (OpenSSH) y 80/TCP.
+
+### 10.2 Ejecuciones
+
+**Ejecución 1: dirección equivocada.** El primer escaneo, sin `sudo`, se dirigió a `192.168.1.14`, la dirección que la máquina virtual tenía en una sesión anterior. Los cinco puertos se informaron como `filtered`. Luego se comprobó que el servidor había recibido otra dirección (`192.168.1.6`) al reiniciarse: el escaneo no había alcanzado al servidor. El resultado se descarta como evidencia del sistema, pero muestra por qué `filtered` no equivale a "protegido" (ver sección 7).
+
+**Ejecución 2: contenedores detenidos.** Escaneo de `192.168.1.6` y de `127.0.0.1`, con el mismo resultado:
+
+| Puerto | Estado | Servicio detectado |
+|---:|---|---|
+| 22 | open | OpenSSH 9.6p1 Ubuntu |
+| 80 | open | nginx 1.24.0 (Ubuntu) |
+| 443 | closed | — |
+| 3308 | closed | — |
+| 8002 | closed | — |
+
+`ss` mostró en escucha solo `sshd` (22) y `nginx` (80). Los contenedores de la API y de MySQL no estaban en ejecución: tras el reinicio del servidor no se levantan solos, porque `compose.yaml` no define una política de reinicio. Con este estado, el sitio carga pero el inicio de sesión no puede funcionar.
+
+**Ejecución 3: contenedores en ejecución, configuración por defecto.** Se actualizó `FRONTEND_ORIGIN` con la nueva dirección, se ejecutó `docker compose up -d` y se repitió el escaneo de `192.168.1.6`:
+
+| Puerto | Estado | Servicio detectado |
+|---:|---|---|
+| 22 | open | OpenSSH 9.6p1 Ubuntu |
+| 80 | open | nginx 1.24.0 (Ubuntu) |
+| 443 | closed | — |
+| **3308** | **open** | **MySQL 8.4.13** |
+| **8002** | **open** | **Apache httpd 2.4.69 (Debian)** |
+
+`ss` mostró a `docker-proxy` escuchando en `0.0.0.0:8002`, `0.0.0.0:3308`, `[::]:8002` y `[::]:3308`, es decir, en todas las interfaces IPv4 e IPv6, aunque `ufw` no permite la entrada a esos puertos.
+
+**Ejecución 4: después de la corrección.** Se agregaron al `.env` del servidor `API_PORT=127.0.0.1:8002` y `MYSQL_PORT=127.0.0.1:3308`, se aplicó con `docker compose up -d` y se repitió el escaneo:
+
+| Puerto | Estado | Servicio detectado |
+|---:|---|---|
+| 22 | open | OpenSSH 9.6p1 Ubuntu |
+| 80 | open | nginx 1.24.0 (Ubuntu) |
+| 443 | closed | — |
+| 3308 | closed | — |
+| 8002 | closed | — |
+
+`ss` mostró a `docker-proxy` escuchando únicamente en `127.0.0.1:8002` y `127.0.0.1:3308`.
+
+**Verificación desde otra computadora de la red (25 de octubre de 2026).** Desde una computadora con Windows de la misma red, mediante el navegador Chrome (ejecución asistida por IA con la extensión Claude en Chrome):
+
+| Comprobación | Resultado |
+|---|---|
+| Abrir `http://192.168.1.6` e iniciar sesión como administrador | El inicio de sesión funcionó y redirigió al panel del administrador. Una consulta a la API a través de Nginx (`/api/talleres`) respondió 200 con los tres talleres |
+| Abrir `http://192.168.1.6:8002/perfil` | El navegador no pudo conectarse y mostró una página de error |
+| Petición a `http://192.168.1.6:8002/perfil` y a `http://192.168.1.6:3308/` | Ambas fallaron sin conexión tras unos 21 segundos de espera; la petición de control a `http://192.168.1.6/index.html` respondió en 10 ms |
+
+La corrección no afectó el funcionamiento del sitio, y la API y MySQL ya no son accesibles directamente desde otra computadora de la red.
+
+### 10.3 Comparación con la matriz de exposición
+
+| Puerto | Esperado (sección 8) | Ejecución 3 (antes) | Ejecución 4 (después) | Resultado |
+|---:|---|---|---|---|
+| 22 | Accesible para administración | open | open | Coincide |
+| 80 | Accesible para el sitio | open | open | Coincide |
+| 443 | Accesible si se configura HTTPS | closed | closed | Coincide: el servidor de prueba no tiene HTTPS |
+| 8002 | No accesible directamente; la API se publica a través de Nginx | **open** | closed | Corregido |
+| 3308 | No accesible desde fuera del servidor | **open** | closed | Corregido |
+
+### 10.4 Hallazgos
+
+| Hallazgo | Explicación | Acción |
+|---|---|---|
+| La API y MySQL quedaban publicados en todas las interfaces | Con los valores por defecto, `compose.yaml` publica 8002 y 3308 en `0.0.0.0`. Docker crea sus propias reglas de red y no respeta `ufw`, por lo que el firewall no los bloqueaba, tal como advierte la guía de despliegue | Corregido en el servidor de prueba limitando ambos puertos a `127.0.0.1` en el `.env` (escenario PC-08 del Plan de Contingencia) |
+| Nmap identificó las versiones exactas de los servicios | Se informan OpenSSH 9.6p1, nginx 1.24.0, Apache 2.4.69 y MySQL 8.4.13. No es una vulnerabilidad por sí misma, pero facilita a un atacante buscar fallas conocidas de esas versiones | Mantener los servicios actualizados; evaluar ocultar la versión en las cabeceras de Nginx y Apache |
+| Los contenedores no se reinician solos | Tras reiniciar el servidor, la API y MySQL quedaron detenidos hasta ejecutar `docker compose up -d` | Evaluar una política de reinicio en `compose.yaml` |
+| La dirección del servidor cambió al reiniciarse | La red asigna la IP de forma dinámica; el primer escaneo apuntó a una dirección que ya no correspondía al servidor | Fijar la dirección (reserva en el router) y registrar siempre la IP y el estado de `docker compose ps` antes de interpretar un escaneo (sección 9) |
+
+### 10.5 Alcance y limitaciones de estos resultados
+
+- Los escaneos con Nmap se ejecutaron desde el propio servidor hacia su dirección de red. La exposición desde otra computadora de la red, después de la corrección, se comprobó con el navegador y no con Nmap; no se registró un escaneo con Nmap desde otra computadora antes de la corrección.
+- La corrección se aplicó en el `.env` del servidor de prueba. El `compose.yaml` del repositorio sigue publicando los puertos 8002 y 3308 en todas las interfaces cuando no se definen `API_PORT` y `MYSQL_PORT`.
+- El escaneo no prueba que los servicios sean seguros: solo describe la superficie de red de los puertos incluidos en el comando.
+
+## 11. Fuentes dentro del proyecto
 
 | Archivo | Uso en este documento |
 |---|---|
@@ -138,4 +229,3 @@ El documento debe actualizarse con los resultados observados únicamente despué
 | `docs/04-implementacion/inau-infraestructura-docker.md` | Arquitectura de contenedores propuesta y objetivo de no exponer MySQL al exterior. |
 | `docs/04-implementacion/Documento de Reconstruccion - Servidor.md` | Procedimiento documentado de firewall, SSH, HTTP/HTTPS, Nginx y Certbot. |
 | `docs/05-Ciberseguridad/Identificación de amenazas.md` | Contexto de riesgos de seguridad analizados por el proyecto. |
-

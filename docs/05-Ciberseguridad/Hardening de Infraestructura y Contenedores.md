@@ -2,7 +2,8 @@
 
 ## Hardening de infraestructura y contenedores
 
-**Fecha de revisión:** 22 de octubre de 2026
+**Fecha de revisión:** 22 de octubre de 2026  
+**Última actualización:** 25 de octubre de 2026
 **Alcance:** configuración Docker de la API PHP, servicio MySQL, almacenamiento persistente, configuración de Apache y límites de carga de archivos.
 
 ---
@@ -13,7 +14,7 @@ Este documento registra las medidas de configuración que pueden verificarse en 
 
 Se contrastó la documentación existente con la configuración versionada bajo `backend/api-completa/`. La guía refleja esa configuración concreta: el archivo `compose.yaml` de esa carpeta define los servicios `api` y `database`. No se atribuyen a esta configuración servicios que no aparecen allí.
 
-Las acciones de mejora identificadas durante la revisión se documentan por separado para mantener este archivo centrado en la implementación y los pasos de ejecución constatados.
+Los hallazgos de la revisión y las acciones recomendadas se registran en la sección 6. Varios de ellos se comprobaron sobre el servidor de prueba del equipo (máquina virtual con Ubuntu Server en la red local, desplegada según `Documento de Reconstruccion - Servidor.md`).
 
 ## 2. Fuentes consultadas
 
@@ -25,7 +26,8 @@ Las acciones de mejora identificadas durante la revisión se documentan por sepa
 | `backend/api-completa/docker/php-apache/entrypoint.sh` | Creación del directorio de cargas y preparación de permisos. |
 | `backend/api-completa/docker/php-apache/uploads.ini` | Límites de tamaño para carga de archivo y petición POST. |
 | `backend/api-completa/.dockerignore` | Archivos y directorios excluidos del contexto de construcción Docker. |
-| `.gitignore` | Reglas de exclusión de variables de entorno, dependencias y archivos generados. |
+| `.gitignore` (raíz) | Reglas de exclusión de variables de entorno, dependencias y archivos generados. |
+| `docs/05-Ciberseguridad/Doc NMAP.md` | Resultados del escaneo de puertos del servidor de prueba (24 y 25 de octubre de 2026). |
 | `backend/api-completa/.htaccess` | Reglas de reescritura y restricciones de acceso a archivos internos y listados de directorios. |
 | `backend/api-completa/storage/.gitignore` | Exclusión del contenido generado dentro de `storage/` del control de versiones. |
 | `backend/api-completa/validators/AdjuntoValidator.php` | Validación de tamaño y tipo MIME de archivos recibidos por la API. |
@@ -106,7 +108,7 @@ El archivo `backend/api-completa/.htaccess` contiene las reglas específicas de 
 
 El archivo `backend/api-completa/.dockerignore` excluye `.env`, `vendor`, archivos Markdown, archivos `.http` y `database.sql` del contexto enviado al constructor. En particular, `.env` no se copia como parte del contexto de construcción.
 
-El `.gitignore` de la raíz excluye `.env`, patrones `.env.*` con excepciones para plantillas de ejemplo, `vendor/`, archivos temporales y ciertas rutas de archivos generados. Además, `backend/api-completa/storage/.gitignore` excluye los archivos generados en `storage/`, conservando únicamente el propio `.gitignore`.
+El `.gitignore` de la raíz excluye `.env`, patrones `.env.*` con excepciones para plantillas de ejemplo, `vendor/`, archivos temporales y archivos del sistema y del editor. Sus dos últimas reglas, previstas para los archivos subidos, están escritas como `Backend/api-completa/...`, con mayúscula inicial, mientras que la carpeta se llama `backend`; como Git distingue mayúsculas y minúsculas, esas dos reglas no tienen efecto (ver sección 6). Además, `backend/api-completa/storage/.gitignore` excluye los archivos generados en `storage/`, conservando únicamente el propio `.gitignore`, y existe un `backend/.gitignore` sin contenido.
 
 ### 4.6. Preparación del directorio de cargas
 
@@ -194,8 +196,18 @@ docker compose down
 
 Este comando detiene y elimina los contenedores del proyecto, pero no elimina los volúmenes con nombre. La base de datos y los archivos se encuentran en `mysql_data` y `uploads_data`, respectivamente.
 
-## 6. Interpretación del resultado
+## 6. Hallazgos de la revisión
+
+| ID | Hallazgo | Evidencia | Riesgo | Acción recomendada |
+|---|---|---|---|---|
+| H-01 | **La API y MySQL quedan publicados en todas las interfaces de red.** Con los valores por defecto, `compose.yaml` publica 8002 y 3308 en `0.0.0.0`. Docker crea sus propias reglas de red y no respeta el firewall `ufw`. | Escaneo con Nmap del 24/10/2026: 8002 (Apache 2.4.69) y 3308 (MySQL 8.4.13) abiertos, aunque `ufw` solo permitía 22 y 80. Tras limitarlos a `127.0.0.1` en el `.env`, quedaron cerrados, y desde otra computadora de la red dejaron de responder (`Doc NMAP.md`, sección 10). | Alto | Corregido en el servidor de prueba con `API_PORT=127.0.0.1:8002` y `MYSQL_PORT=127.0.0.1:3308` en el `.env`. Conviene aplicar ese valor por defecto en `compose.yaml`, para que no dependa de cada `.env`. |
+| H-02 | **Los archivos subidos pueden descargarse sin iniciar sesión.** Se guardan en `/var/www/html/uploads/`, dentro del directorio que publica Apache. `.htaccess` bloquea `vendor/`, `data/` y `storage/`, pero no `uploads/`, y sirve directamente cualquier archivo existente. | Comprobado el 25/10/2026 en el servidor de prueba: sin sesión, la descarga oficial (`/api/adjuntos/4/archivo`) respondió 401, mientras que la ruta directa del archivo (`/api/uploads/entregas/<archivo>`) respondió 200 y entregó el PDF. La API devuelve al cliente `ruta` y `nombre_archivo` de cada adjunto. | Alto | Bloquear `uploads/` en `.htaccess` (como `vendor/`, `data/` y `storage/`) o guardar los archivos fuera del directorio público, y dejar de enviar `ruta` y `nombre_archivo` en las respuestas de la API. |
+| H-03 | **Dos reglas del `.gitignore` no tienen efecto.** `Backend/api-completa/uploads/` y `Backend/api-completa/storage/uploads/` no coinciden con la carpeta real `backend/`. | Revisión del `.gitignore` de la raíz. | Bajo | Corregir a `backend/api-completa/uploads/` y `backend/api-completa/storage/uploads/`. Evaluar eliminar el `backend/.gitignore` vacío. |
+| H-04 | **Los contenedores no se reinician solos.** Tras reiniciar el servidor, la API y MySQL quedaron detenidos hasta ejecutar `docker compose up -d`. | Observado el 24/10/2026 (`Doc NMAP.md`, sección 10.2, ejecución 2). | Medio (disponibilidad) | Agregar una política de reinicio (`restart: unless-stopped`) a los servicios de `compose.yaml`. |
+| H-05 | **Los servicios informan su versión exacta.** Nmap identificó OpenSSH 9.6p1, nginx 1.24.0, Apache 2.4.69 y MySQL 8.4.13. | Escaneo con Nmap del 24/10/2026. | Bajo | Mantener los servicios actualizados y evaluar ocultar la versión en las cabeceras de Nginx (`server_tokens off`) y Apache (`ServerTokens Prod`). |
+
+## 7. Interpretación del resultado
 
 La configuración actual del repositorio incorpora separación de servicios, almacenamiento persistente, una imagen PHP-Apache construida para la API, instalación de dependencias mediante Composer, reglas de Apache contra listados de directorios y acceso web a ciertos archivos internos, exclusiones de contexto y límites de carga de archivos.
 
-El documento registra lo que existe en los archivos revisados y cómo reproducirlo. No constituye una certificación de que el stack esté completamente endurecido o listo para un despliegue con información real; los cambios necesarios o inconsistencias detectadas se detallan en un archivo de mejoras separado.
+El documento registra lo que existe en los archivos revisados y cómo reproducirlo. No constituye una certificación de que el stack esté completamente endurecido o listo para un despliegue con información real. Los hallazgos de la sección 6 deben resolverse antes de usar el sistema con datos de INAU; en particular H-01, corregido solo en el servidor de prueba, y H-02, que permite descargar archivos sin autenticación.

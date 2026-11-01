@@ -143,7 +143,7 @@ Además de la base común, cada panel define componentes propios según las nece
 
 Fondo oscuro con una trama de cuadrícula sutil generada íntegramente por CSS (sin imágenes). La tarjeta de acceso lleva borde superior de 6 px en el acento y una sombra pronunciada, siendo la única pantalla donde se utiliza profundidad: se justifica porque es el único punto de entrada al sistema y debe destacarse por completo sobre el fondo.
 
-El acceso se realiza mediante **cédula y contraseña**, en lugar de un nombre de usuario inventado. La cédula es un identificador que todos los usuarios conocen de memoria y que ya figura en los registros del organismo, lo que reduce la fricción de acceso y evita gestionar credenciales adicionales.
+El acceso se realiza mediante **correo electrónico y contraseña**. El correo es único para cada usuario del sistema y es el dato con el que la API valida las credenciales, lo que permite que un mismo formulario de acceso sirva para los tres roles.
 
 ---
 

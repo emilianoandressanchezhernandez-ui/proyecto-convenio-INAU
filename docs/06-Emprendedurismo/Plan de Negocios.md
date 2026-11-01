@@ -23,7 +23,7 @@
 
 **Oportunidad de negocio:** La oportunidad parte de una necesidad reconocida en la entrevista del proyecto: contar con un espacio unificado donde se pueda consultar y gestionar información de talleres, alumnos, asistencias, tareas e informes. (El proyecto no incluye una validación comercial, ventas ni contratos que permitan afirmar que el servicio está comercializado.)
 
-**Equipo emprendedor:** Emiliano Sánchez: líder del equipo y Scrum Master. Gabriel Rendon: subcoordinador, con tareas de documentación, modelado y apoyo al backend. Thiago Ferragut: desarrollo de backend y participación en tareas de integración.
+**Equipo emprendedor:** Emiliano Sánchez: líder del equipo y Scrum Master. Gabriel Rendon: subcoordinador, con tareas de documentación, modelado y apoyo al backend. Thiago Ferragut: desarrollo de frontend y backend, y tareas de integración.
 
 
 ## 2. Descripción del negocio
@@ -60,15 +60,15 @@ El alcance inicial excluye los foros, la mensajería interna, las notificaciones
 | --- | --- |
 | 1. Relevamiento | Se identificó la necesidad mediante una entrevista y se documentaron los roles, problemas, requerimientos y alcance de la primera versión. |
 | 2. Diseño | Se definieron las interfaces por rol, la identidad visual, la arquitectura tecnológica y el modelo de datos relacional. |
-| 3. Desarrollo del frontend | Se utilizan HTML5, CSS3, Bootstrap 5.3 y JavaScript. Los paneles de administrador y tallerista cuentan con interfaces y comportamiento basado en datos simulados; el panel del alumno sigue pendiente de completar. |
-| 4. Desarrollo del backend | El proyecto cuenta con una API REST en PHP y un modelo de datos MySQL. La revisión de coherencia del 22/09/2026 registra 47 rutas implementadas. |
-| 5. Integración y pruebas | La integración de frontend y backend fue realizada. Las pruebas/testing indican errores menores a corregir. |
-| 6. Despliegue | El repositorio contiene documentación de una alternativa de despliegue con servidor, Docker, Nginx y HTTPS. |
+| 3. Desarrollo del frontend | Se utilizan HTML5, CSS3, Bootstrap 5.3 y JavaScript. Los 3 paneles (administrador, tallerista y alumno) están desarrollados y conectados a la API. |
+| 4. Desarrollo del backend | El proyecto cuenta con una API REST en PHP con 55 rutas, organizada en capas, con autenticación JWT y control de acceso por rol, y una base de datos MySQL. |
+| 5. Integración y pruebas | La integración de frontend y backend fue realizada. Se ejecutaron dos rondas de pruebas en un servidor de prueba (24 y 26/10/2026): la mayoría de los requerimientos de la primera versión se cumplen, y quedan pendientes la exportación de informes en PDF o Excel, el listado de los alumnos, el informe de talleristas y la consulta de datos sensibles. |
+| 6. Despliegue | El sistema se desplegó en un servidor de prueba (Ubuntu Server en una máquina virtual) con Docker y Nginx, siguiendo la guía del repositorio. El HTTPS está documentado, pero no se aplicó en el servidor de prueba. |
 
 
 ### Tecnología y equipamiento
 
-Las tecnologías y herramientas son HTML5, CSS3, Bootstrap 5.3, Bootstrap Icons, JavaScript sin framework, PHP para la API REST, MySQL, Git y GitHub, Visual Studio Code, XAMPP/servidor local para desarrollo y infraestructura con Docker. No se especifica un inventario de equipos físicos ni se confirma un contrato de hosting.
+Las tecnologías y herramientas son HTML5, CSS3, Bootstrap 5.3, Bootstrap Icons, JavaScript sin framework, PHP para la API REST, MySQL, Git y GitHub, Visual Studio Code y Docker para el entorno de desarrollo y prueba. No se especifica un inventario de equipos físicos ni se confirma un contrato de hosting.
 
 
 ### Materias primas y suministros
@@ -105,12 +105,12 @@ El reclutamiento fue por órden de profesores. No hubo un proceso de reclutamien
 
 ### Remuneraciones y beneficios
 
-USD 4.395 el primer año (recursos humanos e infraestructura), con un costo de mantenimiento posterior de USD 75 anuales correspondiente a hosting y dominio.
+USD 2.667 el primer año (recursos humanos e infraestructura), con un costo de mantenimiento posterior de USD 75 anuales correspondiente a hosting y dominio.
 
 
 ### Aspectos legales y normativos
 
-Identificamo a INAU como cliente/patrocinador del proyecto. La documentación exige proteger los datos personales, controlar el acceso según el rol y limitar las acciones de cada usuario. No se especifican forma jurídica de una empresa, inscripción comercial, permisos, licencias ni contratos de comercialización.
+Identificamo a INAU como cliente/patrocinador del proyecto. La documentación exige proteger los datos personales, de acuerdo con la Ley N.º 18.331 de Protección de Datos Personales, controlar el acceso según el rol y limitar las acciones de cada usuario. No se especifican forma jurídica de una empresa, inscripción comercial, permisos, licencias ni contratos de comercialización.
 
 
 ## 5. Anexos
@@ -121,7 +121,8 @@ Los siguientes documentos del repositorio respaldan la descripción del problema
 - [Documento principal del proyecto: entrevista, necesidad, visión y alcance.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/02-analisis/Doc.md)
 - [Requerimientos funcionales y no funcionales.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/02-analisis/requerimientos.md)
 - [Charter: cliente/patrocinador, equipo, visión, alcance y riesgos.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/01-gestion/Charter.md)
-- [Acta de reuniones: acuerdos y asignación de tareas.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/01-gestion/Acta%20de%20Reuniones.md)
+- [Acta de reuniones: acuerdos y asignación de tareas.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/01-gestion/Documentos%20del%20equipo/Acta%20de%20Reuniones.md)
 - [Justificación tecnológica y arquitectura.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/03-dise%C3%B1o/Justificacion%20Tecnologica.md)
 - [Identidad visual.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/03-dise%C3%B1o/Identidad%20Visual.md)
-- [Revisión de coherencia del repositorio del 22/09/2026.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/01-gestion/Revision_Coherencia_INAU.md)
+- [Revisión de coherencia del repositorio.](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/blob/main/docs/01-gestion/Revision_Coherencia_INAU.md)
+- [Registros de pruebas del sistema (Testing-01 y Testing-02).](https://github.com/emilianoandressanchezhernandez-ui/proyecto-convenio-INAU/tree/main/docs/04-implementacion/Testing)
