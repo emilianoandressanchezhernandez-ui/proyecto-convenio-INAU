@@ -23,14 +23,7 @@ class AsignacionController extends Controller
                 'Talleristas del taller obtenidos correctamente.'
             );
         } catch (Exception $e) {
-            $status = $e->getMessage() === 'Taller no encontrado.'
-                ? 404
-                : 400;
-
-            Response::error(
-                $e->getMessage(),
-                $status
-            );
+            $this->handleException($e);
         }
     }
 
@@ -50,29 +43,9 @@ class AsignacionController extends Controller
                 201
             );
         } catch (InvalidArgumentException $e) {
-            $errors = json_decode($e->getMessage(), true);
-
-            Response::error(
-                'Los datos ingresados no son válidos.',
-                422,
-                is_array($errors)
-                    ? $errors
-                    : [$e->getMessage()]
-            );
+            $this->handleValidationException($e);
         } catch (Exception $e) {
-            $status = in_array(
-                $e->getMessage(),
-                [
-                    'Taller no encontrado.',
-                    'Tallerista no encontrado.'
-                ],
-                true
-            ) ? 404 : 400;
-
-            Response::error(
-                $e->getMessage(),
-                $status
-            );
+            $this->handleException($e);
         }
     }
 
@@ -91,17 +64,9 @@ class AsignacionController extends Controller
                 'Tallerista desasignado correctamente.'
             );
         } catch (Exception $e) {
-            $status = $e->getMessage() === 'Taller no encontrado.'
-                ? 404
-                : 400;
-
-            Response::error(
-                $e->getMessage(),
-                $status
-            );
+            $this->handleException($e);
         }
     }
-
 
     // --------------------------------------------------------------
     // Alumnos
@@ -117,7 +82,6 @@ class AsignacionController extends Controller
                     'No se pudo identificar al usuario autenticado.',
                     401
                 );
-                return;
             }
 
             $alumnos = $this->service->getAlumnos(
@@ -130,25 +94,20 @@ class AsignacionController extends Controller
                 'Alumnos del taller obtenidos correctamente.'
             );
         } catch (RuntimeException $e) {
-            $status = $e->getCode() === 403
-                ? 403
-                : 400;
+            if (
+                $e->getCode() === 403 &&
+                $e->getMessage() ===
+                'No tienes permiso para consultar los alumnos de este taller.'
+            ) {
+                Response::error($e->getMessage(), 403);
+            }
 
-            Response::error(
-                $e->getMessage(),
-                $status
-            );
+            $this->handleException($e);
         } catch (Exception $e) {
-            $status = $e->getMessage() === 'Taller no encontrado.'
-                ? 404
-                : 400;
-
-            Response::error(
-                $e->getMessage(),
-                $status
-            );
+            $this->handleException($e);
         }
     }
+
     public function assignAlumno(int $tallerId): void
     {
         try {
@@ -165,29 +124,9 @@ class AsignacionController extends Controller
                 201
             );
         } catch (InvalidArgumentException $e) {
-            $errors = json_decode($e->getMessage(), true);
-
-            Response::error(
-                'Los datos ingresados no son válidos.',
-                422,
-                is_array($errors)
-                    ? $errors
-                    : [$e->getMessage()]
-            );
+            $this->handleValidationException($e);
         } catch (Exception $e) {
-            $status = in_array(
-                $e->getMessage(),
-                [
-                    'Taller no encontrado.',
-                    'Alumno no encontrado.'
-                ],
-                true
-            ) ? 404 : 400;
-
-            Response::error(
-                $e->getMessage(),
-                $status
-            );
+            $this->handleException($e);
         }
     }
 
@@ -206,14 +145,61 @@ class AsignacionController extends Controller
                 'Alumno desinscripto correctamente.'
             );
         } catch (Exception $e) {
-            $status = $e->getMessage() === 'Taller no encontrado.'
-                ? 404
-                : 400;
-
-            Response::error(
-                $e->getMessage(),
-                $status
-            );
+            $this->handleException($e);
         }
+    }
+
+    // --------------------------------------------------------------
+    // Manejo seguro de errores
+    // --------------------------------------------------------------
+
+    private function handleValidationException(
+        InvalidArgumentException $e
+    ): void {
+        $errors = json_decode($e->getMessage(), true);
+
+        Response::error(
+            'Los datos ingresados no son válidos.',
+            422,
+            is_array($errors)
+                ? $errors
+                : ['datos' => $e->getMessage()]
+        );
+    }
+
+    private function handleException(Exception $e): void
+    {
+        $message = $e->getMessage();
+
+        $notFound = [
+            'Taller no encontrado.',
+            'Tallerista no encontrado.',
+            'Alumno no encontrado.'
+        ];
+
+        if (in_array($message, $notFound, true)) {
+            Response::error($message, 404);
+        }
+
+        $conflicts = [
+            'No se puede asignar un tallerista inactivo.',
+            'El tallerista ya está asignado a este taller.',
+            'El tallerista no está asignado a este taller.',
+            'No se puede inscribir un alumno inactivo.',
+            'El alumno ya está inscripto en este taller.',
+            'El alumno no está inscripto en este taller.',
+            'No se pueden realizar asignaciones en un taller finalizado.'
+        ];
+
+        if (in_array($message, $conflicts, true)) {
+            Response::error($message, 409);
+        }
+
+        error_log($e->getMessage());
+
+        Response::error(
+            'No se pudo completar la operación solicitada.',
+            500
+        );
     }
 }

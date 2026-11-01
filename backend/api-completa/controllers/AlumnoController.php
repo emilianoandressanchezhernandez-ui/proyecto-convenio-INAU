@@ -19,10 +19,11 @@ class AlumnoController extends Controller
                 'Alumnos obtenidos correctamente.'
             );
         } catch (Exception $e) {
+            error_log($e->getMessage());
+
             Response::error(
                 'No se pudieron obtener los alumnos.',
-                500,
-                [$e->getMessage()]
+                500
             );
         }
     }
@@ -37,9 +38,15 @@ class AlumnoController extends Controller
                 'Alumno obtenido correctamente.'
             );
         } catch (Exception $e) {
+            if ($e->getMessage() === 'Alumno no encontrado.') {
+                Response::error('Alumno no encontrado.', 404);
+            }
+
+            error_log($e->getMessage());
+
             Response::error(
-                $e->getMessage(),
-                404
+                'No se pudo obtener el alumno.',
+                500
             );
         }
     }
@@ -65,9 +72,18 @@ class AlumnoController extends Controller
                 is_array($errores) ? $errores : [$e->getMessage()]
             );
         } catch (Exception $e) {
+            if ($e->getMessage() === 'Ya existe un alumno con esa cédula.') {
+                Response::error(
+                    'Ya existe un alumno con esa cédula.',
+                    409
+                );
+            }
+
+            error_log($e->getMessage());
+
             Response::error(
-                $e->getMessage(),
-                400
+                'No se pudo crear el alumno.',
+                500
             );
         }
     }
@@ -92,13 +108,15 @@ class AlumnoController extends Controller
                 is_array($errores) ? $errores : [$e->getMessage()]
             );
         } catch (Exception $e) {
-            $codigo = $e->getMessage() === 'Alumno no encontrado.'
-                ? 404
-                : 400;
+            if ($e->getMessage() === 'Alumno no encontrado.') {
+                Response::error('Alumno no encontrado.', 404);
+            }
+
+            error_log($e->getMessage());
 
             Response::error(
-                $e->getMessage(),
-                $codigo
+                'No se pudo actualizar el alumno.',
+                500
             );
         }
     }
@@ -113,13 +131,15 @@ class AlumnoController extends Controller
                 'Alumno desactivado correctamente.'
             );
         } catch (Exception $e) {
-            $codigo = $e->getMessage() === 'Alumno no encontrado.'
-                ? 404
-                : 400;
+            if ($e->getMessage() === 'Alumno no encontrado.') {
+                Response::error('Alumno no encontrado.', 404);
+            }
+
+            error_log($e->getMessage());
 
             Response::error(
-                $e->getMessage(),
-                $codigo
+                'No se pudo desactivar el alumno.',
+                500
             );
         }
     }

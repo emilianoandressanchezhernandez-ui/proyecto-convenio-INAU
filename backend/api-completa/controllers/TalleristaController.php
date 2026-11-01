@@ -19,10 +19,11 @@ class TalleristaController extends Controller
                 'Talleristas obtenidos correctamente.'
             );
         } catch (Exception $e) {
+            error_log($e->getMessage());
+
             Response::error(
                 'No se pudieron obtener los talleristas.',
-                500,
-                [$e->getMessage()]
+                500
             );
         }
     }
@@ -37,9 +38,18 @@ class TalleristaController extends Controller
                 'Tallerista obtenido correctamente.'
             );
         } catch (Exception $e) {
+            if ($e->getMessage() === 'Tallerista no encontrado.') {
+                Response::error(
+                    'Tallerista no encontrado.',
+                    404
+                );
+            }
+
+            error_log($e->getMessage());
+
             Response::error(
-                $e->getMessage(),
-                404
+                'No se pudo obtener el tallerista.',
+                500
             );
         }
     }
@@ -65,9 +75,25 @@ class TalleristaController extends Controller
                 is_array($errores) ? $errores : [$e->getMessage()]
             );
         } catch (Exception $e) {
-            Response::error(
+            if (in_array(
                 $e->getMessage(),
-                400
+                [
+                    'Ya existe un usuario con esa cédula.',
+                    'Ya existe un usuario con ese correo.'
+                ],
+                true
+            )) {
+                Response::error(
+                    $e->getMessage(),
+                    409
+                );
+            }
+
+            error_log($e->getMessage());
+
+            Response::error(
+                'No se pudo crear el tallerista.',
+                500
             );
         }
     }
@@ -92,13 +118,25 @@ class TalleristaController extends Controller
                 is_array($errores) ? $errores : [$e->getMessage()]
             );
         } catch (Exception $e) {
-            $status = $e->getMessage() === 'Tallerista no encontrado.'
-                ? 404
-                : 400;
+            if ($e->getMessage() === 'Tallerista no encontrado.') {
+                Response::error(
+                    'Tallerista no encontrado.',
+                    404
+                );
+            }
+
+            if ($e->getMessage() === 'Ya existe un usuario con ese correo.') {
+                Response::error(
+                    'Ya existe un usuario con ese correo.',
+                    409
+                );
+            }
+
+            error_log($e->getMessage());
 
             Response::error(
-                $e->getMessage(),
-                $status
+                'No se pudo actualizar el tallerista.',
+                500
             );
         }
     }
@@ -113,13 +151,18 @@ class TalleristaController extends Controller
                 'Tallerista desactivado correctamente.'
             );
         } catch (Exception $e) {
-            $status = $e->getMessage() === 'Tallerista no encontrado.'
-                ? 404
-                : 400;
+            if ($e->getMessage() === 'Tallerista no encontrado.') {
+                Response::error(
+                    'Tallerista no encontrado.',
+                    404
+                );
+            }
+
+            error_log($e->getMessage());
 
             Response::error(
-                $e->getMessage(),
-                $status
+                'No se pudo desactivar el tallerista.',
+                500
             );
         }
     }
