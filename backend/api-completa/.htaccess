@@ -15,7 +15,7 @@
 
     # Nadie tiene que poder pedir por el navegador los archivos internos
     # (los datos y el cÃ³digo de la librerÃ­a).
-    RewriteRule ^(vendor|data|storage)/ - [F,L]
+    RewriteRule ^(vendor|data|storage|uploads)/ - [F,L]
 
     # Si piden un archivo o una carpeta que existe de verdad, se sirve tal cual.
     RewriteCond %{REQUEST_FILENAME} !-f
