@@ -650,3 +650,105 @@ function deshabilitarFormularioPerfil() {
         control.disabled = true;
     });
 }
+
+
+// ========================================
+// CAMBIO DE CONTRASEÑA
+// PATCH /perfil/clave
+// ========================================
+
+let cambiandoPasswordPerfil = false;
+
+function configurarCambioPasswordPerfil() {
+    document.getElementById("btn-cambiar-password")
+        ?.addEventListener("click", cambiarPasswordPerfil);
+}
+
+async function cambiarPasswordPerfil() {
+    if (cambiandoPasswordPerfil) {
+        return;
+    }
+
+    const inputActual = document.getElementById("password-actual");
+    const inputNueva = document.getElementById("password");
+    const inputConfirmar = document.getElementById("confirmar-password");
+    const boton = document.getElementById("btn-cambiar-password");
+
+    const claveActual = inputActual?.value || "";
+    const claveNueva = inputNueva?.value || "";
+    const confirmarClave = inputConfirmar?.value || "";
+
+    if (!claveActual || !claveNueva || !confirmarClave) {
+        mostrarAlertaPerfil("Completá los tres campos de contraseña.", "danger");
+        return;
+    }
+
+    if (claveNueva.length < 8) {
+        mostrarAlertaPerfil("La nueva contraseña debe tener al menos 8 caracteres.", "danger");
+        return;
+    }
+
+    if (claveNueva !== confirmarClave) {
+        mostrarAlertaPerfil("Las contraseñas nuevas no coinciden.", "danger");
+        return;
+    }
+
+    if (claveNueva === claveActual) {
+        mostrarAlertaPerfil("La nueva contraseña debe ser diferente de la actual.", "danger");
+        return;
+    }
+
+    cambiandoPasswordPerfil = true;
+    boton.disabled = true;
+
+    try {
+        const respuesta = await fetch(
+            `${ALUMNO_API_URL}/perfil/clave`,
+            {
+                method: "PATCH",
+                credentials: "include",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    clave_actual: claveActual,
+                    clave_nueva: claveNueva
+                })
+            }
+        );
+
+        const resultado = await respuesta.json().catch(() => ({}));
+
+        if (!respuesta.ok || resultado.ok === false) {
+            const errores = resultado.errores && typeof resultado.errores === "object"
+                ? Object.values(resultado.errores).join(" ")
+                : "";
+
+            throw new Error(
+                `${resultado.mensaje || "No se pudo cambiar la contraseña."} ${errores}`.trim()
+            );
+        }
+
+        inputActual.value = "";
+        inputNueva.value = "";
+        inputConfirmar.value = "";
+
+        mostrarAlertaPerfil(
+            "Contraseña actualizada correctamente. Usá la nueva contraseña la próxima vez que inicies sesión.",
+            "success"
+        );
+
+    } catch (error) {
+        mostrarAlertaPerfil(
+            error instanceof TypeError
+                ? "No se pudo conectar con la API."
+                : error.message,
+            "danger"
+        );
+
+    } finally {
+        cambiandoPasswordPerfil = false;
+        boton.disabled = false;
+    }
+}
