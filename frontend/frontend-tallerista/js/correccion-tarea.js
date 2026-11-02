@@ -624,6 +624,15 @@ function configurarEventosCorreccion() {
         botonGuardar.onclick =
             guardarCorreccionAPI;
     }
+
+    const botonEliminarNota = document.getElementById(
+        "btn-eliminar-nota"
+    );
+
+    if (botonEliminarNota) {
+        botonEliminarNota.onclick =
+            eliminarNotaAPI;
+    }
 }
 
 
@@ -696,6 +705,20 @@ function abrirModalCorregirEntrega(entregaId) {
     if (inputComentario) {
         inputComentario.value =
             entregaSeleccionada.comentario ?? "";
+    }
+
+    // "Eliminar nota" solo aparece si la entrega tiene nota.
+    const botonEliminarNota = document.getElementById(
+        "btn-eliminar-nota"
+    );
+
+    if (botonEliminarNota) {
+        const tieneNota =
+            entregaSeleccionada.nota !== null &&
+            entregaSeleccionada.nota !== undefined &&
+            entregaSeleccionada.nota !== "";
+
+        botonEliminarNota.classList.toggle("d-none", !tieneNota);
     }
 
     ocultarAlertaModalCorreccion();
@@ -830,6 +853,74 @@ async function guardarCorreccionAPI() {
         if (boton) {
             boton.disabled = false;
             boton.textContent = "Guardar";
+        }
+    }
+}
+
+
+// ======================================
+// ELIMINAR NOTA
+// DELETE /entregas/{id}/nota
+// ======================================
+
+async function eliminarNotaAPI() {
+    if (guardandoCorreccion || !entregaSeleccionada) {
+        return;
+    }
+
+    const confirmado = window.confirm(
+        "¿Desea eliminar la nota de esta entrega? " +
+        "El comentario de la corrección se conserva."
+    );
+
+    if (!confirmado) {
+        return;
+    }
+
+    const entregaId = Number(entregaSeleccionada.id);
+
+    const boton = document.getElementById("btn-eliminar-nota");
+
+    guardandoCorreccion = true;
+
+    if (boton) {
+        boton.disabled = true;
+    }
+
+    ocultarAlertaModalCorreccion();
+
+    try {
+        await solicitarCorreccionAPI(
+            `/entregas/${entregaId}/nota`,
+            "DELETE"
+        );
+
+        // Consultar nuevamente lo guardado en MySQL.
+        await cargarEntregasCorreccion();
+
+        bootstrap.Modal.getOrCreateInstance(
+            document.getElementById("modal-corregir-entrega")
+        ).hide();
+
+        entregaSeleccionada = null;
+
+        mostrarAlertaCorreccion(
+            "Nota eliminada correctamente.",
+            "success"
+        );
+
+    } catch (error) {
+        console.error("Error al eliminar la nota:", error);
+
+        mostrarAlertaModalCorreccion(
+            "No se pudo eliminar la nota. " + error.message
+        );
+
+    } finally {
+        guardandoCorreccion = false;
+
+        if (boton) {
+            boton.disabled = false;
         }
     }
 }
