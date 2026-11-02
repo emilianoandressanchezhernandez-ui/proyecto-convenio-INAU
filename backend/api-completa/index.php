@@ -82,6 +82,10 @@ require_once __DIR__ . '/core/Token.php';
 require_once __DIR__ . '/core/AuthMiddleware.php';
 require_once __DIR__ . '/core/Router.php';
 
+// NUEVO (DEF-11): limitador de peticiones por IP.
+// Usa Response, por eso se carga despues de el.
+require_once __DIR__ . '/core/RateLimiter.php';
+
 
 // ------------------------------------------------------------------
 // Models: las cosas del problema.
@@ -227,6 +231,12 @@ $path = parse_url(
 // ------------------------------------------------------------------
 
 try {
+
+    // NUEVO (DEF-11): limite general de la API.
+    // Maximo 300 peticiones por minuto por IP. Si se supera, responde
+    // 429 y el pedido no llega al router. El login tiene ademas su
+    // propio limite, mas estricto, en AuthController.
+    RateLimiter::check(300, 60, 'api');
 
     $router = require __DIR__ . '/routes.php';
 
