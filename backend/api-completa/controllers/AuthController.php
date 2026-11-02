@@ -114,6 +114,9 @@ class AuthController extends Controller
     /**
      * PATCH /perfil/clave
      * Cambia la contraseña del usuario autenticado.
+     *
+     * Las demás sesiones del usuario se cierran; la actual recibe
+     * una cookie nueva para seguir abierta.
      */
     public function changePassword($id = null)
     {
@@ -130,11 +133,14 @@ class AuthController extends Controller
             return;
         }
 
-        $this->service->changePassword(
+        $token = $this->service->changePassword(
             (int) $this->user()['id'],
             $data['clave_actual'],
             $data['clave_nueva']
         );
+
+        // Mantener abierta la sesión de quien cambió la contraseña.
+        Token::sendCookie($token);
 
         Response::success(
             null,

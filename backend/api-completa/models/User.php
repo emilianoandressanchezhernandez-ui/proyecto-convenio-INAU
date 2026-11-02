@@ -83,6 +83,16 @@ class User
         return password_verify($plainPassword, $this->claveHash);
     }
 
+    /**
+     * Huella de la contraseña para el token.
+     * Cambia cada vez que cambia la contraseña. Se calcula con la clave
+     * secreta, así que no revela nada del hash.
+     */
+    public function getPasswordFingerprint(): string
+    {
+        return substr(hash_hmac('sha256', $this->claveHash, SECRET_KEY), 0, 16);
+    }
+
     public function toArray(): array
     {
         return [
