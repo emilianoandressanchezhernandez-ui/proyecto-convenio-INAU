@@ -513,8 +513,9 @@ function prepararFuncionesNoDisponiblesPerfil() {
     if (botonEliminarBiografia) {
         botonEliminarBiografia.disabled = true;
     }
+}
 
-    
+
 // ======================================
 // FOTO PREDETERMINADA
 // ======================================
