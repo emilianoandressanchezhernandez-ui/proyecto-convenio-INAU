@@ -680,14 +680,6 @@ function abrirModalCorregirEntrega(entregaId) {
         tieneComentarioAlumno ? comentarioAlumno : ""
     );
 
-
-    colocarTextoCorreccion(
-        "corregir-archivo",
-        obtenerDescripcionAdjuntosCorreccion(
-            entregaSeleccionada
-        )
-    );
-
     const inputNota = document.getElementById(
         "corregir-nota"
     );
