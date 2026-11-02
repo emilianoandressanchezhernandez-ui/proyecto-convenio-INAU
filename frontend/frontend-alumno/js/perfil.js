@@ -33,6 +33,7 @@ async function inicializarPerfil() {
     try {
         prepararFuncionesNoDisponiblesPerfil();
         configurarFormularioPerfil();
+        configurarCambioPasswordPerfil();
 
         const resultado = await solicitarPerfilAlumno(
             "GET",
@@ -513,34 +514,7 @@ function prepararFuncionesNoDisponiblesPerfil() {
         botonEliminarBiografia.disabled = true;
     }
 
-    // Cambio de contraseña:
-    // no se permite desde PATCH /perfil.
-
-    const password = document.getElementById(
-        "password"
-    );
-
-    const confirmarPassword =
-        document.getElementById(
-            "confirmar-password"
-        );
-
-    if (password) {
-        password.value = "";
-        password.disabled = true;
-        password.placeholder =
-            "No disponible por el momento";
-    }
-
-    if (confirmarPassword) {
-        confirmarPassword.value = "";
-        confirmarPassword.disabled = true;
-        confirmarPassword.placeholder =
-            "No disponible por el momento";
-    }
-}
-
-
+    
 // ======================================
 // FOTO PREDETERMINADA
 // ======================================

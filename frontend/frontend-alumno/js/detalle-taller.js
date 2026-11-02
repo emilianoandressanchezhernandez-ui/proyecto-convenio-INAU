@@ -40,12 +40,29 @@ async function inicializarDetalleTaller() {
 
         configurarEnlacesDetalle(taller.id);
 
-        // Todavía no tenemos conectadas las asistencias reales.
-        // Evitamos presentar un porcentaje simulado como verdadero.
-        colocarTextoDetalle(
-            "asistencia-promedio",
-            "Pendiente de integrar"
-        );
+        // Porcentaje de asistencia del alumno en este taller.
+        // Se calcula igual que en Mi Asistencia: presentes / total.
+        try {
+            const asistencias = await consultarDetalleTallerAPI("/mis-asistencias");
+
+            const registrosTaller = Array.isArray(asistencias)
+                ? asistencias.filter(r => Number(r.taller_id) === idTaller)
+                : [];
+
+            const presentes = registrosTaller.filter(
+                r => normalizarDetalle(r.estado) === "presente"
+            ).length;
+
+            colocarTextoDetalle(
+                "asistencia-promedio",
+                registrosTaller.length > 0
+                    ? `${Math.round((presentes / registrosTaller.length) * 100)}%`
+                    : "Sin registros"
+            );
+        } catch (errorAsistencia) {
+            // Si falla, el resto del detalle se sigue mostrando.
+            colocarTextoDetalle("asistencia-promedio", "-");
+        }
 
         const enlaceAsistencia =
             document.getElementById("enlace-asistencia");
@@ -108,13 +125,28 @@ async function inicializarDetalleTaller() {
             adjuntos
         );
 
-        // Mostrar las tareas reales. Las entregas se
-        // integrarán en el próximo paso.
+        // Consultar la entrega del alumno para cada tarea.
+        const tareasTaller = contenidos.filter(
+            contenido => normalizarDetalle(contenido.tipo) === "tarea"
+        );
+
+        const entregas = (await Promise.all(
+            tareasTaller.map(async tarea => {
+                const entrega = await consultarDetalleTallerAPI(
+                    `/contenidos/${tarea.id}/mi-entrega`
+                );
+
+                return entrega
+                    ? { ...entrega, contenidoId: Number(tarea.id) }
+                    : null;
+            })
+        )).filter(Boolean);
+
         renderizarTareasDetalle(
             idTaller,
             Number.NaN,
             contenidos,
-            []
+            entregas
         );
 
         ocultarErrorDetalleTaller();
@@ -692,11 +724,12 @@ function renderizarTareasDetalle(tallerId, alumnoId, contenidos, entregas) {
         .forEach((tarea) => {
             const entrega = entregas.find(
                 (elemento) =>
-                    Number(elemento?.contenidoId) === Number(tarea.id) &&
-                    Number(elemento?.alumnoId) === alumnoId
+                    Number(elemento?.contenidoId) === Number(tarea.id)
             );
 
-            const estadoEntrega = entrega?.estado || "Sin consultar";
+            const estadoEntrega = entrega
+                ? (entrega.estado || "Entregada")
+                : "Pendiente";
 
             const tarjeta = document.createElement("article");
             tarjeta.className = "lista-item";
