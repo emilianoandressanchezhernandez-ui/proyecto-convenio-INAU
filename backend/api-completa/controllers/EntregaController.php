@@ -251,10 +251,16 @@ class EntregaController extends Controller
     private function handleRuntimeException(
         RuntimeException $e
     ): void {
+        // Error de base de datos: lo maneja index.php
+        // (guarda el detalle en el log y responde un mensaje genérico).
+        if ($e instanceof PDOException) {
+            throw $e;
+        }
+ 
         $status = $e->getCode() === 403
             ? 403
             : 400;
-
+ 
         Response::error(
             $e->getMessage(),
             $status

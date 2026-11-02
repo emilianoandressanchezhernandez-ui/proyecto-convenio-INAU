@@ -27,6 +27,10 @@ class ContenidoController extends Controller
                 $contenidos,
                 'Contenidos obtenidos correctamente.'
             );
+        } catch (PDOException $e) {
+            // Error de base de datos: lo maneja index.php
+            // (guarda el detalle en el log y responde un mensaje genérico).
+            throw $e;
         } catch (RuntimeException $e) {
             $this->handleRuntimeException($e);
         } catch (Exception $e) {
@@ -59,6 +63,10 @@ class ContenidoController extends Controller
                 $contenido,
                 'Contenido obtenido correctamente.'
             );
+        } catch (PDOException $e) {
+            // Error de base de datos: lo maneja index.php
+            // (guarda el detalle en el log y responde un mensaje genérico).
+            throw $e;
         } catch (RuntimeException $e) {
             $this->handleRuntimeException($e);
         } catch (Exception $e) {
@@ -95,6 +103,10 @@ class ContenidoController extends Controller
                 'Contenido creado correctamente.',
                 201
             );
+        } catch (PDOException $e) {
+            // Error de base de datos: lo maneja index.php
+            // (guarda el detalle en el log y responde un mensaje genérico).
+            throw $e;
         } catch (InvalidArgumentException $e) {
             Response::error(
                 'Datos inválidos.',
@@ -137,6 +149,10 @@ class ContenidoController extends Controller
                 $contenido,
                 'Contenido actualizado correctamente.'
             );
+        } catch (PDOException $e) {
+            // Error de base de datos: lo maneja index.php
+            // (guarda el detalle en el log y responde un mensaje genérico).
+            throw $e;
         } catch (InvalidArgumentException $e) {
             Response::error(
                 'Datos inválidos.',
@@ -176,6 +192,10 @@ class ContenidoController extends Controller
                 null,
                 'Contenido eliminado correctamente.'
             );
+        } catch (PDOException $e) {
+            // Error de base de datos: lo maneja index.php
+            // (guarda el detalle en el log y responde un mensaje genérico).
+            throw $e;
         } catch (RuntimeException $e) {
             $this->handleRuntimeException($e);
         } catch (Exception $e) {
