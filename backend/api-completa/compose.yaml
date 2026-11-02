@@ -9,7 +9,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:-utu_password}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
     ports:
-      - "${MYSQL_PORT:-3308}:3306"
+      - "${MYSQL_PORT:-127.0.0.1:3308}:3306"
     volumes:
       # Los datos sobreviven aunque se detengan o vuelvan a crear los containers.
       - mysql_data:/var/lib/mysql
@@ -37,7 +37,7 @@ services:
       DB_USER: utu_user
       DB_PASSWORD: ${DB_PASSWORD:-utu_password}
     ports:
-      - "${API_PORT:-8002}:80"
+      - "${API_PORT:-127.0.0.1:8002}:80"
     volumes:
       - uploads_data:/var/www/html/uploads
     depends_on:
