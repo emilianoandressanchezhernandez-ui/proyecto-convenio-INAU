@@ -421,8 +421,13 @@ function crearFilaEntregaCorreccion(entrega) {
         )
     );
 
-    const celdaArchivo = crearCeldaCorreccion(
-        obtenerDescripcionAdjuntosCorreccion(entrega)
+    const celdaArchivo = document.createElement("td");
+
+    celdaArchivo.appendChild(
+        crearEnlacesAdjuntosCorreccion(
+            entrega,
+            mensaje => mostrarAlertaCorreccion(mensaje, "danger")
+        )
     );
 
     // El backend maneja nota y comentario
@@ -526,6 +531,85 @@ function obtenerDescripcionAdjuntosCorreccion(entrega) {
     return nombres.join(", ");
 }
 
+// Crea un botón de descarga por cada adjunto de la entrega.
+// Si no hay adjuntos, devuelve el mismo texto que antes.
+function crearEnlacesAdjuntosCorreccion(entrega, alMostrarError) {
+    const contenedor = document.createElement("span");
+    const adjuntos = adjuntosCorreccion.get(Number(entrega.id));
+
+    if (!Array.isArray(adjuntos) || adjuntos.length === 0) {
+        contenedor.textContent =
+            obtenerDescripcionAdjuntosCorreccion(entrega);
+        return contenedor;
+    }
+
+    adjuntos.forEach((adjunto, indice) => {
+        if (indice > 0) {
+            contenedor.appendChild(document.createTextNode(", "));
+        }
+
+        const boton = document.createElement("button");
+        boton.type = "button";
+        boton.className = "btn btn-link btn-sm p-0 align-baseline";
+        boton.textContent =
+            adjunto.nombre_original ??
+            adjunto.nombre_archivo ??
+            `Adjunto #${adjunto.id ?? "?"}`;
+        boton.title = "Descargar el archivo entregado";
+
+        boton.addEventListener("click", async () => {
+            try {
+                await descargarAdjuntoCorreccion(adjunto);
+            } catch (error) {
+                alMostrarError(error.message);
+            }
+        });
+
+        contenedor.appendChild(boton);
+    });
+
+    return contenedor;
+}
+
+
+// Descarga el archivo usando la ruta protegida de la API.
+async function descargarAdjuntoCorreccion(adjunto) {
+    const id = Number(adjunto.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+        throw new Error("El identificador del archivo no es válido.");
+    }
+
+    const respuesta = await fetch(
+        `${TALLERISTA_API_URL}/adjuntos/${id}/archivo`,
+        { method: "GET", credentials: "include" }
+    );
+
+    if (!respuesta.ok) {
+        if (respuesta.status === 404) {
+            throw new Error("Este archivo no está disponible en el servidor.");
+        }
+
+        if (respuesta.status === 403) {
+            throw new Error("No tenés permisos para descargar este archivo.");
+        }
+
+        throw new Error("No se pudo descargar el archivo.");
+    }
+
+    const blob = await respuesta.blob();
+    const urlTemporal = URL.createObjectURL(blob);
+
+    const enlace = document.createElement("a");
+    enlace.href = urlTemporal;
+    enlace.download = adjunto.nombre_original || "archivo";
+
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+
+    setTimeout(() => URL.revokeObjectURL(urlTemporal), 1000);
+}
 
 // ======================================
 // MODAL DE CORRECCIÓN
@@ -558,12 +642,18 @@ function abrirModalCorregirEntrega(entregaId) {
         return;
     }
 
-    colocarTextoCorreccion(
-        "corregir-alumno",
-        obtenerNombreAlumnoCorreccion(
-            entregaSeleccionada
-        )
+    const contenedorArchivo = document.getElementById(
+        "corregir-archivo"
     );
+
+    if (contenedorArchivo) {
+        contenedorArchivo.replaceChildren(
+            crearEnlacesAdjuntosCorreccion(
+                entregaSeleccionada,
+                mostrarAlertaModalCorreccion
+            )
+        );
+    }
 
 
     // Mostrar el comentario que escribió el alumno al entregar.
