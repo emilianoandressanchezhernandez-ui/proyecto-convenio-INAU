@@ -35,8 +35,13 @@ class AlumnoService
             );
         }
 
-        $alumnoExistente = $this->repository->obtenerPorCedula(
+        // Guardar y comparar siempre en el mismo formato.
+        $datos['cedula'] = AlumnoValidator::normalizarCedula(
             trim($datos['cedula'])
+        );
+
+        $alumnoExistente = $this->repository->obtenerPorCedula(
+            $datos['cedula']
         );
 
         if ($alumnoExistente) {
