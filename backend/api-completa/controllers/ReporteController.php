@@ -99,7 +99,7 @@ class ReporteController extends Controller
                 'Reporte generado correctamente.',
                 201
             );
-            
+
         } catch (PDOException $e) {
             // Error de base de datos: lo maneja index.php
             // (guarda el detalle en el log y responde un mensaje genérico).
@@ -219,6 +219,10 @@ class ReporteController extends Controller
                 $reporte,
                 'Reporte obtenido correctamente.'
             );
+        } catch (PDOException $e) {
+            // Error de base de datos: lo maneja index.php
+            // (guarda el detalle en el log y responde un mensaje genérico).
+            throw $e;
         } catch (RuntimeException $e) {
             Response::error(
                 $e->getMessage(),
