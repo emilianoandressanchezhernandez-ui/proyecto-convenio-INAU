@@ -92,15 +92,15 @@ async function inicializarDetalleTaller() {
             fechaLimite: contenido.fecha_limite
         }));
 
-        // Consultar los adjuntos reales de cada material.
-        const materiales = contenidos.filter(
-            contenido => normalizarDetalle(contenido.tipo) === "material"
+        // Consultar los adjuntos reales de cada material y de cada tarea.
+        const contenidosConArchivos = contenidos.filter(
+            contenido => ["material", "tarea"].includes(normalizarDetalle(contenido.tipo))
         );
 
         const adjuntosPorMaterial = await Promise.all(
-            materiales.map(material =>
+            contenidosConArchivos.map(contenido =>
                 consultarDetalleTallerAPI(
-                    `/contenidos/${material.id}/adjuntos`
+                    `/contenidos/${contenido.id}/adjuntos`
                 )
             )
         );
@@ -146,7 +146,8 @@ async function inicializarDetalleTaller() {
             idTaller,
             Number.NaN,
             contenidos,
-            entregas
+            entregas,
+            adjuntos
         );
 
         ocultarErrorDetalleTaller();
@@ -692,7 +693,7 @@ function renderizarMaterialesDetalle(tallerId, contenidos, adjuntos) {
 // TAREAS DEL TALLER
 // ==============================
 
-function renderizarTareasDetalle(tallerId, alumnoId, contenidos, entregas) {
+function renderizarTareasDetalle(tallerId, alumnoId, contenidos, entregas, adjuntos = []) {
     const contenedor =
         document.getElementById("contenedor-tareas-taller");
 
@@ -785,6 +786,29 @@ function renderizarTareasDetalle(tallerId, alumnoId, contenidos, entregas) {
 
             fechas.textContent = partesFecha.join(" · ") || "Fechas no disponibles";
             contenido.appendChild(fechas);
+
+            // Archivos de la consigna (DEF-16).
+            const archivosTarea = adjuntos.filter(
+                (adjunto) => Number(adjunto?.contenidoId) === Number(tarea.id)
+            );
+
+            if (archivosTarea.length > 0) {
+                const lineaArchivos = document.createElement("p");
+                lineaArchivos.className = "small mt-2 mb-0";
+
+                const iconoArchivos = document.createElement("i");
+                iconoArchivos.className = "bi bi-paperclip me-1";
+                iconoArchivos.setAttribute("aria-hidden", "true");
+
+                lineaArchivos.append(
+                    iconoArchivos,
+                    document.createTextNode(
+                        `Archivos de la consigna: ${archivosTarea.map(a => a.nombreOriginal || "Archivo").join(", ")}. Descargalos desde "Ver tarea".`
+                    )
+                );
+
+                contenido.appendChild(lineaArchivos);
+            }
 
             if (
                 entrega &&
