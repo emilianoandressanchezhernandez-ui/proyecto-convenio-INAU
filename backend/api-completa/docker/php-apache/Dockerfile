@@ -18,6 +18,14 @@ COPY docker/php-apache/app.conf /etc/apache2/conf-available/app.conf
 
 RUN a2enconf app
 
+# H-05: no mostrar las versiones de Apache ni de PHP.
+# security.conf trae ServerTokens OS y ServerSignature On; se cambian ahí
+# porque se carga después de app.conf y pisaría cualquier valor puesto antes.
+RUN sed -i -e 's/^ServerTokens .*/ServerTokens Prod/' \
+           -e 's/^ServerSignature .*/ServerSignature Off/' \
+           /etc/apache2/conf-available/security.conf \
+    && echo "expose_php = Off" > /usr/local/etc/php/conf.d/security.ini
+
 # El contexto de build es esta misma carpeta (api-completa/), asi que esta
 # API se puede copiar sola a otra maquina y levantarla sin nada mas.
 COPY . /var/www/html/
