@@ -3,7 +3,7 @@
 ## Hardening de infraestructura y contenedores
 
 **Fecha de revisión:** 22 de octubre de 2026  
-**Última actualización:** 25 de octubre de 2026
+**Última actualización:** 3 de noviembre de 2026
 **Alcance:** configuración Docker de la API PHP, servicio MySQL, almacenamiento persistente, configuración de Apache y límites de carga de archivos.
 
 ---
@@ -34,6 +34,9 @@ Los hallazgos de la revisión y las acciones recomendadas se registran en la sec
 | `backend/api-completa/controllers/AdjuntoController.php` | Descarga mediante endpoint, nombre adjunto y cabecera `X-Content-Type-Options`. |
 | `backend/api-completa/services/AdjuntoService.php` | Validación de acceso a archivos, ubicación física y operaciones de carga y eliminación. |
 | `docs/04-implementacion/Documento de Reconstruccion - Servidor.md` | Pasos documentados para desplegar el proyecto y comprobar el entorno. |
+| `backend/api-completa/.env.example` y `.env.docker.example` | Plantillas de variables de entorno, incluidos los puertos publicados por defecto. |
+| `docs/04-implementacion/Testing/Testing-04.md` | Verificación del bloqueo de `uploads/` (H-02) y de la clave secreta obligatoria. |
+| `docs/04-implementacion/Testing/Testing-06.md` | Verificación de la corrección de los puertos por defecto en el repositorio (H-01). |
 
 ## 3. Arquitectura de contenedores definida por el proyecto
 
@@ -97,7 +100,7 @@ El Dockerfile establece que el contexto de construcción es `backend/api-complet
 El archivo `backend/api-completa/.htaccess` contiene las reglas específicas de la aplicación:
 
 - Reescribe las rutas que no coinciden con un archivo o directorio físico hacia `index.php`.
-- Bloquea el acceso web a las rutas `vendor/`, `data/` y `storage/`.
+- Bloquea el acceso web a las rutas `vendor/`, `data/`, `storage/` y `uploads/`. Los archivos subidos solo pueden descargarse mediante la ruta oficial de la API (`/adjuntos/{id}/archivo`), que exige sesión.
 - Deniega mediante `FilesMatch` los archivos con extensiones `.env`, `.json`, `.lock`, `.sql`, `.md` y `.http`.
 - Desactiva el listado de directorios.
 - Conserva la cabecera `Authorization` para el caso de peticiones que la utilicen.
@@ -160,7 +163,7 @@ Las variables utilizadas por el Compose de la API incluyen `SECRET_KEY`, `APP_EN
 openssl rand -hex 32
 ```
 
-Copiar el resultado como valor de `SECRET_KEY` y definir contraseñas propias para MySQL. Esta configuración evita depender de los valores de demostración que Compose usa como alternativa cuando ciertas variables están vacías o ausentes. Mantener `APP_ENV=development` para las pruebas locales y establecer `FRONTEND_ORIGIN` con el origen real donde se sirve el frontend.
+Copiar el resultado como valor de `SECRET_KEY` y definir contraseñas propias para MySQL. `SECRET_KEY` no tiene valor alternativo: si falta, Compose no inicia la API y muestra el mensaje "Debes configurar SECRET_KEY en .env". Las contraseñas de MySQL, en cambio, sí tienen valores de demostración como alternativa, por lo que conviene definirlas siempre en el `.env`. Mantener `APP_ENV=development` para las pruebas locales y establecer `FRONTEND_ORIGIN` con el origen real donde se sirve el frontend.
 
 ### Paso 3. Construir e iniciar los contenedores
 
@@ -184,7 +187,7 @@ docker compose logs database
 
 ### Paso 5. Comprobar la conexión
 
-La configuración publica la API en el puerto del host definido por `API_PORT`, cuyo valor predeterminado en Compose es `8002`. La dirección base coincide con la configuración del cliente común en `frontend/js/api.js`: `http://localhost:8002`.
+La configuración publica la API en el puerto del host definido por `API_PORT`, cuyo valor predeterminado es `127.0.0.1:8002`: la API responde en el puerto 8002 solo desde la propia máquina. Desde otras computadoras se accede a través de Nginx (`/api/`), según `Documento de Reconstruccion - Servidor.md`. MySQL se publica de la misma forma, en `127.0.0.1:3308`. La dirección base coincide con la configuración del cliente común en `frontend/js/api.js`: `http://localhost:8002`.
 
 El origen del frontend se configura mediante `FRONTEND_ORIGIN`; el código PHP utiliza ese valor en `backend/api-completa/index.php` para decidir cuándo enviar las cabeceras CORS que permiten credenciales.
 
@@ -200,14 +203,14 @@ Este comando detiene y elimina los contenedores del proyecto, pero no elimina lo
 
 | ID | Hallazgo | Evidencia | Riesgo | Acción recomendada |
 |---|---|---|---|---|
-| H-01 | **La API y MySQL quedan publicados en todas las interfaces de red.** Con los valores por defecto, `compose.yaml` publica 8002 y 3308 en `0.0.0.0`. Docker crea sus propias reglas de red y no respeta el firewall `ufw`. | Escaneo con Nmap del 24/10/2026: 8002 (Apache 2.4.69) y 3308 (MySQL 8.4.13) abiertos, aunque `ufw` solo permitía 22 y 80. Tras limitarlos a `127.0.0.1` en el `.env`, quedaron cerrados, y desde otra computadora de la red dejaron de responder (`Doc NMAP.md`, sección 10). | Alto | Corregido en el servidor de prueba con `API_PORT=127.0.0.1:8002` y `MYSQL_PORT=127.0.0.1:3308` en el `.env`. Conviene aplicar ese valor por defecto en `compose.yaml`, para que no dependa de cada `.env`. |
-| H-02 | **Los archivos subidos pueden descargarse sin iniciar sesión.** Se guardan en `/var/www/html/uploads/`, dentro del directorio que publica Apache. `.htaccess` bloquea `vendor/`, `data/` y `storage/`, pero no `uploads/`, y sirve directamente cualquier archivo existente. | Comprobado el 25/10/2026 en el servidor de prueba: sin sesión, la descarga oficial (`/api/adjuntos/4/archivo`) respondió 401, mientras que la ruta directa del archivo (`/api/uploads/entregas/<archivo>`) respondió 200 y entregó el PDF. La API devuelve al cliente `ruta` y `nombre_archivo` de cada adjunto. | Alto | Bloquear `uploads/` en `.htaccess` (como `vendor/`, `data/` y `storage/`) o guardar los archivos fuera del directorio público, y dejar de enviar `ruta` y `nombre_archivo` en las respuestas de la API. |
+| H-01 | **La API y MySQL quedan publicados en todas las interfaces de red.** Con los valores por defecto, `compose.yaml` publica 8002 y 3308 en `0.0.0.0`. Docker crea sus propias reglas de red y no respeta el firewall `ufw`. | Escaneo con Nmap del 24/10/2026: 8002 (Apache 2.4.69) y 3308 (MySQL 8.4.13) abiertos, aunque `ufw` solo permitía 22 y 80. Tras limitarlos a `127.0.0.1` en el `.env`, quedaron cerrados, y desde otra computadora de la red dejaron de responder (`Doc NMAP.md`, sección 10). | Alto | **Corregido.** En el servidor de prueba, el 24/10/2026, con `API_PORT=127.0.0.1:8002` y `MYSQL_PORT=127.0.0.1:3308` en el `.env`. En el repositorio, el 02/11/2026 (commit `fbc9612`): `compose.yaml` usa esos valores por defecto, y las plantillas `.env.example` y `.env.docker.example` traen los mismos (`Doc NMAP.md`, sección 10.6; `Testing-06.md`). |
+| H-02 | **Los archivos subidos pueden descargarse sin iniciar sesión.** Se guardan en `/var/www/html/uploads/`, dentro del directorio que publica Apache. `.htaccess` bloquea `vendor/`, `data/` y `storage/`, pero no `uploads/`, y sirve directamente cualquier archivo existente. | Comprobado el 25/10/2026 en el servidor de prueba: sin sesión, la descarga oficial (`/api/adjuntos/4/archivo`) respondió 401, mientras que la ruta directa del archivo (`/api/uploads/entregas/<archivo>`) respondió 200 y entregó el PDF. La API devuelve al cliente `ruta` y `nombre_archivo` de cada adjunto. | Alto | **Corregido (01/11/2026).** `.htaccess` bloquea `uploads/` (commit `46320c2`). La ruta directa respondió `403` con sesión y sin sesión, y la descarga oficial siguió funcionando con sesión (`Testing-04.md`, CP-02). **Pendiente:** dejar de enviar `ruta` y `nombre_archivo` en las respuestas de la API. |
 | H-03 | **Dos reglas del `.gitignore` no tienen efecto.** `Backend/api-completa/uploads/` y `Backend/api-completa/storage/uploads/` no coinciden con la carpeta real `backend/`. | Revisión del `.gitignore` de la raíz. | Bajo | Corregir a `backend/api-completa/uploads/` y `backend/api-completa/storage/uploads/`. Evaluar eliminar el `backend/.gitignore` vacío. |
 | H-04 | **Los contenedores no se reinician solos.** Tras reiniciar el servidor, la API y MySQL quedaron detenidos hasta ejecutar `docker compose up -d`. | Observado el 24/10/2026 (`Doc NMAP.md`, sección 10.2, ejecución 2). | Medio (disponibilidad) | Agregar una política de reinicio (`restart: unless-stopped`) a los servicios de `compose.yaml`. |
 | H-05 | **Los servicios informan su versión exacta.** Nmap identificó OpenSSH 9.6p1, nginx 1.24.0, Apache 2.4.69 y MySQL 8.4.13. | Escaneo con Nmap del 24/10/2026. | Bajo | Mantener los servicios actualizados y evaluar ocultar la versión en las cabeceras de Nginx (`server_tokens off`) y Apache (`ServerTokens Prod`). |
 
 ## 7. Interpretación del resultado
 
-La configuración actual del repositorio incorpora separación de servicios, almacenamiento persistente, una imagen PHP-Apache construida para la API, instalación de dependencias mediante Composer, reglas de Apache contra listados de directorios y acceso web a ciertos archivos internos, exclusiones de contexto y límites de carga de archivos.
+La configuración actual del repositorio incorpora separación de servicios, almacenamiento persistente, una imagen PHP-Apache construida para la API, instalación de dependencias mediante Composer, una clave secreta obligatoria para iniciar la API, puertos publicados solo en la interfaz local, reglas de Apache contra listados de directorios y acceso web a ciertos archivos internos, exclusiones de contexto y límites de carga de archivos.
 
-El documento registra lo que existe en los archivos revisados y cómo reproducirlo. No constituye una certificación de que el stack esté completamente endurecido o listo para un despliegue con información real. Los hallazgos de la sección 6 deben resolverse antes de usar el sistema con datos de INAU; en particular H-01, corregido solo en el servidor de prueba, y H-02, que permite descargar archivos sin autenticación.
+El documento registra lo que existe en los archivos revisados y cómo reproducirlo. No constituye una certificación de que el stack esté completamente endurecido o listo para un despliegue con información real. H-01 y H-02 están corregidos. Antes de usar el sistema con datos de INAU deben resolverse los hallazgos pendientes: H-03, H-04 y H-05, y la segunda parte de la recomendación de H-02. También debe definirse en el `.env` una contraseña propia para MySQL, que todavía tiene valores de demostración como alternativa.
