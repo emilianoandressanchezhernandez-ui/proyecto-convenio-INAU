@@ -251,7 +251,7 @@ Estos elementos figuran en el modelo para reflejar el diseño completo del siste
 
 **Las dos clases asociativas comparten trazabilidad** (RF03, HU03, EP2), dado que ambas derivan del mismo requerimiento de asignación.
 
-**Los seis RF postergados por plazo** (RF15, RF18, RF20, RF21, RF23, RF26) no figuran en esta tabla, ya que no tienen historia de usuario asociada en el backlog de la primera versión. Los atributos y métodos que originan sí están presentes en el modelo, señalados como (v2). RF13, postergado después de iniciado el desarrollo, se mantiene en esta tabla porque tiene historias de usuario en el backlog; sus métodos de exportación figuran como (v2).
+**Los seis RF postergados por plazo** (RF15, RF18, RF20, RF21, RF26)… RF23, postergado al principio, se incluyó en la primera versión sin una historia de usuario propia. RF13, postergado después de iniciado el desarrollo, se mantiene en esta tabla porque tiene historias de usuario en el backlog; sus métodos de exportación figuran como (v2).
 
 ---
 

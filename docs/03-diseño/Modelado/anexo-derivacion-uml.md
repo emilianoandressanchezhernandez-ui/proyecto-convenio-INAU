@@ -296,7 +296,7 @@ Sin atributos propios. Se distingue de la tarea por no requerir devolución ni a
 | Alumno | `foto`, `biografia` | RF15 |
 | Alumno | `fechaNacimiento`, `correo`, `telefono`, `direccion`, `referenteAdulto`, `centroReferencia`, `observaciones` | RF21 |
 
-Los restantes requerimientos excluidos (RF18, RF20, RF23 y RF26) no aportan atributos nuevos: operan sobre datos ya presentes en el modelo. RF23, por ejemplo, únicamente requiere que el alumno pueda consultar el atributo `nota` de `Entrega`, incorporado por RF10.
+Los restantes requerimientos excluidos (RF18, RF20 y RF26) no aportan atributos nuevos: operan sobre datos ya presentes en el modelo. Tampoco RF23, incluido finalmente en la primera versión: únicamente requiere que el alumno pueda consultar el atributo nota de Entrega, incorporado por RF10.
 
 ---
 
@@ -380,8 +380,7 @@ Este criterio evita que las clases de rol concentren la totalidad del comportami
 | `eliminarNota(entregaId)` | "eliminar la nota asignada" | RF17 | RF17 lo habilita explícitamente. |
 | `consultarAlumnosDeTaller(tallerId)` | "consultar el listado de alumnos" | RF25 | RF25 lo acota a los alumnos de su propio taller. |
 | `eliminarAsistencia(asistenciaId)` **(v2)** | "eliminar un registro de asistencia" | RF18 | Excluido de la primera versión. |
-| `modificarContenido(contenidoId, datos)` **(v2)** | "modificar el material o las tareas" | RF26 | Excluido de la primera versión en la interfaz. La API ya admite la modificación (PATCH /contenidos/{id}), pero ninguna pantalla la ofrece. |
-
+| `modificarContenido(contenidoId, datos)` **(v2)** | "modificar el material o las tareas" | RF26 | Excluido de la primera versión en la interfaz. La API ya admite la modificación (`PATCH /contenidos/{id}`), pero ninguna pantalla la ofrece. |
 
 **Justificación de la separación entre `corregirTarea()` y `asignarNota()`:** RF09 y RF10 son requerimientos independientes con estimaciones diferentes. El tallerista puede devolver un comentario sin calificar aún, o modificar la nota sin alterar el comentario. Unificarlos obligaría a proporcionar siempre ambos parámetros.
 
@@ -394,7 +393,7 @@ Este criterio evita que las clases de rol concentren la totalidad del comportami
 | `visualizarMaterial(tallerId)` | "visualizar el material" | RF07 | RF07 lo acota al taller que le corresponde. |
 | `visualizarTareas(tallerId)` | "visualizar... las tareas" | RF07 | Ídem. |
 | `entregarTarea(tareaId, archivos, comentario)` | "enviar/subir los archivos" | RF08 | RF08 atribuye la acción al alumno. |
-| `visualizarNotas()` | "visualizar las notas asignadas" | RF23 | Excluido de la primera versión. |
+| `visualizarNotas()` | "visualizar las notas asignadas" | RF23 | RF23 lo atribuye al alumno. Se incluyó en la primera versión: el alumno ve la nota y la devolución de cada entrega. |
 | `eliminarDatoPerfil(campo)` **(v2)** | "eliminar ciertos datos de su perfil" | RF15 | Excluido de la primera versión. |
 
 **Justificación de los métodos propios de Alumno:** si bien su acceso al sistema se realiza mediante una cuenta de usuario asociada, las acciones de RF07 y RF08 corresponden al alumno en su condición de participante del taller, no al usuario genérico. Un administrador con cuenta activa no puede entregar tareas.
@@ -528,7 +527,7 @@ Incorporar un método de registro en cada clase dispersaría la lógica y contra
 | Tallerista | `modificarContenido()` | RF26 |
 | Alumno | `eliminarDatoPerfil()` | RF15 |
 
-modificarContenido() (RF26) está disponible en la API (PATCH /contenidos/{id}), pero ninguna pantalla lo ofrece en la primera versión.
+`modificarContenido()` (RF26) está disponible en la API (`PATCH /contenidos/{id}`), pero ninguna pantalla lo ofrece en la primera versión.
 
 ---
 
