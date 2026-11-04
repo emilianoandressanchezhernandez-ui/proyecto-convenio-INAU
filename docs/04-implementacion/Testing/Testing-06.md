@@ -14,8 +14,8 @@
 
 | Elemento | Valor |
 |---|---|
-| Fecha de ejecución | Correcciones: del 02/11/2026 al 04/11/2026. Prueba completa: 04/11/2026, hasta las 12:35 |
-| Rama / commit | `cambios-frontend` / `b992ac2`, `3d32378`, `a9179fa`, `1ff8170` y `0ebc5ed` (DEF-10, DEF-12 y DEF-13); `ce23286` (DEF-07); `25c453f` (DEF-09); `fbc9612` (H-01); `829d1ae` (H-02, H-03, H-04 y contraseñas de MySQL); `b6144d6` (H-05); `2f35d21` (DEF-06); `222722c` (DEF-16); `ceff0a0` (retiro del inventario de datos sensibles, ver 2.8); `fe516e8` (detalle del alumno en el panel del administrador). La prueba completa se ejecutó sobre `fe516e8` |
+| Fecha de ejecución | Correcciones: del 02/11/2026 al 04/11/2026. Prueba completa: 04/11/2026, hasta las 12:35. Verificación de CP-38: 04/11/2026, 14:01 |
+| Rama / commit | `cambios-frontend` / `b992ac2`, `3d32378`, `a9179fa`, `1ff8170` y `0ebc5ed` (DEF-10, DEF-12 y DEF-13); `ce23286` (DEF-07); `25c453f` (DEF-09); `fbc9612` (H-01); `829d1ae` (H-02, H-03, H-04 y contraseñas de MySQL); `b6144d6` (H-05); `2f35d21` (DEF-06); `222722c` (DEF-16); `ceff0a0` (retiro del inventario de datos sensibles, ver 2.8); `fe516e8` (detalle del alumno en el panel del administrador); `da3dc6b` (alumno en la ventana **Corregir**). La prueba completa se ejecutó sobre `fe516e8`, y CP-38, sobre `da3dc6b` |
 | Servidor | Máquina virtual con Ubuntu Server en VirtualBox (`one-security-mark01`), API y MySQL 8.4 en Docker y frontend servido por Nginx. Se actualizó según el Paso 10 de `Documento de Reconstruccion - Servidor.md`; en los cambios del backend se reconstruyeron los contenedores con `docker compose up -d --build` |
 | Sitio | `http://192.168.1.7` (red local). La dirección del servidor cambió durante el período (la asigna el router por DHCP) |
 | Navegador | Google Chrome en Windows |
@@ -28,7 +28,7 @@
 | Rol o registro | Usuario | Uso en esta ronda |
 |---|---|---|
 | Administrador | carlos.perez@inau.gov.uy | Cambio de contraseña (CP-12); cédula repetida (CP-17); datos personales (CP-25 a CP-27); recorrido del panel (CP-29 a CP-31) |
-| Tallerista | martin.rodriguez@ejemplo.com | Cambio de contraseña (CP-12); eliminar una nota (CP-14); material con adjuntos (CP-15); recorrido del panel (CP-32 a CP-34) |
+| Tallerista | martin.rodriguez@ejemplo.com | Cambio de contraseña (CP-12); eliminar una nota (CP-14); material con adjuntos (CP-15); recorrido del panel (CP-32 a CP-34); alumno en la ventana **Corregir** (CP-38) |
 | Alumno | sofia.pereira@email.com | Detalle del taller, tareas y asistencia (CP-01 a CP-07); cambio de contraseña y perfil (CP-08 a CP-11 y CP-13); acceso a datos ajenos (CP-35) |
 | Tareas "T4 Tarea de prueba" (id 4) y "T4 Tarea entrega JPG" (id 7), creadas en `Testing-04.md` | — | Archivos de la consigna (CP-04 a CP-07) |
 
@@ -110,6 +110,12 @@
 
 No se probó. El equipo decidió postergar la exportación a PDF y Excel, porque requiere cambios en el código y se prefirió no entregar una función mal integrada. Los botones de exportación siguen descargando JSON. La decisión se registra en `Control de Cambios.md`.
 
+### 2.10 Alumno vacío en la ventana Corregir (observación de `Testing-05.md`)
+
+| ID | Caso | Resultado obtenido | Estado |
+|---|---|---|---|
+| CP-38 | Como Martín, abrir **Corregir** en las entregas de "T4 Tarea entrega JPG" y de "T4 Tarea de prueba", y cerrar la ventana sin guardar | El campo "Alumno:" muestra "Sofía Pereira" en las dos entregas, junto con el archivo entregado (`entrega-foto.jpg` y `mi-entrega-t4.pdf`) y la nota (7 y 9). El nombre se toma de la misma lista de alumnos del taller que usa la tabla de entregas. No se modificó ninguna nota | Aprobado |
+
 ---
 
 <br>
@@ -149,6 +155,7 @@ No se probó. El equipo decidió postergar la exportación a PDF y Excel, porque
 | DEF-12 | "Pendiente de integrar" en el detalle del taller del alumno | **Corregido** (CP-01) |
 | DEF-13 | Estado "Sin consultar" en tareas entregadas o corregidas | **Corregido** (CP-02) |
 | DEF-16 | Los archivos de la tarea no se muestran al alumno | **Corregido** (CP-04 a CP-07) |
+| Observación de `Testing-05.md` | El campo "Alumno:" aparece vacío en la ventana **Corregir** | **Corregido** (CP-38) |
 | H-01 a H-05 | Hallazgos de hardening | **Corregidos** (CP-19 a CP-23) |
 
 Los defectos DEF-11, DEF-14 y DEF-15, y los de la Revisión 4.7 y de Mecanismos 4.5, se corrigieron en `Testing-04.md` y `Testing-05.md`, y se mantienen correctos (CP-30 a CP-32).
@@ -176,14 +183,14 @@ Los defectos DEF-11, DEF-14 y DEF-15, y los de la Revisión 4.7 y de Mecanismos 
 | Hardening | 6 | 6 | 0 | 0 | 0 |
 | DEF-03 y DEF-04 | 4 | 4 | 0 | 0 | 0 |
 | Prueba completa | 9 | 9 | 0 | 0 | 0 |
-| **Total** | **37** | **37** | **0** | **0** | **0** |
+| Alumno en la ventana Corregir | 1 | 1 | 0 | 0 | 0 |
+| **Total** | **38** | **38** | **0** | **0** | **0** |
 
 **Criterios:** iguales a los de `Testing-01.md`. CP-25 se registra con el resultado de su repetición; la primera ejecución se describe en el propio caso. CP-18, CP-21 y CP-24 se verificaron en el código.
 
-**Conclusión.** Los defectos de prioridad media están corregidos, salvo DEF-02, que se posterga, y DEF-08, que corresponde a un dato de prueba. El alumno ve su asistencia real, el estado de sus tareas y los archivos de la consigna. El tallerista puede adjuntar archivos al material y eliminar notas. Los tres roles pueden cambiar su contraseña. Una cédula ya registrada se detecta aunque se escriba en otro formato. Los hallazgos de hardening están corregidos. La prueba completa no encontró fallos en las funciones de los tres roles ni en el control de acceso. El único defecto nuevo es visual (DEF-17).
+**Conclusión.** Los defectos de prioridad media están corregidos, salvo DEF-02, que se posterga, y DEF-08, que corresponde a un dato de prueba. El alumno ve su asistencia real, el estado de sus tareas y los archivos de la consigna. El tallerista puede adjuntar archivos al material, eliminar notas y ve el nombre del alumno en la ventana **Corregir**. Los tres roles pueden cambiar su contraseña. Una cédula ya registrada se detecta aunque se escriba en otro formato. Los hallazgos de hardening están corregidos. La prueba completa no encontró fallos en las funciones de los tres roles ni en el control de acceso. El único defecto nuevo es visual (DEF-17).
 
 **Observaciones de la ejecución:**
-- **Alumno vacío en la corrección:** en la ventana **Corregir**, el campo "Alumno:" sigue vacío (observación de `Testing-05.md`).
 - **Tallerista "Sin asignar":** en **Asistencias** del administrador, el taller "Taller T4", que ya finalizó, muestra el tallerista como "Sin asignar".
 - **Horas en UTC:** el último acceso de los talleristas y otras fechas con hora se muestran en UTC, tres horas adelantadas respecto de la hora de Uruguay.
 - **Caché del navegador:** después de actualizar el frontend en el servidor, el navegador mostró la versión anterior de una página hasta recargarla con Ctrl+Shift+R.
