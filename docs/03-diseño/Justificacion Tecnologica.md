@@ -159,8 +159,8 @@ La composición del equipo y la asignación de roles se detallan en el Project C
 | NRF01 — Diseño responsive | Bootstrap 5.3 |
 | NRF05 — Validación frontend y backend | Validación en JavaScript + validación en PHP |
 | NRF06 — Separación frontend/backend | Arquitectura de API REST |
-| NRF07 — Control de acceso por rol | Autenticación con token JWT en cookie HttpOnly y verificación de rol en cada ruta, más paneles separados. El rol y el estado del usuario se comprueban en la base de datos en cada pedido. |
-| NRF08 — Protección de datos personales | Hash de contraseñas, consultas preparadas, control de permisos por endpoint, límite de intentos de inicio de sesión y cierre de las sesiones abiertas al cambiar la contraseña. |
+| NRF07 — Control de acceso por rol | Autenticación con token JWT en cookie HttpOnly y verificación de rol en cada ruta, más paneles separados. El rol y el estado del usuario se comprueban en la base de datos en cada pedido |
+| NRF08 — Protección de datos personales | Hash de contraseñas, consultas preparadas, control de permisos por endpoint, límite de intentos de inicio de sesión y cierre de las sesiones abiertas al cambiar la contraseña |
 | NRF09 — Persistencia relacional | MySQL |
 | NRF10 — Trazabilidad | Tabla `trazabilidad`, más el registro del usuario responsable en `registros_asistencia` y de la fecha de carga en `adjuntos` |
 | NRF11 — Restricción de formatos | Validación de extensión y MIME type (PDF y JPG) |
@@ -178,7 +178,7 @@ La composición del equipo y la asignación de roles se detallan en el Project C
 
 | Componente | Estado |
 |---|---|
-| Panel administrador | Conectado a la API. Pendientes: exportación de informes en PDF o Excel, listado de alumnos, informe de talleristas y consulta de datos sensibles. |
+| Panel administrador | Conectado a la API. El listado de alumnos, el informe de talleristas y la consulta de datos personales se resuelven en los paneles Alumnos y Talleristas. La exportación de informes a PDF o Excel (RF13) quedó postergada: los informes se descargan en JSON. |
 | Panel tallerista | Conectado a la API. Incluye la gestión de material y tareas con archivos adjuntos, la corrección de entregas, la eliminación de notas y el cambio de contraseña. Los informes se descargan en JSON (RF13 postergado). |
 | Panel alumno | Conectado a la API, incluidos la asistencia, el estado de las tareas y los archivos de la consigna. Permite cambiar la contraseña. |
 | Login (`frontend/index.html`) | Acceso por correo y contraseña, autenticación contra la API y redirección por rol. |

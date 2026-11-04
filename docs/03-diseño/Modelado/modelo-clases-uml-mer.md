@@ -20,7 +20,7 @@ Este documento presenta el modelo de clases resultante y su traducción al model
 
 | Atributos | Métodos |
 |---|---|
-| — | `crearUsuario()`, `modificarUsuario()`, `eliminarUsuario()`, `consultarUsuario()`, `crearTaller()`, `modificarTaller()`, `eliminarTaller()`, `asignarAlumnoATaller()`, `asignarTalleristaATaller()`, `consultarDatosSensibles()`, `generarInformeAsistencia()`, `generarInformeTalleres()`, `generarListadoAlumnos()`, `generarInformeTalleristas()`, `exportarInforme()`, `generarInformeCalificaciones()` **(v2)**, `generarInformeDetalladoAlumnos()` **(v2)** |
+| — | `crearUsuario()`, `modificarUsuario()`, `eliminarUsuario()`, `consultarUsuario()`, `crearTaller()`, `modificarTaller()`, `eliminarTaller()`, `asignarAlumnoATaller()`, `asignarTalleristaATaller()`, `consultarDatosSensibles()`, `generarInformeAsistencia()`, `generarInformeTalleres()`, `generarListadoAlumnos()`, `generarInformeTalleristas()`, `exportarInforme()` **(v2)**, `generarInformeCalificaciones()` **(v2)**, `generarInformeDetalladoAlumnos()` **(v2)** |
 
 ### 1.3 Tallerista *(hereda de Usuario)*
 
@@ -92,7 +92,7 @@ Este documento presenta el modelo de clases resultante y su traducción al model
 
 | Atributos | Métodos |
 |---|---|
-| `nombre`, `tipo`, `fechaInicio`, `fechaFin`, `fechaGeneracion`, `formato`, `estado`, `contenido` | `exportarPDF()`, `exportarExcel()`, `obtenerContenido()` |
+| `nombre`, `tipo`, `fechaInicio`, `fechaFin`, `fechaGeneracion`, `formato`, `estado`, `contenido` | `exportarPDF()` **(v2)**, `exportarExcel()` **(v2)**, `obtenerContenido()` |
 
 ### 1.15 RegistroTrazabilidad
 
@@ -202,13 +202,14 @@ Cuatro reglas del modelo no pueden expresarse en la base de datos y deben implem
 |---|---|---|
 | Alumno | `foto`, `biografia`, `eliminarDatoPerfil()` | RF15 |
 | Alumno | `fechaNacimiento`, `correo`, `telefono`, `direccion`, `referenteAdulto`, `centroReferencia`, `observaciones` | RF21 |
-| Alumno | `visualizarNotas()` | RF23 |
 | Tallerista | `eliminarAsistencia()` | RF18 |
 | Tallerista | `modificarContenido()` | RF26 |
 | Administrador | `generarInformeCalificaciones()` | RF20 |
 | Administrador | `generarInformeDetalladoAlumnos()` | RF21 |
+| Administrador | `exportarInforme()` | RF13 |
+| Informe | `exportarPDF()`, `exportarExcel()` | RF13 |
 
-Estos elementos figuran en el modelo para reflejar el diseño completo del sistema, pero no se implementan en la primera versión.
+Estos elementos figuran en el modelo para reflejar el diseño completo del sistema, pero no se implementan en la primera versión. La única excepción parcial es modificarContenido() (RF26): la API ya admite la modificación (PATCH /contenidos/{id}), pero ninguna pantalla la ofrece.
 
 ---
 
@@ -250,7 +251,7 @@ Estos elementos figuran en el modelo para reflejar el diseño completo del siste
 
 **Las dos clases asociativas comparten trazabilidad** (RF03, HU03, EP2), dado que ambas derivan del mismo requerimiento de asignación.
 
-**Los seis RF postergados por plazo** (RF15, RF18, RF20, RF21, RF23, RF26) no figuran en esta tabla, ya que no tienen historia de usuario asociada en el backlog de la primera versión. Los atributos y métodos que originan sí están presentes en el modelo, señalados como (v2).
+**Los seis RF postergados por plazo** (RF15, RF18, RF20, RF21, RF23, RF26) no figuran en esta tabla, ya que no tienen historia de usuario asociada en el backlog de la primera versión. Los atributos y métodos que originan sí están presentes en el modelo, señalados como (v2). RF13, postergado después de iniciado el desarrollo, se mantiene en esta tabla porque tiene historias de usuario en el backlog; sus métodos de exportación figuran como (v2).
 
 ---
 
@@ -296,7 +297,7 @@ classDiagram
         +generarInformeTalleres() Informe
         +generarListadoAlumnos() Informe
         +generarInformeTalleristas() Informe
-        +exportarInforme(informe, formato) File
+        +exportarInforme(informe, formato) File [v2]
         +generarInformeCalificaciones() Informe [v2]
         +generarInformeDetalladoAlumnos() Informe [v2]
     }
@@ -335,7 +336,7 @@ classDiagram
         +visualizarMaterial(tallerId) List
         +visualizarTareas(tallerId) List
         +entregarTarea(tareaId, archivos, comentario) Entrega
-        +visualizarNotas() List [v2]
+        +visualizarNotas() List
         +eliminarDatoPerfil(campo) void [v2]
     }
 
@@ -434,8 +435,8 @@ classDiagram
         +String formato
         +String estado
         +JSON contenido
-        +exportarPDF() File
-        +exportarExcel() File
+        +exportarPDF() File [v2]
+        +exportarExcel() File [v2]
         +obtenerContenido() JSON
     }
 

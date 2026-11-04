@@ -151,7 +151,7 @@ Al contrastar la entrevista con la lista de requerimientos funcionales se advirt
 | Visualización de las notas por parte del alumno | *"puede ver... las notas que le dejó el tallerista asignado"* | RF23 → método `visualizarNotas()` | Postergado |
 | Consulta de datos sensibles | *"Se debe consultar: datos sensibles usados"* | RF24 → método `consultarDatosSensibles()` | Incluido |
 | Consulta del listado de alumnos por el tallerista | *"quién está en su taller"* | RF25 → método `consultarAlumnosDeTaller()` | Incluido |
-| Modificación de material ya publicado | *"Ajuste de materiales de su taller"* | RF26 → método `modificarContenido()` | Postergado |
+| Modificación de material ya publicado | *"Ajuste de materiales de su taller"* | RF26 → método `modificarContenido()` | Postergado en la interfaz; disponible en la API |
 
 **Observación metodológica:** estas ausencias no se detectaron al redactar los requerimientos sino al aplicar el Paso 3 de la derivación, que exige localizar el verbo de origen de cada método. Al recorrer la entrevista buscando verbos de acción aparecieron los que ningún requerimiento había recogido. La derivación funcionó, en este sentido, como una verificación de completitud sobre la documentación previa.
 
