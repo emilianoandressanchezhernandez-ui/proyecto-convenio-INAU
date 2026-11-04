@@ -1,18 +1,16 @@
-# Registro de pruebas 02 — TheNewfutures / INAU
+# Registro de pruebas 02 — Cambios posteriores a la primera ronda
 
 <br>
 
-## Sistema de Gestión de Talleres en Convenio con INAU
+## Sistema de Gestión de Talleres en Convenio con INAU — TheNewfutures
 
-> **Qué es este documento.** Registra la segunda ronda de pruebas, ejecutada después de los cambios de código posteriores a `Testing-01.md`: cambio de contraseña (`PATCH /perfil/clave`), asistencia real del alumno (`GET /mis-asistencias`), validación de cédula y teléfono, y modal para quitar alumnos de un taller. Además vuelve a probar el defecto DEF-01. Igual que en `Testing-01.md`, los resultados esperados se toman de los requerimientos (`docs/02-analisis/requerimientos.md`). Cuando no coinciden con lo obtenido, la diferencia se registra como defecto. `Testing-01.md` se conserva sin cambios como registro de la primera ronda.
+> **Qué es este documento.** Segunda ronda de pruebas. Verifica los cambios de código posteriores a `Testing-01.md` y vuelve a probar DEF-01.
 
 ---
 
 <br>
 
 ## 1. Alcance y entorno
-
-Se prueban solo las funciones nuevas o modificadas y una regresión breve de la asistencia del tallerista. Varios resultados se confirmaron con peticiones directas a la API desde la misma sesión del navegador, para comprobar que el backend valida aunque se saltee el formulario. Los defectos de Testing-01 que no tuvieron cambios de código (DEF-02 a DEF-08) no se volvieron a probar.
 
 | Elemento | Valor |
 |---|---|
@@ -22,6 +20,8 @@ Se prueban solo las funciones nuevas o modificadas y una regresión breve de la 
 | Sitio | `http://192.168.1.6` (red local) |
 | Navegador | Google Chrome en Windows |
 | Ejecutado por | Ejecución asistida por IA (Claude, mediante la extensión Claude en Chrome), supervisada por Gabriel Rendon (subcoordinador). |
+
+**Método.** Se prueban solo las funciones nuevas o modificadas: cambio de contraseña (`PATCH /perfil/clave`), asistencia real del alumno (`GET /mis-asistencias`), validación de cédula y teléfono, y modal para quitar alumnos de un taller; además, una regresión breve de la asistencia del tallerista. Varios resultados se confirmaron con peticiones directas a la API desde la misma sesión del navegador, para comprobar que el backend valida aunque se saltee el formulario. Igual que en `Testing-01.md`, los resultados esperados se toman de los requerimientos (`docs/02-analisis/requerimientos.md`); cuando no coinciden con lo obtenido, la diferencia se registra como defecto. Los defectos de Testing-01 que no tuvieron cambios de código (DEF-02 a DEF-08) no se volvieron a probar. `Testing-01.md` se conserva sin cambios como registro de la primera ronda.
 
 **Datos de prueba** (las contraseñas no se publican):
 
@@ -33,8 +33,6 @@ Se prueban solo las funciones nuevas o modificadas y una regresión breve de la 
 | Alumno creado en CP-06 | Prueba Testing (cédula 4.999.999-1, sin cuenta de acceso) | Inscripto y quitado del taller 1 en CP-09 |
 | Alumno creado en CP-08 | Dup Testing (cédula 49999991, sin cuenta de acceso) | Prueba de cédula duplicada |
 | Tallerista creado en CP-07 | tallerista.testing02@example.com (cédula 48888882) | Alta válida de tallerista |
-
-> Todas las contraseñas modificadas durante las pruebas se restauraron a su valor original, y se comprobó el inicio de sesión con ellas. Los tres usuarios creados en esta ronda quedaron en la base de datos del servidor de pruebas.
 
 ---
 
@@ -70,7 +68,7 @@ Se prueban solo las funciones nuevas o modificadas y una regresión breve de la 
 
 ## 4. Defectos
 
-### 4.1 Estado de los defectos de Testing-01
+### 4.1 Estado de los defectos anteriores
 
 | ID | Descripción | Estado tras esta ronda |
 |---|---|---|
@@ -99,12 +97,18 @@ Se prueban solo las funciones nuevas o modificadas y una regresión breve de la 
 
 **Criterios:** iguales a los de `Testing-01.md`.
 
+**Conclusión.** De 10 casos, 8 se aprobaron, 1 fue parcial y 1 falló. DEF-01 queda cerrado: el alumno ve sus registros reales de asistencia. El caso fallido corresponde a la cédula repetida escrita en otro formato (DEF-09) y el parcial, a que el tallerista y el alumno no pueden cambiar su contraseña desde la interfaz, aunque la API lo permite (DEF-10).
+
 **Observaciones de la ejecución:**
 - Los diálogos de confirmación del navegador (`confirm()`) se reemplazaron por funciones que los aceptan automáticamente, para que no bloquearan la ejecución asistida. El modal de CP-09 es propio de la página y se probó con sus botones.
 - Solo "quitar alumno" usa un modal propio. Las demás confirmaciones siguen usando el diálogo del navegador: cerrar sesión (tres paneles), finalizar taller, desactivar alumno o tallerista, quitar tallerista de un taller y eliminar material o tarea. Lo observó el supervisor de forma manual y se confirmó en el código. No es un defecto, porque los requerimientos no exigen un tipo de confirmación, pero la interfaz queda inconsistente.
 - En CP-07, el formulario del tallerista valida la cédula con la validación nativa del navegador, mientras que el del alumno muestra un mensaje propio; el resultado (no se envía) es el mismo.
 - Los mensajes de teléfono del formulario y de la API no son idénticos ("El teléfono debe contener entre 8 y 15 dígitos." frente a "… y no puede incluir letras."), aunque coinciden en la regla.
 
-**Limitaciones:** pruebas manuales y asistidas, sin pruebas automatizadas; ronda limitada a los cambios nuevos y a la regresión de asistencia; no se repitieron las pruebas de vista de teléfono ni de persistencia tras reiniciar los contenedores.
+**No ejecutado:** no se repitieron las pruebas de vista de teléfono ni de persistencia tras reiniciar los contenedores.
+
+**Limitaciones:** pruebas manuales y asistidas, sin pruebas automatizadas; ronda limitada a los cambios nuevos y a la regresión de asistencia.
+
+**Datos del servidor de prueba:** todas las contraseñas modificadas durante las pruebas se restauraron a su valor original, y se comprobó el inicio de sesión con ellas. Los tres usuarios creados en esta ronda quedaron en la base de datos del servidor de pruebas.
 
 **Documentos relacionados:** `Testing-01.md`, `requerimientos.md`, `Documento de Reconstruccion - Servidor.md` y `Doc NMAP.md`.

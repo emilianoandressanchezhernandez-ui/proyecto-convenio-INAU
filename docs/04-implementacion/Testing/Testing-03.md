@@ -4,7 +4,7 @@
 
 ## Sistema de Gestión de Talleres en Convenio con INAU — TheNewfutures
 
-> **Qué es este documento.** Registra las pruebas de rendimiento y de carga del sistema, que quedaron pendientes en `Testing-01.md` (NRF02 y NRF03). Mide dos cosas: el tiempo de respuesta sin carga y cuántas solicitudes simultáneas soporta el sistema antes de colapsar. La prueba se llevó deliberadamente hasta el punto de falla. Los valores se registran tal como los devolvieron las herramientas. `Testing-01.md` y `Testing-02.md` se conservan sin cambios.
+> **Qué es este documento.** Pruebas de rendimiento y de carga (NRF02 y NRF03), pendientes en `Testing-01.md`. La carga se llevó hasta el punto de falla.
 
 ---
 
@@ -12,18 +12,21 @@
 
 ## 1. Alcance y entorno
 
-Se midió, en orden: el tiempo de respuesta de la página y de la API sin carga (desde el navegador), y la resistencia a la carga de tres rutas (desde el propio servidor), subiendo la cantidad de solicitudes simultáneas por escalones hasta provocar el colapso.
-
 | Elemento | Valor |
 |---|---|
 | Fecha de ejecución | 29/10/2026 |
 | Rama / commit | `cambios-frontend` / `5cbb75b` |
 | Servidor | Máquina virtual con Ubuntu Server en VirtualBox (`one-security-mark01`), 2 núcleos de CPU, 3,8 GiB de RAM y 2,2 GiB de swap. API y MySQL 8.4 en Docker; frontend servido por Nginx |
 | Sitio | `http://192.168.1.14` (red local) |
-| Herramientas | Tiempo de respuesta: navegador (Claude en Chrome) desde Windows por Wi-Fi. Carga: ApacheBench (`ab`) y `curl`, ejecutados dentro del servidor; monitoreo con `curl` y `docker stats` |
+| Navegador | Google Chrome en Windows, por Wi-Fi (tiempo de respuesta, mediante Claude en Chrome) |
+| Herramientas | Carga: ApacheBench (`ab`) y `curl`, ejecutados dentro del servidor; monitoreo con `curl` y `docker stats` |
 | Ejecutado por | Ejecución asistida por IA (Claude), supervisada por Gabriel Rendon (subcoordinador). Los comandos se ejecutaron en el servidor por SSH |
 
+**Método.** Se midió, en orden: el tiempo de respuesta de la página y de la API sin carga (desde el navegador), y la resistencia a la carga de tres rutas (desde el propio servidor), subiendo la cantidad de solicitudes simultáneas por escalones hasta provocar el colapso. Así se miden dos cosas: el tiempo de respuesta sin carga y cuántas solicitudes simultáneas soporta el sistema antes de colapsar. Los valores se registran tal como los devolvieron las herramientas. `Testing-01.md` y `Testing-02.md` se conservan sin cambios.
+
 **Criterio de colapso (definido para esta prueba):** se llevó cada ruta hasta que el servidor dejó de responder correctamente a la mayoría de las solicitudes, sin fijar un umbral de corte previo. Se registra en qué escalón empiezan las fallas y en cuál colapsa.
+
+**Datos de prueba:** los datos de ejemplo del script de la base. El inicio de sesión y las rutas con sesión usaron credenciales válidas de un usuario de ejemplo (las contraseñas no se publican).
 
 ---
 
@@ -116,20 +119,31 @@ Con ApacheBench, 60 segundos por escalón, subiendo las solicitudes simultáneas
 - **Pérdida de la sesión durante la prueba.** Durante los escalones de inicio de sesión, la conexión SSH interactiva se cortó (la CPU estaba saturada) y el monitoreo automático dejó de registrar a las 16:16:45. El escalón de 1000 simultáneos del inicio de sesión quedó registrado recién a las 18:44, tras reconectarse al servidor.
 - **Recuperación.** El servidor volvió a estar accesible por SSH y la página y la API respondieron con normalidad una vez retirada la carga. No fue necesario reiniciar los contenedores manualmente para la navegación normal.
 
-### 4.1 Defectos encontrados en la revisión funcional complementaria (31/10/2026)
+---
 
-Durante el recorrido de todas las pantallas para elaborar el `Manual de Usuario.md` (31/10/2026, sitio `http://192.168.1.9`, usuarios de prueba de los tres roles, sin modificar datos), se detectaron dos defectos en el panel del alumno que no corresponden a la prueba de carga, pero se registran en este documento por ser la ronda de pruebas vigente:
+<br>
 
-| ID | Pantalla | Descripción | Evidencia | Severidad |
-|---|---|---|---|---|
-| DEF-12 | `frontend-alumno/detalle-taller.html` | La tarjeta "Mi asistencia en este taller" muestra "Promedio: Pendiente de integrar", aunque la asistencia real ya se obtiene de la API | En **Mi Asistencia**, la misma alumna muestra 50 % de asistencia, con sus registros reales | Baja |
-| DEF-13 | `frontend-alumno/detalle-taller.html` | La tarea "Primera página web" figura como "Sin consultar", aunque la alumna ya la entregó y está corregida con nota 9 | En **Mis Tareas** y en el detalle de la tarea, la misma tarea figura como "Corregida", con nota 9 | Media |
+## 5. Defectos
+
+### 5.1 Estado de los defectos anteriores
+
+No se revisaron en esta ronda, que se limitó al rendimiento y la carga.
+
+### 5.2 Defectos nuevos
+
+Durante el recorrido de todas las pantallas para elaborar el `Manual de Usuario.md` (31/10/2026, sitio `http://192.168.1.9`, usuarios de prueba de los tres roles, sin modificar datos), se detectaron dos defectos en el panel del alumno (DEF-12 y DEF-13) que no corresponden a la prueba de carga, pero se registran en este documento por ser la ronda de pruebas vigente. DEF-11 surge de la prueba de carga del inicio de sesión.
+
+| ID | Caso | Descripción | Severidad | Estado | Referencia |
+|---|---|---|---|---|---|
+| DEF-11 | Sección 3.3 | No hay límite de intentos de inicio de sesión (el `RateLimiter` existe pero no está conectado). La prueba de carga del login llegó al límite del servidor sin que nada la frenara | Media (seguridad) | Abierto | `Mecanismos_Autenticacion_Criptografia_INAU.md`, sección 9 |
+| DEF-12 | Revisión complementaria (31/10/2026) | La tarjeta "Mi asistencia en este taller" muestra "Promedio: Pendiente de integrar", aunque la asistencia real ya se obtiene de la API. En **Mi Asistencia**, la misma alumna muestra 50 % de asistencia, con sus registros reales | Baja | Abierto | `frontend-alumno/detalle-taller.html` |
+| DEF-13 | Revisión complementaria (31/10/2026) | La tarea "Primera página web" figura como "Sin consultar", aunque la alumna ya la entregó y está corregida con nota 9. En **Mis Tareas** y en el detalle de la tarea, la misma tarea figura como "Corregida", con nota 9 | Media | Abierto | `frontend-alumno/detalle-taller.html` |
 
 ---
 
 <br>
 
-## 5. Resumen
+## 6. Resumen de resultados
 
 | Ruta | Techo de rendimiento | Primeras fallas | Colapso |
 |---|---|---|---|
@@ -144,21 +158,17 @@ Durante el recorrido de todas las pantallas para elaborar el `Manual de Usuario.
 | NRF03 — Responder con rapidez en las operaciones habituales | Cumplido | Con un solo usuario, todas las rutas respondieron en menos de medio segundo (sección 2). Bajo carga, la API mantiene tiempos menores a un segundo hasta 100 usuarios simultáneos (sección 3.2). |
 | NRF02 — Disponibilidad las 24 horas una vez desplegado | No verificable con esta prueba | La prueba mide la resistencia a la carga, no la disponibilidad continua. Ningún servicio se cayó durante el colapso, pero los contenedores no se reinician solos tras un reinicio del servidor (`Hardening de Infraestructura y Contenedores.md`, H-04). |
 
+**Criterios:** el criterio de colapso se define en la sección 1. Los requerimientos se evalúan como *Cumplido* o *No verificable con esta prueba*, según el fundamento indicado.
+
 **Conclusión.** El sistema responde de forma rápida con un solo usuario (menos de medio segundo en todas las rutas). Bajo carga, la página estática resiste bien (1000 usuarios simultáneos sin fallas). La API tiene un techo de unas 136 solicitudes por segundo y el inicio de sesión, de unas 16, que es el límite más bajo del sistema. Para un uso previsto de decenas de usuarios de talleres en convenio, estos límites son holgados; serían un problema solo ante cientos de inicios de sesión en el mismo instante. Ninguno de los componentes llegó a caerse ni a quedarse sin memoria: el límite es la capacidad de CPU y la cantidad de procesos del servidor de prueba.
 
-**Hallazgos para considerar:**
+**Observaciones de la ejecución:**
+- Nginx agota sus conexiones (`768 worker_connections`) bajo carga alta; es un parámetro ajustable si se quisiera mayor capacidad (antes registrado como OBS-01, severidad baja).
 
-| ID | Descripción | Severidad |
-|---|---|---|
-| DEF-11 | No hay límite de intentos de inicio de sesión (el `RateLimiter` existe pero no está conectado). La prueba de carga del login llegó al límite del servidor sin que nada la frenara. Coincide con lo señalado en `Mecanismos_Autenticacion_Criptografia_INAU.md`, sección 9. | Media (seguridad) |
-| OBS-01 | Nginx agota sus conexiones (`768 worker_connections`) bajo carga alta; es un parámetro ajustable si se quisiera mayor capacidad. | Baja |
-| DEF-12 | El detalle del taller del alumno muestra "Promedio: Pendiente de integrar" en lugar de su asistencia real (sección 4.1). | Baja |
-| DEF-13 | El detalle del taller del alumno muestra el estado de una tarea corregida como "Sin consultar" (sección 4.1). | Media |
+**No ejecutado:** la verificación de NRF02 (disponibilidad las 24 horas), que no puede comprobarse con una prueba de carga.
 
-**Limitaciones de la prueba:**
-- La herramienta de carga se ejecutó en el mismo servidor, por lo que compitió por la CPU con los servicios medidos; el rendimiento real de los servicios, por sí solos, sería algo mayor.
-- El tiempo de respuesta de la sección 2 se midió por Wi-Fi e incluye la red local.
-- Las lecturas de CPU por contenedor no fueron representativas; la saturación se infiere del promedio de carga del sistema.
-- Se usaron los datos de prueba del script, no datos reales de INAU.
+**Limitaciones:** la herramienta de carga se ejecutó en el mismo servidor, por lo que compitió por la CPU con los servicios medidos (el rendimiento real de los servicios, por sí solos, sería algo mayor); el tiempo de respuesta de la sección 2 se midió por Wi-Fi e incluye la red local; las lecturas de CPU por contenedor no fueron representativas (la saturación se infiere del promedio de carga del sistema). Se usaron los datos de prueba del script, no datos reales de INAU.
+
+**Datos del servidor de prueba:** esta ronda no creó ni modificó registros, las rutas probadas solo consultan datos o inician sesión, y la revisión complementaria se hizo sin modificar datos.
 
 **Documentos relacionados:** `Testing-01.md`, `Testing-02.md`, `Mecanismos_Autenticacion_Criptografia_INAU.md`, `Hardening de Infraestructura y Contenedores.md` y `requerimientos.md` (NRF02 y NRF03).
