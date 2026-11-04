@@ -27,10 +27,10 @@
 | **MySQL** | Base de datos | Establecido en la propuesta original. El modelo de datos requiere relaciones N:M, lo que justifica un motor relacional. Cumple NRF09. |
 | **PDO (pdo_mysql)** | Acceso a la base de datos | Consultas preparadas en todos los accesos, lo que previene la inyección SQL. Contribuye a NRF08. |
 | **Composer + firebase/php-jwt** | Autenticación | Gestión de dependencias y emisión de tokens JWT para la autenticación, sin implementar criptografía propia. |
-| **Symfony Rate Limiter** | Limitación de intentos | Restringe los intentos repetidos de inicio de sesión, como defensa ante ataques de fuerza bruta. |
+| **Symfony Rate Limiter** | Limitación de intentos y de pedidos | Restringe los intentos repetidos de inicio de sesión (cinco por correo cada cinco minutos) y limita los pedidos a la API a 300 por minuto por IP, como defensa ante ataques de fuerza bruta y uso abusivo. |
 | **API REST** | Comunicación frontend-backend | Requisito explícito de la propuesta original ("organización del sistema bajo arquitectura de endpoints REST"). Permite mantener las capas desacopladas (NRF06). |
 | **Fetch API** | Consumo de la API desde el cliente | API nativa del navegador, sin necesidad de librerías externas, coherente con la decisión de dependencias mínimas. |
-| **Filesystem del servidor** | Almacenamiento de adjuntos | Establecido en la propuesta original. Los archivos se guardan en un volumen de Docker (`uploads`), sin depender de un servicio de almacenamiento externo. |
+| **Filesystem del servidor** | Almacenamiento de adjuntos | Establecido en la propuesta original. Los archivos se guardan en un volumen de Docker (`uploads_data`), sin depender de un servicio de almacenamiento externo. |
 
 <br>
 
@@ -159,8 +159,8 @@ La composición del equipo y la asignación de roles se detallan en el Project C
 | NRF01 — Diseño responsive | Bootstrap 5.3 |
 | NRF05 — Validación frontend y backend | Validación en JavaScript + validación en PHP |
 | NRF06 — Separación frontend/backend | Arquitectura de API REST |
-| NRF07 — Control de acceso por rol | Autenticación con token JWT en cookie HttpOnly y verificación de rol en cada ruta, más paneles separados |
-| NRF08 — Protección de datos personales | Hash de contraseñas, consultas preparadas, control de permisos por endpoint |
+| NRF07 — Control de acceso por rol | Autenticación con token JWT en cookie HttpOnly y verificación de rol en cada ruta, más paneles separados. El rol y el estado del usuario se comprueban en la base de datos en cada pedido. |
+| NRF08 — Protección de datos personales | Hash de contraseñas, consultas preparadas, control de permisos por endpoint, límite de intentos de inicio de sesión y cierre de las sesiones abiertas al cambiar la contraseña. |
 | NRF09 — Persistencia relacional | MySQL |
 | NRF10 — Trazabilidad | Tabla `trazabilidad`, más el registro del usuario responsable en `registros_asistencia` y de la fecha de carga en `adjuntos` |
 | NRF11 — Restricción de formatos | Validación de extensión y MIME type (PDF y JPG) |
@@ -179,11 +179,11 @@ La composición del equipo y la asignación de roles se detallan en el Project C
 | Componente | Estado |
 |---|---|
 | Panel administrador | Conectado a la API. Pendientes: exportación de informes en PDF o Excel, listado de alumnos, informe de talleristas y consulta de datos sensibles. |
-| Panel tallerista | Conectado a la API. Incluye la gestión de material y tareas y, la corrección de entregas. Adjuntar archivos al material, eliminar notas y cambiar la contraseña desde la interfaz queda pendiente. |
-| Panel alumno | Conectado a la API, incluida la asistencia. Cambiar la contraseña desde la interfaz queda pendiente. |
+| Panel tallerista | Conectado a la API. Incluye la gestión de material y tareas con archivos adjuntos, la corrección de entregas, la eliminación de notas y el cambio de contraseña. Los informes se descargan en JSON (RF13 postergado). |
+| Panel alumno | Conectado a la API, incluidos la asistencia, el estado de las tareas y los archivos de la consigna. Permite cambiar la contraseña. |
 | Login (`frontend/index.html`) | Acceso por correo y contraseña, autenticación contra la API y redirección por rol. |
 | Base de datos | Script con las trece tablas y datos de prueba en `backend/api-completa/DataBase/inau_talleres.sql`, ejecutado en el entorno Docker. |
 | Backend | Implementado: API REST con 55 rutas, organizada en capas, con autenticación JWT y control de acceso por rol. |
-| Documentación técnica | Análisis, diseño, modelado y pruebas completos (`Testing/Testing-01.md` y `Testing/Testing-02.md`, ejecutados el 24 y el 26/10/2026 en un servidor Ubuntu). `api.md` pendiente de contenido |
+| Documentación técnica | Análisis, diseño, modelado y pruebas completos (`Testing/Testing-01.md` a `Testing/Testing-06.md`, ejecutados entre el 24/10 y el 04/11/2026 en un servidor Ubuntu), documentación de la API (`api.md`) y manual de usuario (`Manual_de_Usuario.md`). |
 
 El backend se desarrolló con las herramientas previstas, por lo que las decisiones de esta justificación se mantienen.

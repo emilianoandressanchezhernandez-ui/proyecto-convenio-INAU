@@ -71,17 +71,17 @@ proyecto-convenio-INAU/
 │   │
 │   ├── 04-implementacion/
 │   │   ├── Documento de Reconstruccion - Servidor.md
-│   │   ├── Manual_de_Usuario.md          ← nuevo
+│   │   ├── Manual_de_Usuario.md          
 │   │   ├── PrimeraVista.md
 │   │   ├── api.md
 │   │   ├── inau-infraestructura-docker.md
 │   │   └── Testing/
 │   │       ├── Testing-01.md
 │   │       ├── Testing-02.md
-│   │       ├── Testing-03.md             ← nuevo
-│   │       ├── Testing-04.md             ← nuevo
-│   │       ├── Testing-05.md             ← nuevo
-│   │       └── Testing-06.md             ← nuevo
+│   │       ├── Testing-03.md             
+│   │       ├── Testing-04.md             
+│   │       ├── Testing-05.md             
+│   │       └── Testing-06.md            
 │   │
 │   ├── 05-Ciberseguridad/
 │   │   ├── Doc NMAP.md
