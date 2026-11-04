@@ -145,7 +145,6 @@ require_once __DIR__ . '/repositories/ReporteRepository.php';
 require_once __DIR__ . '/repositories/ContenidoRepository.php';
 require_once __DIR__ . '/repositories/EntregaRepository.php';
 require_once __DIR__ . '/repositories/AdjuntoRepository.php';
-require_once __DIR__ . '/repositories/DatoSensibleRepository.php';
 
 // ------------------------------------------------------------------
 // Services: reglas del negocio.
@@ -164,7 +163,6 @@ require_once __DIR__ . '/services/ReporteService.php';
 require_once __DIR__ . '/services/ContenidoService.php';
 require_once __DIR__ . '/services/EntregaService.php';
 require_once __DIR__ . '/services/AdjuntoService.php';
-require_once __DIR__ . '/services/DatoSensibleService.php';
 
 // ------------------------------------------------------------------
 // Controllers: puerta de entrada desde HTTP.
@@ -185,7 +183,6 @@ require_once __DIR__ . '/controllers/ReporteController.php';
 require_once __DIR__ . '/controllers/ContenidoController.php';
 require_once __DIR__ . '/controllers/EntregaController.php';
 require_once __DIR__ . '/controllers/AdjuntoController.php';
-require_once __DIR__ . '/controllers/DatoSensibleController.php';
 
 
 // NOTA:

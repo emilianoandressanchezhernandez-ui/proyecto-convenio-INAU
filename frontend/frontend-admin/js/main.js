@@ -185,7 +185,6 @@ function inicializarPaginaActual() {
         "asistencias": "inicializarAsistencias",
         "reportes": "inicializarReportes",
         "detalle-reporte": "inicializarDetalleReporte",
-        "datos-sensibles": "inicializarDatosSensibles",
         "perfil": "inicializarPerfil"
     };
 
