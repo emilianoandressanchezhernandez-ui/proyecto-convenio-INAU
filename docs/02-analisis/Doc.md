@@ -196,7 +196,7 @@
 16. Consulta del listado de alumnos inscritos en el taller por parte del tallerista.
 
 >Nota: este alcance corresponde a la definición inicial, previa al ajuste por plazo.
->Seis funciones fueron postergadas posteriormente; ver la sección 14, Paso 2.
+>Seis funciones fueron postergadas posteriormente (ver la sección 14, Paso 2). Al cierre, RF23 se incluyó y la exportación de informes (RF13) quedó postergada (ver la sección 23).
 
 ---
 
@@ -620,6 +620,8 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 
 #### Resultado del sprint: *Completado parcialmente.*
 
+> Nota: Lo que faltaba (adjuntar archivos al material y el cambio de contraseña del tallerista y del alumno) se completó al cierre (`Testing-06.md`).
+
 ---
 
 <br>
@@ -649,6 +651,8 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 
 #### Resultado del sprint: 	*Completado parcialmente.* 
 
+> Nota: La eliminación de notas desde la interfaz se completó al cierre (`Testing-06.md`).
+
 ---
 
 <br>
@@ -675,7 +679,9 @@ Al finalizar el sprint, el sistema permitirá:
 
 Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
 
-#### Resultado del sprint: *En proceso.*
+#### Resultado del sprint: *Completado parcialmente.*
+
+> Nota: Los informes de asistencia y de talleres funcionan. La exportación a PDF o Excel (HU17, RF13) quedó postergada: los informes se descargan en JSON.
 
 ---
 
@@ -720,8 +726,8 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 | Sprint 2 | Gestión de usuarios, talleres y asistencia | Gestión de alumnos, talleristas y talleres; registro y corrección de asistencia | 11 | Completado. |
 | Sprint 3 | Material, tareas y entregas | Publicación de material y tareas, consulta y entrega del alumno, gestión de perfil | 10 | Completado parcialmente. |
 | Sprint 4 | Corrección, calificación y depuración | Corrección de entregas, asignación y eliminación de notas, eliminación de material | 11 | Completado parcialmente. |
-| Sprint 5 | Informes y exportación | Informes de asistencia y de talleres, exportación a PDF o Excel | 11 | En proceso. |
-| Sprint 6 | Consultas complementarias y cierre | Consulta de datos sensibles, listados de alumnos e informe de talleristas | 9 | En proceso. |
+| Sprint 5 | Informes y exportación | Informes de asistencia y de talleres, exportación a PDF o Excel postergada (descarga en JSON) | 11 | Completado parcialmente. |
+| Sprint 6 | Consultas complementarias y cierre | Consulta de datos sensibles. Listado de alumnos del taller, listado general, informe de talleristas y datos personales en los paneles del administrador | 9 | Completado. |
 | **Total** | | | **63** | |
 
 ---
@@ -737,10 +743,10 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 | Después del Sprint 1 | Existe una base funcional con acceso por rol y asignación a talleres. |
 | Después del Sprint 2 | Se gestionan usuarios y talleres, y se registra la asistencia. |
 | Después del Sprint 3 | Funciona el circuito de material, tareas y entregas. |
-| Después del Sprint 4 | Se corrigen entregas y se asignan notas; eliminar una nota desde la interfaz queda pendiente. |
-| Después del Sprint 5 | La administración genera informes de asistencia y de talleres; la exportación a PDF o Excel queda en proceso. |
-| Después del Sprint 6 | El tallerista consulta el listado de su taller; el listado general, el informe de talleristas y la consulta de datos sensibles quedan en proceso. |
-| Cierre | Las seis funciones postergadas por plazo (RF15, RF18, RF20, RF21, RF23 y RF26) quedan para etapas futuras. |
+| Después del Sprint 4 | Se corrigen entregas, se asignan notas y eliminar una nota desde la interfaz se completó al cierre. |
+| Después del Sprint 5 | La administración genera informes de asistencia y de talleres. La exportación a PDF o Excel quedó postergada. |
+| Después del Sprint 6 | El tallerista consulta el listado de su taller, y el administrador accede al listado general, a la información de los talleristas y a los datos personales desde sus paneles. |
+| Cierre | Cinco funciones postergadas por plazo (RF15, RF18, RF20, RF21 y RF26) y la exportación de informes (RF13) quedan para etapas futuras. RF23 se incluyó en la primera versión. |
 
 ---
 
@@ -748,37 +754,36 @@ Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Dec
 
 ## 23. Estado de los requerimientos al cierre
 
-Estado verificado en las pruebas del sistema del 24/10/2026 (`docs/04-implementacion/Testing/Testing-01.md`) y del 26/10/2026 (`Testing-02.md`, casos citados como "T2").
+Estado verificado en las pruebas del sistema, de `docs/04-implementacion/Testing/Testing-01.md` (24/10/2026) a `Testing-06.md` (04/11/2026). Los casos de `Testing-01.md` se citan solo con su número, y los de las rondas posteriores, con el número de ronda delante (por ejemplo, "T6 CP-14").
 
 | Área | Requerimiento | Estado | Observación | Prueba |
 | --- | --- | --- | --- | --- |
 | Autenticación y acceso por rol | RF01 — Inicio de sesión diferenciado por rol | Cumplido | Acceso por correo y contraseña; cada rol es redirigido a su panel. | CP-01, CP-02, CP-03 |
-| Gestión de usuarios y talleres | RF02 — Gestión de alumnos, talleristas y talleres | Cumplido |Alta y edición verificadas; la eliminación no se probó. La cédula (8 dígitos) y el teléfono (8 a 15 dígitos) se validan en el formulario y en la API. La misma cédula escrita con o sin puntos se acepta dos veces (DEF-09).|CP-04, CP-05; T2 CP-06 a CP-08|
-| Gestión de usuarios y talleres | RF03 — Asignación de alumnos y talleristas a talleres | Cumplido | — |CP-06; T2 CP-09|
-| Registro y corrección de asistencia | RF04 — Registrar asistencia | Cumplido | Los cuatro estados se guardan correctamente. |CP-07; T2 CP-02|
-| Registro y corrección de asistencia | RF05 — Consultar y modificar asistencia | Cumplido | El tallerista consulta y modifica la asistencia, y el alumno consulta sus registros reales (DEF-01 corregido). |CP-07, CP-08; T2 CP-01|
-| Material, tareas y entregas | RF06 — Subir material y tareas | Parcial | Material y tareas se publican, pero el formulario del tallerista no permite adjuntar archivos; solo es posible mediante la API. | CP-09 |
-| Material, tareas y entregas | RF07 — El alumno visualiza material y tareas | Cumplido | — | CP-10 |
+| Gestión de usuarios y talleres | RF02 — Gestión de alumnos, talleristas y talleres | Cumplido | Alta y edición verificadas; la eliminación no se probó. La cédula (8 dígitos) y el teléfono (8 a 15 dígitos) se validan en el formulario y en la API. Una cédula ya registrada se detecta aunque se escriba en otro formato (DEF-09 corregido). | CP-04, CP-05; T2 CP-06 a CP-08; T6 CP-17 |
+| Gestión de usuarios y talleres | RF03 — Asignación de alumnos y talleristas a talleres | Cumplido | — | CP-06; T2 CP-09 |
+| Registro y corrección de asistencia | RF04 — Registrar asistencia | Cumplido | Los cuatro estados se guardan correctamente. | CP-07; T2 CP-02 |
+| Registro y corrección de asistencia | RF05 — Consultar y modificar asistencia | Cumplido | El tallerista consulta y modifica la asistencia, y el alumno consulta sus registros reales (DEF-01 corregido) y su porcentaje en el detalle del taller (DEF-12 corregido). | CP-07, CP-08; T2 CP-01; T6 CP-01 |
+| Material, tareas y entregas | RF06 — Subir material y tareas | Cumplido | Material y tareas se publican con archivos adjuntos PDF o JPG (DEF-06 corregido). | CP-09; T6 CP-15, CP-16 |
+| Material, tareas y entregas | RF07 — El alumno visualiza material y tareas | Cumplido | El alumno ve el estado de cada tarea y los archivos de la consigna (DEF-13 y DEF-16 corregidos). | CP-10; T6 CP-02, CP-04 a CP-07 |
 | Material, tareas y entregas | RF08 — El alumno envía archivos de una tarea | Cumplido | Entrega con PDF y comentario. | CP-10 |
 | Corrección y calificación | RF09 — Corregir tareas | Cumplido | — | CP-11 |
 | Corrección y calificación | RF10 — Asignar nota | Cumplido | Se rechazan notas fuera del rango 1 a 10. | CP-11 |
 | Corrección y calificación | RF16 — Eliminar material | Cumplido | — | CP-09 |
-| Corrección y calificación | RF17 — Eliminar nota | Parcial | La interfaz no ofrece la opción; solo es posible mediante la API. | CP-11 |
+| Corrección y calificación | RF17 — Eliminar nota | Cumplido | El tallerista elimina la nota desde la ventana Corregir (DEF-07 corregido). | CP-11; T6 CP-14 |
+| Corrección y calificación | RF23 — El alumno visualiza sus notas | Cumplido | Postergado por plazo al inicio; se incluyó en la primera versión. El alumno ve la nota y la devolución de cada entrega. | T6 CP-02, CP-06 |
 | Informes y exportación | RF11 — Informe de asistencia por taller | Cumplido | — | CP-12 |
 | Informes y exportación | RF12 — Informe de talleres con sus talleristas | Cumplido | — | CP-12 |
-| Informes y exportación | RF13 — Exportar informes en PDF o Excel | Pendiente | La descarga genera un archivo JSON. | CP-13 |
-| Informes y exportación | RF19 — Listado de alumnos | Pendiente | No existe la opción para generarlo. | CP-14 |
-| Informes y exportación | RF22 — Informe de talleristas | Pendiente | No existe la opción para generarlo. | CP-14 |
-| Gestión de perfil | RF14 — Gestionar el perfil | Parcial | Se modifican los datos de contacto. El cambio de contraseña está implementado en la API para los tres roles, pero solo el administrador lo tiene en la interfaz (DEF-10). | CP-15; T2 CP-03 a CP-05 |
-| Datos sensibles y listado por taller | RF24 — Consultar datos sensibles | Pendiente | No existe la funcionalidad. | CP-16 |
+| Informes y exportación | RF13 — Exportar informes en PDF o Excel | Postergado | Requiere cambios en el código; se prefirió no entregar una función mal integrada. La descarga genera un archivo JSON. | CP-13; T6 sección 2.9 |
+| Informes y exportación | RF19 — Listado de alumnos | Cumplido | Lo resuelve el panel Alumnos: listado completo con búsqueda (DEF-03 cerrado). | CP-14; T6 CP-27 |
+| Informes y exportación | RF22 — Informe de talleristas | Cumplido | Lo resuelve el panel Talleristas: listado y detalle de cada tallerista (DEF-03 cerrado). | CP-14; T6 CP-26, CP-27 |
+| Gestión de perfil | RF14 — Gestionar el perfil | Cumplido | Los tres roles modifican sus datos de contacto y su contraseña desde la interfaz (DEF-10 corregido). | CP-15; T2 CP-03 a CP-05; T6 CP-08 a CP-13 |
+| Datos sensibles y listado por taller | RF24 — Consultar datos sensibles | Cumplido | El administrador consulta los datos personales de alumnos y talleristas en sus detalles (DEF-04 cerrado). | CP-16; T6 CP-25, CP-26 |
 | Datos sensibles y listado por taller | RF25 — Listado de alumnos del taller | Cumplido | — | CP-06 |
-| Funciones postergadas por plazo | RF15, RF18, RF20, RF21, RF23, RF26 | Postergado | Pendiente para una fase futura (Control de Cambios, CC-01). | — |
+| Funciones postergadas por plazo | RF15, RF18, RF20, RF21, RF26 | Postergado | Pendiente para una fase futura (Control de Cambios, CC-01). RF26 ya está disponible en la API (`PATCH /contenidos/{id}`), sin pantalla. | — |
 | Alcance excluido | Foros, notificaciones y mensajería interna | Excluido | Pendiente para una fase futura. | — |
 | Alcance excluido | Soporte multiformato y asistencia avanzada | Excluido | Pendiente para una fase futura. | — |
 
-**Resumen:** de los 20 requerimientos de la primera versión, 13 están cumplidos, 3 parciales (RF06, RF14 y RF17) y 4 pendientes (RF13, RF19, RF22 y RF24).
-
----
+**Resumen:** de los 20 requerimientos de la primera versión, 19 están cumplidos y 1 postergado (RF13). Además, RF23, postergado por plazo al inicio, quedó cumplido.
 
 <br>
 
@@ -797,9 +802,9 @@ Estado verificado en las pruebas del sistema del 24/10/2026 (`docs/04-implementa
 ---
 
 ## 25. Conclusión.
-
-El proyecto partió de una necesidad general del cliente: organizar la gestión de los talleres que se dictan en convenio con INAU. La entrevista permitió convertirla en un alcance concreto, con tres roles diferenciados y veintiséis requerimientos funcionales, y el equipo organizó el trabajo con Scrum en seis sprints quincenales. El plan se ajustó de 91 a 63 puntos para respetar el plazo de doce semanas y la capacidad de un equipo de tres integrantes, y seis funciones se postergaron de forma explícita para una fase futura, según consta en el Control de Cambios.
-
-Como resultado, se cerró el alcance de la primera versión: una API REST en PHP organizada en capas, una base de datos MySQL derivada del modelo de clases, autenticación con JWT y control de acceso por rol, y tres paneles web responsive conectados a la API. El administrador gestiona usuarios y talleres y dispone de informes exportables; el tallerista registra la asistencia, publica material y tareas y corrige las entregas; y el alumno consulta el material y su asistencia, y entrega sus trabajos. Todo el entorno se levanta con Docker y su despliegue en un servidor quedó documentado.
-
+ 
+El proyecto partió de una necesidad general del cliente: organizar la gestión de los talleres que se dictan en convenio con INAU. La entrevista permitió convertirla en un alcance concreto, con tres roles diferenciados y veintiséis requerimientos funcionales, y el equipo organizó el trabajo con Scrum en seis sprints quincenales. El plan se ajustó de 91 a 63 puntos para respetar el plazo de doce semanas y la capacidad de un equipo de tres integrantes, y seis funciones se postergaron de forma explícita para una fase futura, según consta en el Control de Cambios; al cierre, una de ellas (RF23) se incorporó y la exportación de informes (RF13) se sumó a las postergadas.
+ 
+Como resultado, se cerró el alcance de la primera versión: una API REST en PHP organizada en capas, una base de datos MySQL derivada del modelo de clases, autenticación con JWT y control de acceso por rol, y tres paneles web responsive conectados a la API. El administrador gestiona usuarios y talleres, consulta sus datos y genera informes, que por ahora se descargan en JSON; el tallerista registra la asistencia, publica material y tareas y corrige las entregas; y el alumno consulta el material y su asistencia, y entrega sus trabajos. Todo el entorno se levanta con Docker y su despliegue en un servidor quedó documentado.
+ 
 La principal limitación fue la ausencia del cliente durante el desarrollo: sin Sprint Reviews, el alcance dependió por completo de la entrevista inicial. Aun así, la trazabilidad entre entrevista, requerimientos, historias de usuario, modelo y código permite verificar que lo construido responde a lo que el cliente pidió. El sistema queda como una primera versión funcional, con mejoras identificadas en la Revisión de Coherencia y preparada para incorporar las funciones postergadas.
