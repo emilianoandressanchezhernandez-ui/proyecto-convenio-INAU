@@ -55,12 +55,17 @@ proyecto-convenio-INAU/
 │   │
 │   ├── 04-implementacion/
 │   │   ├── Documento de Reconstruccion - Servidor.md
+│   │   ├── Manual_de_Usuario.md          ← nuevo
 │   │   ├── PrimeraVista.md
 │   │   ├── api.md
 │   │   ├── inau-infraestructura-docker.md
 │   │   └── Testing/
 │   │       ├── Testing-01.md
-│   │       └── Testing-02.md
+│   │       ├── Testing-02.md
+│   │       ├── Testing-03.md             ← nuevo
+│   │       ├── Testing-04.md             ← nuevo
+│   │       ├── Testing-05.md             ← nuevo
+│   │       └── Testing-06.md             ← nuevo
 │   │
 │   ├── 05-Ciberseguridad/
 │   │   ├── Doc NMAP.md
@@ -166,7 +171,7 @@ proyecto-convenio-INAU/
 
 | Carpeta | Contenido | Archivos |
 | --- | --- | --- |
-| Raíz | `README.md`, `.gitignore` y `.gitattributes` | 3 |
+| Raíz | `README.md`, `.gitignore`, `.gitattributes` | 3 |
 | `backend/` | Reglas de exclusión de Git (archivo vacío) | 1 |
 | `backend/api-completa/` | API REST en PHP, configuración Docker y script de la base de datos con datos de prueba | 74 |
 | `docs/` | Índice de la estructura del repositorio | 1 |
@@ -175,15 +180,15 @@ proyecto-convenio-INAU/
 | `docs/02-analisis/` | Documento principal del proyecto, entrevista y requerimientos | 3 |
 | `docs/03-diseño/` | Identidad visual y justificación tecnológica | 2 |
 | `docs/03-diseño/Modelado/` | Modelo de clases y MER, anexo de derivación y análisis del modelo | 3 |
-| `docs/04-implementacion/` | Reconstrucción en servidor, estado inicial, infraestructura y documentación de la API | 4 |
-| `docs/04-implementacion/Testing/` | Registros de pruebas, uno por ejecución | 2 |
-| `docs/05-Ciberseguridad/` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening de infraestructura y contenedores, escaneo con Nmap y plan de contingencia (asignatura electiva) | 5 |
-| `docs/06-Emprendedurismo/` | Plan de negocios (asignatura Emprendedurismo) | 1 |
+| `docs/04-implementacion/` | Reconstrucción en servidor, estado inicial, infraestructura, documentación de la API y manual de usuario | 5 |
+| `docs/04-implementacion/Testing/` | Registros de pruebas, uno por ejecución | 6 |
+| `docs/05-Ciberseguridad/` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening de infraestructura y contenedores, escaneo con Nmap y plan de contingencia | 5 |
+| `docs/06-Emprendedurismo/` | Plan de negocios | 1 |
 | `frontend/` | Pantalla de acceso y scripts compartidos (`api.js`, `auth.js`) | 3 |
 | `frontend/frontend-admin/` | Panel del administrador: 11 páginas, 1 hoja de estilos, 15 scripts | 28 |
 | `frontend/frontend-tallerista/` | Panel del tallerista: 9 páginas, 1 hoja de estilos, 12 scripts | 23 |
 | `frontend/frontend-alumno/` | Panel del alumno: 7 páginas, 1 hoja de estilos, 10 scripts | 18 |
-| **Total** | | **178** |
+| **Total** | | **183** |
 
 <br>
 
@@ -193,7 +198,7 @@ La documentación se agrupa en seis carpetas numeradas: las cuatro primeras refl
 
 Los documentos de modelado se ubican en una subcarpeta propia dentro de `03-diseño`, dado que constituyen un conjunto de tres piezas que se referencian entre sí: el modelo, su derivación justificada y el análisis de cómo resuelve la operativa.
 
-Las pruebas se ubican en una subcarpeta propia dentro de `04-implementacion`, `Testing/`, con un documento por cada ejecución (`Testing-01.md`, `Testing-02.md`), de modo que las pruebas posteriores se agreguen sin modificar el registro de las anteriores.
+Las pruebas se ubican en una subcarpeta propia dentro de `04-implementacion`, `Testing/`, con un documento por cada ejecución (`Testing-01.md` a `Testing-06.md`), de modo que las pruebas posteriores se agreguen sin modificar el registro de las anteriores.
 
 La revisión de coherencia y el control de cambios se ubican en `01-gestion` por tratarse de registros sobre el conjunto del proyecto, y no de artefactos técnicos de una etapa determinada. Dentro de esa carpeta, la subcarpeta `Documentos del equipo/` agrupa los registros propios del equipo: las actas de reuniones, la declaración sobre las Sprint Review y la declaración de uso ético de IA.
 
@@ -209,8 +214,8 @@ El script de base de datos que se utiliza se ubica en `backend/api-completa/Data
 
 | Componente | Estado |
 | --- | --- |
-| Panel del administrador | Completo y conectado a la API |
-| Panel del tallerista | Completo y conectado a la API. Incluye la gestión de material y tareas y la corrección de entregas |
+| Panel del administrador | Completo y conectado a la API. La exportación de informes a PDF o Excel (RF13) quedó postergada: los informes se descargan en JSON |
+| Panel del tallerista | Completo y conectado a la API. Incluye la gestión de material y tareas y la corrección de entregas. Los informes se descargan en JSON (RF13 postergado) |
 | Panel del alumno | Completo y conectado a la API, incluida la asistencia |
 | Pantalla de acceso (`frontend/index.html`) | Acceso por correo y contraseña, autenticación contra la API y redirección por rol |
 | Base de datos | Script con las trece tablas y datos de prueba en `backend/api-completa/DataBase/inau_talleres.sql`, ejecutado en el entorno Docker |
