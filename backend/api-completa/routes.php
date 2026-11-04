@@ -429,6 +429,19 @@ $router->add(
     'admin|tallerista'
 );
 
+// ---- Datos sensibles (RF24) ---------------------------------------
+
+// Inventario de los datos sensibles que guarda la plataforma.
+// Devuelve cantidades y descripciones, nunca valores personales.
+
+$router->add(
+    'GET',
+    '/datos-sensibles',
+    'DatoSensibleController',
+    'index',
+    'admin'
+);
+
 
 
 // ------------------------------------------------------------------
