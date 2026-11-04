@@ -1,5 +1,7 @@
 # Registro de pruebas 02 — TheNewfutures / INAU
 
+<br>
+
 ## Sistema de Gestión de Talleres en Convenio con INAU
 
 > **Qué es este documento.** Registra la segunda ronda de pruebas, ejecutada después de los cambios de código posteriores a `Testing-01.md`: cambio de contraseña (`PATCH /perfil/clave`), asistencia real del alumno (`GET /mis-asistencias`), validación de cédula y teléfono, y modal para quitar alumnos de un taller. Además vuelve a probar el defecto DEF-01. Igual que en `Testing-01.md`, los resultados esperados se toman de los requerimientos (`docs/02-analisis/requerimientos.md`). Cuando no coinciden con lo obtenido, la diferencia se registra como defecto. `Testing-01.md` se conserva sin cambios como registro de la primera ronda.

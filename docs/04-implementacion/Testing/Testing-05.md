@@ -1,5 +1,7 @@
 # Registro de pruebas 05 — Verificación de las correcciones de alta prioridad
 
+<br>
+
 ## Sistema de Gestión de Talleres en Convenio con INAU — TheNewfutures
 
 > **Qué es este documento.** Registra la quinta ronda de pruebas, que verifica las correcciones de los defectos de alta prioridad que quedaron abiertos en `Testing-04.md`: el enlace al archivo entregado en la pantalla de corrección (DEF-15), el límite de intentos de inicio de sesión (DEF-11), el cierre de las sesiones abiertas al cambiar la contraseña (`Mecanismos_Autenticacion_Criptografia_INAU.md`, sección 4.5) y la filtración de errores internos de la API (Revisión de Coherencia 4.7). Incluye además una regresión de las rutas principales, para comprobar que los cambios no afectaron el resto del sistema. Los resultados se registran tal como los devolvió el sistema. `Testing-01.md` a `Testing-04.md` se conservan sin cambios.

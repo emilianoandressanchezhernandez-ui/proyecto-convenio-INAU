@@ -1,5 +1,7 @@
 # Registro de pruebas 03 — Rendimiento y carga
 
+<br>
+
 ## Sistema de Gestión de Talleres en Convenio con INAU — TheNewfutures
 
 > **Qué es este documento.** Registra las pruebas de rendimiento y de carga del sistema, que quedaron pendientes en `Testing-01.md` (NRF02 y NRF03). Mide dos cosas: el tiempo de respuesta sin carga y cuántas solicitudes simultáneas soporta el sistema antes de colapsar. La prueba se llevó deliberadamente hasta el punto de falla. Los valores se registran tal como los devolvieron las herramientas. `Testing-01.md` y `Testing-02.md` se conservan sin cambios.

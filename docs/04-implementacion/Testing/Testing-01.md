@@ -1,5 +1,7 @@
 # Plan y registro de pruebas — TheNewfutures / INAU
 
+<br>
+
 ## Sistema de Gestión de Talleres en Convenio con INAU
 
 > **Qué es este documento.** Registra las pruebas de la primera versión del sistema, cada una vinculada al requerimiento que verifica, con el resultado obtenido al ejecutarlas. Los resultados esperados se toman de los requerimientos (`docs/02-analisis/requerimientos.md`), no del comportamiento actual del código; cuando no coinciden, la diferencia se registra como defecto.
