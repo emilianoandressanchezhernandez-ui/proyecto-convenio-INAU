@@ -4,7 +4,7 @@
 
 ## Sistema de Gestión de Talleres en Convenio con INAU — TheNewfutures
 
-> **Qué es este documento.** Registra la quinta ronda de pruebas, que verifica las correcciones de los defectos de alta prioridad que quedaron abiertos en `Testing-04.md`: el enlace al archivo entregado en la pantalla de corrección (DEF-15), el límite de intentos de inicio de sesión (DEF-11), el cierre de las sesiones abiertas al cambiar la contraseña (`Mecanismos_Autenticacion_Criptografia_INAU.md`, sección 4.5) y la filtración de errores internos de la API (Revisión de Coherencia 4.7). Incluye además una regresión de las rutas principales, para comprobar que los cambios no afectaron el resto del sistema. Los resultados se registran tal como los devolvió el sistema. `Testing-01.md` a `Testing-04.md` se conservan sin cambios.
+> **Qué es este documento.** Quinta ronda de pruebas. Verifica las correcciones de los defectos de alta prioridad abiertos en `Testing-04.md` e incluye una regresión de las rutas principales.
 
 ---
 
@@ -14,15 +14,23 @@
 
 | Elemento | Valor |
 |---|---|
-| Fechas de ejecución | 01/11/2026 (21:50 a 23:50) y 02/11/2026 (12:28 a 12:42) |
-| Rama | `cambios-frontend` |
-| Commits verificados | `767ba3e` y `feae87b` (DEF-15), `52743cc` (DEF-11), `e039725` (sesiones), `bb7a254`, `43f0e87`, `9c7647a`, `2da95d9` y `616421b` (Revisión 4.7). Las pruebas en el servidor se ejecutaron sobre `2da95d9`; el commit `616421b` se verificó en el código |
+| Fecha de ejecución | 01/11/2026 (21:50 a 23:50) y 02/11/2026 (12:28 a 12:42) |
+| Rama / commit | `cambios-frontend` / `767ba3e` y `feae87b` (DEF-15), `52743cc` (DEF-11), `e039725` (sesiones), `bb7a254`, `43f0e87`, `9c7647a`, `2da95d9` y `616421b` (Revisión 4.7). Las pruebas en el servidor se ejecutaron sobre `2da95d9`; el commit `616421b` se verificó en el código |
 | Servidor | Máquina virtual con Ubuntu Server en VirtualBox (`one-security-mark01`), API y MySQL 8.4 en Docker, frontend servido por Nginx. Actualizado después de cada corrección según el Paso 10 de `Documento de Reconstruccion - Servidor.md`; en los cambios del backend, con `docker compose up -d --build` y revisión de sintaxis (`php -l`) dentro del contenedor |
 | Sitio | `http://192.168.1.5` (red local) |
 | Navegador | Google Chrome en Windows; ventana de incógnito para las pruebas con dos sesiones simultáneas |
 | Ejecutado por | Ejecución asistida por IA (Claude, mediante la extensión Claude en Chrome), supervisada por Gabriel Rendon (subcoordinador). Los inicios de sesión, el cambio de contraseña y los comandos del servidor los realizó el supervisor |
 
-**Método.** Cada corrección se probó en la interfaz y con peticiones directas a la API desde la sesión del navegador. Para no guardar archivos en el equipo, las descargas se verificaron hasta el último paso (petición a la API, tipo y tamaño del archivo recibido y nombre con el que se guardaría), interceptando el clic final. Las pruebas de límite de intentos usaron **correos inexistentes** (`def11.prueba.*@example.com`, `def11.final.*@example.com`) para no bloquear cuentas reales. Las pruebas que provocan errores de base de datos usaron datos que la base rechaza, por lo que no crearon ni modificaron registros.
+**Método.** Se verifican el enlace al archivo entregado en la pantalla de corrección (DEF-15), el límite de intentos de inicio de sesión (DEF-11), el cierre de las sesiones abiertas al cambiar la contraseña (`Mecanismos_Autenticacion_Criptografia_INAU.md`, sección 4.5) y la filtración de errores internos de la API (Revisión de Coherencia 4.7); la regresión comprueba que los cambios no afectaron el resto del sistema. Cada corrección se probó en la interfaz y con peticiones directas a la API desde la sesión del navegador. Para no guardar archivos en el equipo, las descargas se verificaron hasta el último paso (petición a la API, tipo y tamaño del archivo recibido y nombre con el que se guardaría), interceptando el clic final. Las pruebas de límite de intentos usaron **correos inexistentes** (`def11.prueba.*@example.com`, `def11.final.*@example.com`) para no bloquear cuentas reales. Las pruebas que provocan errores de base de datos usaron datos que la base rechaza, por lo que no crearon ni modificaron registros. Los resultados se registran tal como los devolvió el sistema. `Testing-01.md` a `Testing-04.md` se conservan sin cambios.
+
+**Datos de prueba** (las contraseñas no se publican):
+
+| Rol o registro | Usuario | Uso en esta ronda |
+|---|---|---|
+| Administrador | carlos.perez@inau.gov.uy | Cambio de contraseña con dos sesiones abiertas (CP-10 y CP-11); desactivación de Martín (CP-12); errores de base de datos (CP-14 a CP-18); regresión (CP-19) |
+| Tallerista | martin.rodriguez@ejemplo.com | Archivo entregado en la pantalla de corrección (CP-01 a CP-03); sesión abierta al ser desactivado (CP-12); permisos (CP-13) |
+| Taller "Taller T4" (id 3) y tarea "T4 Tarea entrega JPG" (id 7), creados en `Testing-04.md` | — | Errores de base de datos (CP-14 y CP-15); archivo entregado (CP-01 y CP-02) |
+| Correos inexistentes | `def11.prueba.*@example.com`, `def11.final.*@example.com` | Límite de intentos de inicio de sesión (CP-05 a CP-08) |
 
 ---
 
@@ -85,7 +93,7 @@
 
 ## 4. Defectos
 
-### 4.1 Estado de los defectos verificados
+### 4.1 Estado de los defectos anteriores
 
 | ID | Descripción | Estado tras esta ronda |
 |---|---|---|

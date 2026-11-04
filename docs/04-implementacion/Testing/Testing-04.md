@@ -4,7 +4,7 @@
 
 ## Sistema de Gestión de Talleres en Convenio con INAU — TheNewfutures
 
-> **Qué es este documento.** Registra la cuarta ronda de pruebas, ejecutada después de las correcciones de código del 01/11/2026. Tiene tres objetivos: verificar esas correcciones, repetir la prueba de todas las funciones de los tres roles (regresión completa) y cubrir lo que no se había probado en las rondas anteriores. Los resultados esperados se toman de los requerimientos (`requerimientos.md`); los obtenidos se registran tal como los devolvió el sistema. `Testing-01.md` a `Testing-03.md` se conservan sin cambios.
+> **Qué es este documento.** Cuarta ronda de pruebas. Verifica las correcciones del 01/11/2026, repite la prueba de todas las funciones de los tres roles y cubre lo no probado en rondas anteriores.
 
 ---
 
@@ -23,7 +23,9 @@
 
 <br>
 
-**Método.** Cada función se probó por la interfaz y, además, con peticiones directas a la API desde la misma sesión del navegador, para comprobar que el servidor aplica las reglas aunque se omita la pantalla. Las pruebas que crean, modifican, desactivan o finalizan datos se hicieron sobre **registros creados para esta prueba**, para no alterar los datos de ejemplo:
+**Método.** Cada función se probó por la interfaz y, además, con peticiones directas a la API desde la misma sesión del navegador, para comprobar que el servidor aplica las reglas aunque se omita la pantalla. Los resultados esperados se toman de los requerimientos (`requerimientos.md`); los obtenidos se registran tal como los devolvió el sistema. `Testing-01.md` a `Testing-03.md` se conservan sin cambios.
+
+**Datos de prueba** (las contraseñas no se publican): las pruebas que crean, modifican, desactivan o finalizan datos se hicieron sobre **registros creados para esta prueba**, para no alterar los datos de ejemplo:
 
 <br>
 
@@ -34,7 +36,7 @@
 | Taller "Taller T4" (id 3) | Altas, asignaciones, asistencia, reportes, finalización |
 | Tareas "T4 Tarea de prueba" (id 4) y "T4 Tarea entrega JPG" (id 7), en el taller 1 | Adjuntos, entregas en PDF y JPG, corrección |
 
-Los usuarios de ejemplo (Carlos, Martín y Sofía) se usaron para iniciar sesión. Las contraseñas y los teléfonos que se modificaron durante las pruebas se restauraron a su valor original.
+Los usuarios de ejemplo (Carlos, Martín y Sofía) se usaron para iniciar sesión.
 
 ---
 
@@ -201,6 +203,6 @@ Los usuarios de ejemplo (Carlos, Martín y Sofía) se usaron para iniciar sesió
 
 **Limitaciones:** pruebas manuales y asistidas, sin pruebas automatizadas; un solo navegador; vista de teléfono simulada; datos de prueba, no datos reales de INAU.
 
-**Datos que quedaron en el servidor de prueba:** talleristas 7 ("Dup T4", duplicado de Martín) y 8 ("Tallerista Cuatro"); alumnos 6 ("Dup T4", inactivo) y 7 ("Alumno Cuatro"); taller 3 ("Taller T4", finalizado) con sus asistencias; reportes 1 a 3; tareas 4 y 7 del taller 1, con las entregas y notas de Sofía; y la asistencia del 01/11 del taller 1.
+**Datos del servidor de prueba:** las contraseñas y los teléfonos que se modificaron durante las pruebas se restauraron a su valor original. Quedaron en el servidor: talleristas 7 ("Dup T4", duplicado de Martín) y 8 ("Tallerista Cuatro"); alumnos 6 ("Dup T4", inactivo) y 7 ("Alumno Cuatro"); taller 3 ("Taller T4", finalizado) con sus asistencias; reportes 1 a 3; tareas 4 y 7 del taller 1, con las entregas y notas de Sofía; y la asistencia del 01/11 del taller 1.
 
 **Documentos relacionados:** `Testing-01.md`, `Testing-02.md`, `Testing-03.md`, `requerimientos.md`, `api.md`, `Documento de Reconstruccion - Servidor.md`, `Hardening de Infraestructura y Contenedores.md` y `Revision_Coherencia_INAU.md`.

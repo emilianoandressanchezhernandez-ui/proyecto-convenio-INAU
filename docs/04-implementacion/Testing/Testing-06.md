@@ -4,7 +4,7 @@
 
 ## Sistema de Gestión de Talleres en Convenio con INAU — TheNewfutures
 
-> **Qué es este documento.** Registra la sexta ronda de pruebas. Verifica las correcciones de los defectos de prioridad media que seguían abiertos después de `Testing-05.md`, las correcciones de los hallazgos de `Hardening de Infraestructura y Contenedores.md`. También deja constancia de que DEF-02 se posterga. Incluye una prueba completa del sistema con los tres roles, que sirve además como regresión de las correcciones de `Testing-05.md`. Los resultados se registran tal como los devolvió el sistema. `Testing-01.md` a `Testing-05.md` se conservan sin cambios.
+> **Qué es este documento.** Sexta ronda de pruebas. Verifica las correcciones de prioridad media y del hardening, e incluye una prueba completa del sistema con los tres roles.
 
 ---
 
@@ -14,15 +14,23 @@
 
 | Elemento | Valor |
 |---|---|
-| Fechas | Correcciones: del 02/11/2026 al 04/11/2026. Prueba completa: 04/11/2026, hasta las 12:35 |
-| Rama | `cambios-frontend` |
-| Commits verificados | `b992ac2`, `3d32378`, `a9179fa`, `1ff8170` y `0ebc5ed` (DEF-10, DEF-12 y DEF-13); `ce23286` (DEF-07); `25c453f` (DEF-09); `fbc9612` (H-01); `829d1ae` (H-02, H-03, H-04 y contraseñas de MySQL); `b6144d6` (H-05); `2f35d21` (DEF-06); `222722c` (DEF-16); `ceff0a0` (retiro del inventario de datos sensibles, ver 2.8); `fe516e8` (detalle del alumno en el panel del administrador). La prueba completa se ejecutó sobre `fe516e8` |
+| Fecha de ejecución | Correcciones: del 02/11/2026 al 04/11/2026. Prueba completa: 04/11/2026, hasta las 12:35 |
+| Rama / commit | `cambios-frontend` / `b992ac2`, `3d32378`, `a9179fa`, `1ff8170` y `0ebc5ed` (DEF-10, DEF-12 y DEF-13); `ce23286` (DEF-07); `25c453f` (DEF-09); `fbc9612` (H-01); `829d1ae` (H-02, H-03, H-04 y contraseñas de MySQL); `b6144d6` (H-05); `2f35d21` (DEF-06); `222722c` (DEF-16); `ceff0a0` (retiro del inventario de datos sensibles, ver 2.8); `fe516e8` (detalle del alumno en el panel del administrador). La prueba completa se ejecutó sobre `fe516e8` |
 | Servidor | Máquina virtual con Ubuntu Server en VirtualBox (`one-security-mark01`), API y MySQL 8.4 en Docker y frontend servido por Nginx. Se actualizó según el Paso 10 de `Documento de Reconstruccion - Servidor.md`; en los cambios del backend se reconstruyeron los contenedores con `docker compose up -d --build` |
 | Sitio | `http://192.168.1.7` (red local). La dirección del servidor cambió durante el período (la asigna el router por DHCP) |
 | Navegador | Google Chrome en Windows |
 | Ejecutado por | Ejecución asistida por IA (Claude, mediante la extensión Claude en Chrome), supervisada por Gabriel Rendon (subcoordinador). Los inicios de sesión, los cambios de contraseña y los comandos del servidor los realizó el supervisor |
 
-**Método.** Cada corrección se revisó en el código al subirse al repositorio y se probó en el servidor durante la prueba completa del 04/11/2026: en la interfaz y con peticiones directas a la API desde la sesión del navegador. Como en `Testing-05.md`, las descargas se verificaron hasta el último paso (petición a la API, tipo y tamaño del archivo recibido y nombre con el que se guardaría), interceptando el clic final para no guardar archivos en el equipo. Las validaciones del cambio de contraseña se probaron con **valores inventados**, por lo que ninguna contraseña cambió durante las pruebas. Los casos que modifican datos se revirtieron al terminar.
+**Método.** Se verifican las correcciones de los defectos de prioridad media que seguían abiertos después de `Testing-05.md` y las de los hallazgos de `Hardening de Infraestructura y Contenedores.md`, y se deja constancia de que DEF-02 se posterga. La prueba completa con los tres roles sirve además como regresión de las correcciones de `Testing-05.md`. Cada corrección se revisó en el código al subirse al repositorio y se probó en el servidor durante la prueba completa del 04/11/2026: en la interfaz y con peticiones directas a la API desde la sesión del navegador. Como en `Testing-05.md`, las descargas se verificaron hasta el último paso (petición a la API, tipo y tamaño del archivo recibido y nombre con el que se guardaría), interceptando el clic final para no guardar archivos en el equipo. Las validaciones del cambio de contraseña se probaron con **valores inventados**, por lo que ninguna contraseña cambió durante las pruebas. Los casos que modifican datos se revirtieron al terminar. Los resultados se registran tal como los devolvió el sistema. `Testing-01.md` a `Testing-05.md` se conservan sin cambios.
+
+**Datos de prueba** (las contraseñas no se publican):
+
+| Rol o registro | Usuario | Uso en esta ronda |
+|---|---|---|
+| Administrador | carlos.perez@inau.gov.uy | Cambio de contraseña (CP-12); cédula repetida (CP-17); datos personales (CP-25 a CP-27); recorrido del panel (CP-29 a CP-31) |
+| Tallerista | martin.rodriguez@ejemplo.com | Cambio de contraseña (CP-12); eliminar una nota (CP-14); material con adjuntos (CP-15); recorrido del panel (CP-32 a CP-34) |
+| Alumno | sofia.pereira@email.com | Detalle del taller, tareas y asistencia (CP-01 a CP-07); cambio de contraseña y perfil (CP-08 a CP-11 y CP-13); acceso a datos ajenos (CP-35) |
+| Tareas "T4 Tarea de prueba" (id 4) y "T4 Tarea entrega JPG" (id 7), creadas en `Testing-04.md` | — | Archivos de la consigna (CP-04 a CP-07) |
 
 ---
 
@@ -126,7 +134,7 @@ No se probó. El equipo decidió postergar la exportación a PDF y Excel, porque
 
 ## 4. Defectos
 
-### 4.1 Estado de los defectos
+### 4.1 Estado de los defectos anteriores
 
 | ID | Descripción | Estado tras esta ronda |
 |---|---|---|
@@ -147,7 +155,7 @@ Los defectos DEF-11, DEF-14 y DEF-15, y los de la Revisión 4.7 y de Mecanismos 
 
 ### 4.2 Defectos nuevos
 
-| ID | Caso | Descripción | Prioridad | Estado | Ubicación |
+| ID | Caso | Descripción | Severidad | Estado | Referencia |
 |---|---|---|---|---|---|
 | DEF-17 | CP-29 | En las tablas del panel del administrador, el texto de los encabezados es blanco sobre fondo blanco y no se lee. La regla `.table thead th` define el color del texto, pero Bootstrap pinta el fondo de las celdas | Baja | Abierto | `frontend-admin/css/styles.css`, línea 279 |
 

@@ -650,6 +650,11 @@ function abrirModalCorregirEntrega(entregaId) {
 
         return;
     }
+    
+    colocarTextoCorreccion(
+        "corregir-alumno",
+        obtenerNombreAlumnoCorreccion(entregaSeleccionada)
+    );
 
     const contenedorArchivo = document.getElementById(
         "corregir-archivo"
