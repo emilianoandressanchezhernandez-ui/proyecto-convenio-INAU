@@ -1,10 +1,10 @@
-# Plan y registro de pruebas — TheNewfutures / INAU
+# Registro de pruebas 01 — Primera versión del sistema
 
 <br>
 
-## Sistema de Gestión de Talleres en Convenio con INAU
+## Sistema de Gestión de Talleres en Convenio con INAU — TheNewfutures
 
-> **Qué es este documento.** Registra las pruebas de la primera versión del sistema, cada una vinculada al requerimiento que verifica, con el resultado obtenido al ejecutarlas. Los resultados esperados se toman de los requerimientos (`docs/02-analisis/requerimientos.md`), no del comportamiento actual del código; cuando no coinciden, la diferencia se registra como defecto.
+> **Qué es este documento.** Primera ronda de pruebas del sistema. Cada caso se vincula al requerimiento que verifica, según `requerimientos.md`.
 
 ---
 
@@ -12,20 +12,18 @@
 
 ## 1. Alcance y entorno
 
-Se prueban los requerimientos de la primera versión desde la interfaz de cada rol. Algunos resultados se confirmaron además con consultas a la API hechas desde la misma sesión del navegador. No se prueban los requerimientos postergados por plazo (RF15, RF18, RF20, RF21, RF23 y RF26) ni el alcance excluido.
-
 | Elemento | Valor |
 |---|---|
 | Fecha de ejecución | 24/10/2026 |
 | Rama / commit | `cambios-frontend` / `ff403b5` |
 | Servidor | Máquina virtual con Ubuntu Server en VirtualBox, desplegada según `Documento de Reconstruccion - Servidor.md` (API y MySQL 8.4 en Docker; frontend servido por Nginx) |
 | Sitio | `http://192.168.1.14` (red local) |
-| Navegador y dispositivos | Google Chrome en Windows; vista de teléfono simulada con un ancho de 375 px |
+| Navegador | Google Chrome en Windows; vista de teléfono simulada con un ancho de 375 px |
 | Ejecutado por | Ejecución asistida por IA (Claude, mediante la extensión Claude en Chrome), supervisada por Gabriel Rendon (subcoordinador). |
 
-**Datos de prueba** (cargados por `backend/api-completa/DataBase/inau_talleres.sql`; las contraseñas no se publican):
+**Método.** Se prueban los requerimientos de la primera versión desde la interfaz de cada rol. Algunos resultados se confirmaron además con consultas a la API hechas desde la misma sesión del navegador. Los resultados esperados se toman de los requerimientos (`docs/02-analisis/requerimientos.md`), no del comportamiento actual del código; cuando no coinciden, la diferencia se registra como defecto. No se prueban los requerimientos postergados por plazo (RF15, RF18, RF20, RF21, RF23 y RF26) ni el alcance excluido.
 
-<br>
+**Datos de prueba** (cargados por `backend/api-completa/DataBase/inau_talleres.sql`; las contraseñas no se publican):
 
 | Rol | Usuario | Relación |
 |---|---|---|
@@ -82,7 +80,13 @@ Se prueban los requerimientos de la primera versión desde la interfaz de cada r
 
 <br>
 
-## 4. Defectos encontrados
+## 4. Defectos
+
+### 4.1 Estado de los defectos anteriores
+
+No corresponde: es la primera ronda de pruebas.
+
+### 4.2 Defectos nuevos
 
 | ID | Caso | Descripción | Severidad | Estado | Referencia |
 |---|---|---|---|---|---|
@@ -107,13 +111,23 @@ Se prueban los requerimientos de la primera versión desde la interfaz de cada r
 | No funcionales y seguridad | 7 | 6 | 0 | 1 | 0 |
 | **Total** | **23** | **15** | **3** | **5** | **0** |
 
-**Criterios:** *Aprobado*, el resultado coincide con el esperado; *Parcial*, funciona con limitaciones que se indican; *Fallido*, no coincide y se registra en la sección 4; *No ejecutado*, no se pudo probar y se indica el motivo.
+**Criterios:** \
+    - **Aprobado**, el resultado coincide con el esperado.\
+    - **Parcial**, funciona con limitaciones que se indican. \
+    - **Fallido**, no coincide y se registra en la sección 4.2. \
+    - **No ejecutado**, no se pudo probar y se indica el motivo.
+
+**Conclusión.** De 23 casos, 15 se aprobaron, 3 fueron parciales y 5 fallaron. Los fallos corresponden a la asistencia del alumno con datos simulados, la exportación de informes en JSON, la falta del listado de alumnos, del informe de talleristas y de la consulta de datos sensibles, y el rechazo de documentos de oficina (cerrado después al modificarse NRF11, CC-13). Los casos parciales corresponden a funciones que la API admite pero la interfaz no ofrece (adjuntar archivos al material y eliminar una nota) y a la falta del archivo del adjunto de ejemplo. Los defectos se registran en la sección 4.2.
 
 **Observaciones de la ejecución:**
 - Las confirmaciones del navegador ("¿Desea quitar…?", "¿Querés eliminar…?", "¿Desea cerrar sesión?") se aceptaron automáticamente durante la ejecución asistida.
 - En el formulario de edición de alumnos del administrador, la cédula aparece como solo lectura.
 - En el entorno probado, los puertos de la API (8002) y de MySQL (3308) quedaron publicados en todas las interfaces de la máquina virtual (`0.0.0.0`), porque el `.env` del servidor no los restringe a `127.0.0.1` como indica la guía de despliegue. Corregido después de las pruebas: los puertos se limitaron a `127.0.0.1` y se verificó con Nmap (`Doc NMAP.md`, sección 10).
 
-**Limitaciones:** las pruebas fueron manuales y asistidas, sin pruebas automatizadas; no se probaron rendimiento (NRF03) ni disponibilidad continua (NRF02); la vista de teléfono fue simulada; se usaron los datos de prueba del script, no datos reales de INAU.
+**No ejecutado:** las pruebas de rendimiento (NRF03) y de disponibilidad continua (NRF02).
+
+**Limitaciones:** las pruebas fueron manuales y asistidas, sin pruebas automatizadas; la vista de teléfono fue simulada; se usaron los datos de prueba del script, no datos reales de INAU.
+
+**Datos del servidor de prueba:** esta ronda creó el tallerista "Prueba Tallerista", la alumna "Lucía Prueba" y el "Taller de Pruebas" (CP-04), además de la asistencia (CP-07), la tarea (CP-09; el material se eliminó en el mismo caso), la entrega corregida (CP-10 y CP-11) y los dos reportes (CP-12). Los registros comprobados en NF-07 se conservaron después de reiniciar los contenedores.
 
 **Documentos relacionados:** `requerimientos.md`, `Documento de Reconstruccion - Servidor.md`, `Revision_Coherencia_INAU.md`, `Control_de_Cambios.md`, `Doc NMAP.md` y `Hardening de Infraestructura y Contenedores.md`.
