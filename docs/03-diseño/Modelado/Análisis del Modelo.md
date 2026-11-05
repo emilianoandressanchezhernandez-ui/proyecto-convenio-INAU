@@ -96,7 +96,7 @@ Una vez generado, el informe puede exportarse con `exportarPDF()` o `exportarExc
 
 **Decisión que se pone a prueba:** el atributo `fechaInscripcion` de la clase `Inscripcion` resulta indispensable en este paso. Un informe de asistencia por rango de fechas debe considerar únicamente las jornadas posteriores a la incorporación de cada alumno al taller; sin ese dato, un alumno inscripto a mitad del período figuraría como ausente en todas las jornadas previas a su ingreso, distorsionando el resultado.
 
-La multiplicidad **0..1** entre `Taller` e `Informe` también se justifica acá: el listado general de alumnos y el informe de talleristas son de alcance global y no corresponden a ningún taller en particular.
+La multiplicidad **0..1** entre `Taller` e `Informe` también se justifica acá: el informe general (RF12) es de alcance global y no corresponde a ningún taller en particular.
 
 <br>
 
@@ -127,7 +127,7 @@ Este registro no se activa desde las clases del dominio sino desde la capa de se
 
 incluidos los que no provienen de un requerimiento funcional: `RegistroTrazabilidad` y la asociación entre `RegistroAsistencia` y `Usuario`, derivados de NRF10; los métodos `validarFormato()` y `validarTamano()`, derivados de NRF11 y NRF12; y los métodos `estaCompleta()` y `generarNombreSeguro()`, señalados explícitamente como derivados de la operativa.
 
-Los cuatro requerimientos restantes del alcance de la primera versión se ejercitan de forma transversal: RF01 al inicio de cada paso mediante la autenticación, RF14 cuando cualquier usuario edita su perfil, y RF24 y RF25 como consultas del administrador y del tallerista sobre información ya registrada.
+Los cinco requerimientos restantes del alcance de la primera versión se ejercitan de forma transversal: RF01 al inicio de cada paso mediante la autenticación, RF14 cuando cualquier usuario edita su perfil, RF23 cuando el alumno consulta la nota y la devolución registradas en el paso 6, y RF24 y RF25 como consultas del administrador y del tallerista sobre información ya registrada.
 
 **Conclusión del análisis:** el circuito operativo completo se resuelve con las 15 clases del modelo, sin requerir estructuras adicionales. Las decisiones de diseño que en el momento de tomarlas podían parecer sobreabundantes —la separación de la asistencia en dos niveles, la especialización de material y tarea, la fecha de inscripción— encuentran su justificación funcional en un paso concreto del circuito.
 
@@ -147,7 +147,7 @@ Al contrastar la entrevista con la lista de requerimientos funcionales se advirt
 |---|---|---|---|
 | Eliminación de material, calificaciones y asistencia por parte del tallerista | *"Puede eliminar material, notas y asistencia"* | RF16, RF17, RF18 → métodos `eliminarMaterial()`, `eliminarNota()` y `eliminarAsistencia()` | RF16 y RF17 incluidos; RF18 postergado |
 | Comunicación del tallerista con los alumnos | *"comunicarse con los alumnos"* | Formalizada como requerimiento | Excluida por complejidad de implementación |
-| Cuatro de los siete reportes solicitados | Sección de reportes: listas de alumnos, histórico de calificaciones, información de alumnos y de talleristas | RF19 a RF22 → métodos de generación en `Administrador` | RF19 y RF22 incluidos; RF20 y RF21 postergados |
+| Cuatro de los siete reportes solicitados | Sección de reportes: listas de alumnos, histórico de calificaciones, información de alumnos y de talleristas |RF19 a RF22 → métodos de `Administrador`; en la primera versión, RF19 y RF22 se resuelven como consultas en pantalla | RF19 y RF22 incluidos; RF20 y RF21 postergados |
 | Visualización de las notas por parte del alumno | *"puede ver... las notas que le dejó el tallerista asignado"* | RF23 → método `visualizarNotas()` | Incluido (postergado al principio) |
 | Consulta de datos sensibles | *"Se debe consultar: datos sensibles usados"* | RF24 → método `consultarDatosSensibles()` | Incluido |
 | Consulta del listado de alumnos por el tallerista | *"quién está en su taller"* | RF25 → método `consultarAlumnosDeTaller()` | Incluido |

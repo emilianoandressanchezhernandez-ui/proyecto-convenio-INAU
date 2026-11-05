@@ -38,6 +38,7 @@ Se aplicó el método de derivación en cinco pasos a partir de los requerimient
 | RF17 | tallerista, nota, alumno |
 | RF19 | listado, alumnos |
 | RF22 | informe, información, talleristas |
+| RF23 | alumno, notas, tallerista |
 | RF24 | administrador, datos sensibles, plataforma |
 | RF25 | tallerista, listado, alumnos, taller |
 
@@ -361,7 +362,7 @@ Este criterio evita que las clases de rol concentren la totalidad del comportami
 | `generarInformeCalificaciones()` **(v2)** | "histórico de calificaciones" | RF20 | Excluido de la primera versión. |
 | `generarInformeDetalladoAlumnos()` **(v2)** | "información detallada de los alumnos" | RF21 | Excluido de la primera versión. |
 
-**Justificación de la ubicación de los métodos de generación de informes:** el administrador es quien inicia la acción y el informe constituye su resultado, no su ejecutor. Estos métodos producen instancias de `Informe`.
+**Justificación de la ubicación de los métodos de generación de informes:** el administrador es quien inicia la acción y el informe constituye su resultado, no su ejecutor. Los métodos de RF11 y RF12 producen instancias de `Informe`; `generarListadoAlumnos()` y `generarInformeTalleristas()` se resuelven en la primera versión como consultas en pantalla, en los paneles Alumnos y Talleristas, sin generar un `Informe` (CC-16).
 
 <br>
 
@@ -752,7 +753,7 @@ Las siguientes decisiones no derivan del modelo conceptual sino de la implementa
 | Decisión | Justificación |
 |---|---|
 | `usuarios.especialidad` admite valor nulo | Consecuencia directa de la estrategia de tabla única: el atributo pertenece a `Tallerista`, por lo que queda vacío en las filas correspondientes a administradores y alumnos. Es el costo asumido al absorber las subclases en una sola tabla (ver 5.2). |
-| `reportes.contenido` se almacena como estructura de datos variable | Cada tipo de informe consolida columnas distintas: el de asistencia agrupa por taller y fecha, el listado de alumnos enumera participantes, el de talleristas incluye especialidad. Definir una tabla por tipo de informe multiplicaría la estructura sin necesidad, dado que el contenido solo se lee al exportarlo y nunca se consulta por campos individuales. |
+| `reportes.contenido` se almacena como estructura de datos variable | Cada tipo de informe consolida datos distintos: el de asistencia resume los registros de un taller y el general, los totales del sistema. Definir una tabla por tipo de informe multiplicaría la estructura sin necesidad, dado que el contenido se lee completo al mostrar o descargar el informe y nunca se consulta por campos individuales. |
 | `trazabilidad` referencia las entidades de forma genérica mediante `entidad` y `entidad_id`, sin clave foránea | NRF10 exige auditar acciones sobre cualquier clase del modelo. Una clave foránea obligaría a una columna por cada tabla auditada, o bien a una tabla de historial independiente por entidad. La referencia genérica permite registrar acciones sobre cualquier entidad con una única estructura. Se asume como contrapartida que la base de datos no puede verificar la integridad de esas referencias, verificación que corresponde a la capa de aplicación. |
 | Las tablas intermedias incorporan una clave primaria propia además de la restricción de unicidad sobre el par | La alternativa habitual es una clave primaria compuesta por ambas claves foráneas. Se optó por un identificador propio para mantener uniformidad con el resto de las tablas y simplificar las referencias desde la aplicación, conservando la restricción `UNIQUE` sobre el par, que es la que garantiza la regla de negocio. |
 | Se incorporan índices sobre las columnas de filtrado frecuente (`estado`, `rol`, `tipo`, `fecha`) | NRF03 exige rapidez en las operaciones habituales. Los listados e informes filtran de forma recurrente por estas columnas, por lo que los índices reducen el tiempo de respuesta sin afectar el modelo conceptual. |
