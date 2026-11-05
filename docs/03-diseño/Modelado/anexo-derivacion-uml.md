@@ -38,6 +38,7 @@ Se aplicó el método de derivación en cinco pasos a partir de los requerimient
 | RF17 | tallerista, nota, alumno |
 | RF19 | listado, alumnos |
 | RF22 | informe, información, talleristas |
+| RF23 | alumno, notas, tallerista |
 | RF24 | administrador, datos sensibles, plataforma |
 | RF25 | tallerista, listado, alumnos, taller |
 
@@ -70,14 +71,14 @@ Se aplicó el método de derivación en cinco pasos a partir de los requerimient
 | 11 | **Tarea** | RF06, RF07, RF08, RF09, RF10 | Contenido que exige una entrega del alumno y admite calificación. |
 | 12 | **Entrega** | RF08, RF09, RF10, RF17 | Vincula a un alumno con una tarea y almacena su corrección y nota. |
 | 13 | **Adjunto** | RF06, RF08 | Archivo asociado a un contenido o a una entrega; requiere persistir ruta y metadatos. |
-| 14 | **Informe** | RF11, RF12, RF13, RF19, RF22 | Resultado consolidado de una consulta, exportable en distintos formatos. Ver 1.5. |
+| 14 | **Informe** | RF11, RF12, RF13 | Resultado consolidado de una consulta, exportable en distintos formatos. Ver 1.5. |
 | 15 | **RegistroTrazabilidad** | NRF10 | Registro de una acción relevante ejecutada por un usuario. Ver 1.6. |
 
 <br>
 
 ### 1.4 Decisiones de modelado
 
-**Usuario, Administrador y Tallerista se modelan mediante herencia.** RF01 exige distinguir tres roles con permisos diferenciados, pero los tres comparten los mismos datos de identificación y acceso. `Usuario` concentra esos atributos comunes como clase abstracta, y cada rol especializa el comportamiento. Solo `Tallerista` aporta un atributo propio (`especialidad`, requerido por RF22).
+**Usuario, Administrador y Tallerista se modelan mediante herencia.** RF01 exige distinguir tres roles con permisos diferenciados, pero los tres comparten los mismos datos de identificación y acceso. `Usuario` concentra esos atributos comunes; sus instancias directas son las cuentas de acceso de los alumnos, y `Administrador` y `Tallerista` especializan el comportamiento. Solo `Tallerista` aporta un atributo propio (`especialidad`, requerido por RF22).
 
 **Alumno no hereda de Usuario, se asocia a él.** El administrador registra al alumno como participante (RF02) antes de que este tenga cuenta de acceso, y RF07 y RF08 requieren que pueda ingresar al sistema. Por lo tanto, un alumno puede existir con o sin cuenta asociada: la relación correcta es una asociación opcional (0..1), no una herencia.
 
@@ -95,7 +96,7 @@ Se aplicó el método de derivación en cinco pasos a partir de los requerimient
 
 ### 1.5 Observación sobre la clase Informe
 
-Los requerimientos RF11, RF12, RF19 y RF22 establecen la generación de informes, y RF13 exige poder exportarlos en formato PDF o Excel. Esta última operación requiere que el informe exista como objeto con identidad propia: para exportarlo es necesario haberlo generado previamente, con sus datos consolidados, su tipo y su formato de salida.
+Los requerimientos RF11 y RF12 establecen la generación de informes, y RF13 exige poder exportarlos en formato PDF o Excel. Esta última operación requiere que el informe exista como objeto con identidad propia: para exportarlo es necesario haberlo generado previamente, con sus datos consolidados, su tipo y su formato de salida.(RF19 y RF22 se resuelven como consultas en pantalla; ver 3.2).
 
 Por ese motivo `Informe` se incorpora como clase del modelo y forma parte de la primera versión. Su persistencia habilita además el historial de informes emitidos, funcionalidad prevista para etapas posteriores, aunque ningún requerimiento de la primera versión exige conservarlos.
 
@@ -105,7 +106,7 @@ Por ese motivo `Informe` se incorpora como clase del modelo y forma parte de la 
 
 Es la única clase del modelo que no proviene de un requerimiento funcional, sino de NRF10: "el sistema debe registrar la trazabilidad de las acciones importantes realizadas por los usuarios".
 
-Se incorpora como clase porque la información debe persistirse y vincularse a un usuario. No obstante, y a diferencia de las restantes, **no participa de la lógica de negocio ni aporta métodos al dominio**: su registro corresponde a un mecanismo transversal de la capa de servicios, según se detalla en 3.16.
+Se incorpora como clase porque la información debe persistirse y vincularse a un usuario. No obstante, y a diferencia de las restantes, **no participa de la lógica de negocio ni aporta métodos al dominio**: su registro corresponde a un mecanismo transversal de la capa de servicios, según se detalla en 3.16. En la primera versión, la API todavía no registra acciones en ella (ver *Análisis del Modelo*, paso 8)..
 
 ---
 
@@ -120,7 +121,7 @@ Se incorpora como clase porque la información debe persistirse y vincularse a u
 
 <br>
 
-### 2.1 Usuario *(clase abstracta)*
+### 2.1 Usuario
 
 | Atributo | Origen | Justificación |
 |---|---|---|
@@ -157,11 +158,11 @@ Sin atributos propios. Se distingue de las demás especializaciones únicamente 
 | `nombre`, `apellido` | RF02, RF19 | Datos mínimos requeridos por el listado de alumnos. |
 | `estado` | RF02 | Baja lógica del participante. |
 | `fechaIngreso` | RF02 | Fecha de alta del alumno como participante del programa. Se completa en el momento del registro, por lo que forma parte de la primera versión, a diferencia del resto de los datos de la ficha detallada. |
-| `fechaNacimiento` **(v2)** | RF21 | Dato de la ficha detallada; permite además verificar edades en un contexto de menores. |
-| `correo`, `telefono`, `direccion` **(v2)** | RF21 | Datos de contacto de la ficha detallada. |
-| `referenteAdulto` **(v2)** | RF21 | Contacto adulto responsable, propio del contexto socioeducativo. |
-| `centroReferencia` **(v2)** | RF21 | Centro o programa al que pertenece el alumno. |
-| `observaciones` **(v2)** | RF21 | Campo libre de la ficha. |
+| `fechaNacimiento` | RF02, RF24 | Dato registrado en el alta; permite además verificar edades en un contexto de menores. |
+| `correo`, `telefono`, `direccion` | RF02, RF24 | Datos de contacto registrados por el administrador y consultables en el detalle del alumno. |
+| `referenteAdulto` | RF02, RF24 | Contacto adulto responsable, propio del contexto socioeducativo. |
+| `centroReferencia` | RF02, RF24 | Centro o programa al que pertenece el alumno. |
+| `observaciones` | RF02 | Campo libre de la ficha. |
 | `foto` **(v2)** | RF15 | RF15 permite al alumno eliminar su foto de perfil. |
 | `biografia` **(v2)** | RF15 | Ídem anterior. |
 
@@ -270,7 +271,7 @@ Sin atributos propios. Se distingue de la tarea por no requerir devolución ni a
 | Atributo | Origen | Justificación |
 |---|---|---|
 | `nombre` | RF11, RF12 | Identifica el informe generado. |
-| `tipo` | RF11, RF12, RF19, RF22 | Distingue entre informe de asistencia, de talleres, listado de alumnos e información de talleristas. |
+| `tipo` | RF11, RF12 | Distingue entre informe de asistencia e informe general de talleres. |
 | `fechaInicio`, `fechaFin` | RF11 | Delimitan el rango temporal del informe de asistencia. |
 | `fechaGeneracion` | RF13 | Momento de emisión del informe. |
 | `formato` | RF13 | RF13 contempla exportación en PDF o Excel. |
@@ -295,7 +296,6 @@ Sin atributos propios. Se distingue de la tarea por no requerir devolución ni a
 | Clase | Atributos (v2) | RF de origen |
 |---|---|---|
 | Alumno | `foto`, `biografia` | RF15 |
-| Alumno | `fechaNacimiento`, `correo`, `telefono`, `direccion`, `referenteAdulto`, `centroReferencia`, `observaciones` | RF21 |
 
 Los restantes requerimientos excluidos (RF18, RF20 y RF26) no aportan atributos nuevos: operan sobre datos ya presentes en el modelo. Tampoco RF23, incluido finalmente en la primera versión: únicamente requiere que el alumno pueda consultar el atributo nota de Entrega, incorporado por RF10.
 
@@ -326,7 +326,7 @@ Este criterio evita que las clases de rol concentren la totalidad del comportami
 
 <br>
 
-### 3.2 Usuario *(clase abstracta)*
+### 3.2 Usuario
 
 | Método | Verbo de origen | RF | Justificación |
 |---|---|---|---|
@@ -336,7 +336,7 @@ Este criterio evita que las clases de rol concentren la totalidad del comportami
 | `obtenerRol()` | "diferenciando el acceso según el rol" | RF01 | Necesario para determinar a qué panel se redirige al usuario tras el ingreso. |
 | `darDeBaja()` | "eliminar" | RF02 | Implementa la baja lógica modificando el estado, sin borrar el registro. |
 
-**Justificación de `autenticar()` en la clase abstracta:** aunque cada rol posee permisos distintos, el proceso de verificación de credenciales es idéntico para los tres. Diferenciarlo por rol duplicaría lógica innecesariamente; la distinción se produce después, en la redirección.
+**Justificación de `autenticar()` en la clase base:** aunque cada rol posee permisos distintos, el proceso de verificación de credenciales es idéntico para los tres. Diferenciarlo por rol duplicaría lógica innecesariamente; la distinción se produce después, en la redirección.
 
 <br>
 
@@ -353,16 +353,16 @@ Este criterio evita que las clases de rol concentren la totalidad del comportami
 | `eliminarTaller(id)` | "eliminar" | RF02 | Ídem. |
 | `asignarAlumnoATaller(alumnoId, tallerId)` | "asignar alumnos" | RF03 | RF03 atribuye la asignación exclusivamente al administrador. |
 | `asignarTalleristaATaller(talleristaId, tallerId)` | "asignar... talleristas" | RF03 | Ídem. |
-| `consultarDatosSensibles()` | "consultar los datos sensibles" | RF24 | RF24 restringe esta consulta al administrador. |
+| `consultarDatosSensibles()` | ... | RF24 | RF24 restringe esta consulta al administrador. Se implementa con el detalle de alumnos y talleristas del panel del administrador (CC-16). |
 | `generarInformeAsistencia(tallerId, desde, hasta)` | "generar informes de asistencia" | RF11 | La generación de informes corresponde al administrador según las historias de usuario asociadas. |
-| `generarInformeTalleres()` | "generar informes de talleres" | RF12 | Ídem. |
-| `generarListadoAlumnos()` | "generar un listado de alumnos" | RF19 | Ídem. |
+| `generarInformeTalleres()` | "generar informes de talleres" | RF22 | Ídem, con el listado y el detalle del panel Talleristas. |
+| `generarListadoAlumnos()` | "generar un listado de alumnos" | RF19 | Corresponde al administrador. Se implementa como el listado con búsqueda del panel Alumnos, sin generar un `Informe` (CC-16). |
 | `generarInformeTalleristas()` | "generar un informe... de los talleristas" | RF22 | Ídem. |
 | `exportarInforme(informe, formato)` **(v2)** | "exportar los informes" | RF13 | RF13 contempla dos formatos, por lo que el formato se recibe como parámetro. Postergado en la primera versión. |
 | `generarInformeCalificaciones()` **(v2)** | "histórico de calificaciones" | RF20 | Excluido de la primera versión. |
 | `generarInformeDetalladoAlumnos()` **(v2)** | "información detallada de los alumnos" | RF21 | Excluido de la primera versión. |
 
-**Justificación de la ubicación de los métodos de generación de informes:** el administrador es quien inicia la acción y el informe constituye su resultado, no su ejecutor. Estos métodos producen instancias de `Informe`.
+**Justificación de la ubicación de los métodos de generación de informes:** el administrador es quien inicia la acción y el informe constituye su resultado, no su ejecutor. Los métodos de RF11 y RF12 producen instancias de `Informe`; `generarListadoAlumnos()` y `generarInformeTalleristas()` se resuelven en la primera versión como consultas en pantalla, en los paneles Alumnos y Talleristas, sin generar un `Informe` (CC-16).
 
 <br>
 
@@ -510,7 +510,7 @@ Sin métodos propios. Hereda el comportamiento de `Contenido` sin especializarlo
 
 ### 3.16 RegistroTrazabilidad
 
-Sin métodos propios. NRF10 exige registrar las acciones relevantes ejecutadas por los usuarios, pero ese registro **no constituye una operación del dominio**: corresponde a un mecanismo transversal que se activa automáticamente al ejecutar operaciones de creación, modificación y eliminación en cualquier clase del modelo.
+Sin métodos propios. NRF10 exige registrar las acciones relevantes ejecutadas por los usuarios, pero ese registro **no constituye una operación del dominio**: corresponde a un mecanismo transversal que debe activarse automáticamente al ejecutar operaciones de creación, modificación y eliminación en cualquier clase del modelo.
 
 Incorporar un método de registro en cada clase dispersaría la lógica y contravendría el principio de responsabilidad única, por lo que su implementación corresponde a la capa de servicios. La clase existe únicamente para persistir la información resultante.
 
@@ -556,13 +556,13 @@ Incorporar un método de registro en cada clase dispersaría la lógica y contra
 | Relación | Multiplicidad | Frase de origen | Justificación de la cardinalidad |
 |---|---|---|---|
 | Usuario — Alumno | 0..1 ←→ 0..1 | RF01, RF02 | Del lado del alumno, **0..1** porque el administrador lo registra antes de crearle cuenta. Del lado del usuario, **0..1** porque administradores y talleristas no tienen ficha de alumno. Es la única asociación con ambos extremos opcionales. |
-| Taller — Tallerista | 1..\* ←→ 0..\* | RF03: "asignar... talleristas a los talleres" | Un taller no puede dictarse sin responsable, y el plural habilita más de uno. Un tallerista puede no tener talleres asignados tras su alta, o tener varios. |
+| Taller — Tallerista | 0..\* ←→ 1..\* | RF03: "asignar... talleristas a los talleres" | Un taller no puede dictarse sin responsable, y el plural habilita más de uno. Un tallerista puede no tener talleres asignados tras su alta, o tener varios. |
 | Taller — Alumno | 0..\* ←→ 0..\* | RF03, RF25 | Un taller admite **0..\*** alumnos porque al crearse no tiene inscriptos. Un alumno participa en **0..\*** talleres: la especificación admite más de uno. |
 | RegistroAsistencia — Alumno | 0..\* ←→ 1 | RF04 | Todo registro corresponde a **1** alumno, ya que el estado es individual. Un alumno acumula **0..\*** registros, uno por jornada. |
 | RegistroAsistencia — Usuario | 0..\* ←→ 1 | NRF10 | Todo registro identifica al usuario que lo cargó o modificó por última vez. Es **1** porque la responsabilidad sobre un registro no puede ser compartida ni quedar indeterminada. Un usuario acumula **0..\*** registros a lo largo de su actividad. |
 | Alumno — Entrega | 1 ←→ 0..\* | RF08 | Toda entrega pertenece a **1** alumno: no existen entregas anónimas ni grupales. Un alumno realiza **0..\*** entregas, una por tarea completada. |
-| Usuario — Informe | 1 ←→ 0..\* | RF11-RF13, RF19, RF22 | Todo informe registra quién lo generó, conforme a NRF10. |
-| Taller — Informe | 0..1 ←→ 0..\* | RF11: "informes de asistencia por taller" | **0..1** porque no todos los informes refieren a un taller: el listado de alumnos (RF19) y el de talleristas (RF22) son de alcance global. |
+| Usuario — Informe | 1 ←→ 0..\* | RF11-RF13 | Todo informe registra quién lo generó, conforme a NRF10. |
+| Taller — Informe | 0..1 ←→ 0..\* | RF11: "informes de asistencia por taller" **0..1** porque no todos los informes refieren a un taller: el informe general (RF12) es de alcance global. |
 | Usuario — RegistroTrazabilidad | 1 ←→ 0..\* | NRF10 | Toda acción registrada corresponde al usuario que la ejecutó. |
 
 <br>
@@ -663,7 +663,7 @@ Existen tres formas estándar de traducir una jerarquía de herencia. La elecci�
 
 | Clase UML | Tabla | Observación |
 |---|---|---|
-| `Usuario` *(abstracta)* | `usuarios` | Absorbe a `Administrador` y `Tallerista` mediante el discriminador `rol` |
+| `Usuario` | `usuarios` | Absorbe a `Administrador` y `Tallerista` mediante el discriminador `rol`; las filas con rol `alumno` son cuentas de alumnos |
 | `Administrador` | — | Sin tabla propia |
 | `Tallerista` | — | Sin tabla propia; aporta la columna `especialidad` |
 | `Alumno` | `alumnos` | Tabla propia, al no heredar de `Usuario` |
@@ -744,6 +744,14 @@ Cuatro reglas del modelo carecen de traducción directa y deben implementarse en
 
 **Observación sobre la duplicación de datos personales:** se origina en la decisión de modelar al alumno como entidad administrada independiente de su cuenta, dado que el administrador puede registrarlo antes de otorgarle acceso (RF02) y el listado de alumnos debe funcionar en ambos casos (RF19). Para minimizar el riesgo de desincronización, se establece como regla del proyecto que ninguna operación modifique estos campos mediante instrucciones directas, sino exclusivamente a través de la función designada.
 
+**Reglas de multiplicidad controladas en la interfaz.** (misma tabla que en el modelo)
+
+| Regla | Dónde se controla |
+|---|---|
+| Todo taller tiene al menos un tallerista (`Taller` 0..\* ←→ 1..\* `Tallerista`) | Formulario de alta de taller del administrador. La API admite crear un taller sin tallerista y quitar el último asignado |
+| Todo taller tiene al menos un horario (`Taller` ◆— 1..\* `Horario`) | Formulario de alta de taller. La API admite un taller sin horarios |
+| Una jornada registra a todos los alumnos inscriptos (`estaCompleta()`) | Pantalla de asistencia del tallerista. La API admite guardar registros por separado |
+
 <br>
 
 ### 5.8 Decisiones propias del modelo relacional
@@ -753,7 +761,7 @@ Las siguientes decisiones no derivan del modelo conceptual sino de la implementa
 | Decisión | Justificación |
 |---|---|
 | `usuarios.especialidad` admite valor nulo | Consecuencia directa de la estrategia de tabla única: el atributo pertenece a `Tallerista`, por lo que queda vacío en las filas correspondientes a administradores y alumnos. Es el costo asumido al absorber las subclases en una sola tabla (ver 5.2). |
-| `reportes.contenido` se almacena como estructura de datos variable | Cada tipo de informe consolida columnas distintas: el de asistencia agrupa por taller y fecha, el listado de alumnos enumera participantes, el de talleristas incluye especialidad. Definir una tabla por tipo de informe multiplicaría la estructura sin necesidad, dado que el contenido solo se lee al exportarlo y nunca se consulta por campos individuales. |
+| `reportes.contenido` se almacena como estructura de datos variable | Cada tipo de informe consolida datos distintos: el de asistencia resume los registros de un taller y el general, los totales del sistema. Definir una tabla por tipo de informe multiplicaría la estructura sin necesidad, dado que el contenido se lee completo al mostrar o descargar el informe y nunca se consulta por campos individuales. |
 | `trazabilidad` referencia las entidades de forma genérica mediante `entidad` y `entidad_id`, sin clave foránea | NRF10 exige auditar acciones sobre cualquier clase del modelo. Una clave foránea obligaría a una columna por cada tabla auditada, o bien a una tabla de historial independiente por entidad. La referencia genérica permite registrar acciones sobre cualquier entidad con una única estructura. Se asume como contrapartida que la base de datos no puede verificar la integridad de esas referencias, verificación que corresponde a la capa de aplicación. |
 | Las tablas intermedias incorporan una clave primaria propia además de la restricción de unicidad sobre el par | La alternativa habitual es una clave primaria compuesta por ambas claves foráneas. Se optó por un identificador propio para mantener uniformidad con el resto de las tablas y simplificar las referencias desde la aplicación, conservando la restricción `UNIQUE` sobre el par, que es la que garantiza la regla de negocio. |
 | Se incorporan índices sobre las columnas de filtrado frecuente (`estado`, `rol`, `tipo`, `fecha`) | NRF03 exige rapidez en las operaciones habituales. Los listados e informes filtran de forma recurrente por estas columnas, por lo que los índices reducen el tiempo de respuesta sin afectar el modelo conceptual. |

@@ -10,7 +10,7 @@ Este documento presenta el modelo de clases resultante y su traducción al model
 
 ## 1. Clases del modelo
 
-### 1.1 Usuario *(abstracta)*
+### 1.1 Usuario
 
 | Atributos | Métodos |
 |---|---|
@@ -32,7 +32,7 @@ Este documento presenta el modelo de clases resultante y su traducción al model
 
 | Atributos | Métodos |
 |---|---|
-| `cedula`, `nombre`, `apellido`, `estado`, `fechaIngreso`, `fechaNacimiento` **(v2)**, `correo` **(v2)**, `telefono` **(v2)**, `direccion` **(v2)**, `referenteAdulto` **(v2)**, `centroReferencia` **(v2)**, `observaciones` **(v2)**, `foto` **(v2)**, `biografia` **(v2)** | `visualizarMaterial()`, `visualizarTareas()`, `entregarTarea()`, `visualizarNotas()`, `eliminarDatoPerfil()` **(v2)** |
+| `cedula`, `nombre`, `apellido`, `estado`, `fechaIngreso`, `fechaNacimiento`, `correo`, `telefono`, `direccion`, `referenteAdulto`, `centroReferencia`, `observaciones`, `foto` **(v2)**, `biografia` **(v2)** | `visualizarMaterial()`, `visualizarTareas()`, `entregarTarea()`, `visualizarNotas()`, `eliminarDatoPerfil()` **(v2)** |
 
 ### 1.5 Taller
 
@@ -116,7 +116,7 @@ Este documento presenta el modelo de clases resultante y su traducción al model
 | Usuario | Administrador, Tallerista | Generalización | — | — |
 | Contenido | Material, Tarea | Generalización | — | — |
 | Usuario | Alumno | Asociación | 0..1 ←→ 0..1 | — |
-| Taller | Tallerista | Asociación | 1..\* ←→ 0..\* | AsignacionTallerista |
+| Taller | Tallerista | Asociación | 0..\* ←→ 1..\* | AsignacionTallerista |
 | Taller | Alumno | Asociación | 0..\* ←→ 0..\* | Inscripcion |
 | Taller | Horario | Composición | 1 ◆— 1..\* | — |
 | Taller | Asistencia | Composición | 1 ◆— 0..\* | — |
@@ -159,7 +159,7 @@ Las dos jerarquías de herencia (`Usuario` y `Contenido`) se implementan mediant
 
 | Clase | Tabla | Observación |
 |---|---|---|
-| Usuario | `usuarios` | Absorbe a Administrador y Tallerista |
+| Usuario | `usuarios` | Absorbe a Administrador y Tallerista; sus instancias directas (rol = alumno) son las cuentas de acceso de los alumnos |
 | Administrador | — | `usuarios` con rol = admin |
 | Tallerista | — | `usuarios` con rol = tallerista; aporta `especialidad` |
 | Alumno | `alumnos` | — |
@@ -170,7 +170,7 @@ Las dos jerarquías de herencia (`Usuario` y `Contenido`) se implementan mediant
 | Contenido | `contenidos` | Absorbe a Material y Tarea |
 | Material | — | `contenidos` con tipo = Material |
 | Tarea | — | `contenidos` con tipo = Tarea; aporta `fecha_limite`. La consigna se almacena en `descripcion` |
-| Entrega | `entregas` | — |
+| Entrega | `entregas` | `comentarioCorreccion` se almacena en la columna `comentario` |
 | Adjunto | `adjuntos` | — |
 | Informe | `reportes` | — |
 | RegistroTrazabilidad | `trazabilidad` | — |
@@ -194,6 +194,15 @@ Cuatro reglas del modelo no pueden expresarse en la base de datos y deben implem
 
 **Regla de proyecto:** ninguna operación debe modificar los campos duplicados mediante instrucciones directas. Toda actualización se realiza a través de una única función que escriba en ambas tablas dentro de la misma transacción.
 
+**Reglas de multiplicidad controladas en la interfaz.** Tres multiplicidades mínimas del modelo tampoco pueden expresarse en la base de datos. En la primera versión las controla el frontend, no la API:
+
+| Regla | Dónde se controla |
+|---|---|
+| Todo taller tiene al menos un tallerista (`Taller` 0..\* ←→ 1..\* `Tallerista`) | Formulario de alta de taller del administrador. La API admite crear un taller sin tallerista y quitar el último asignado |
+| Todo taller tiene al menos un horario (`Taller` ◆— 1..\* `Horario`) | Formulario de alta de taller. La API admite un taller sin horarios |
+| Una jornada registra a todos los alumnos inscriptos (`estaCompleta()`) | Pantalla de asistencia del tallerista. La API admite guardar registros por separado |
+
+
 ---
 
 ## 6. Elementos correspondientes a la fase 2
@@ -201,7 +210,6 @@ Cuatro reglas del modelo no pueden expresarse en la base de datos y deben implem
 | Clase | Elementos (v2) | RF de origen |
 |---|---|---|
 | Alumno | `foto`, `biografia`, `eliminarDatoPerfil()` | RF15 |
-| Alumno | `fechaNacimiento`, `correo`, `telefono`, `direccion`, `referenteAdulto`, `centroReferencia`, `observaciones` | RF21 |
 | Tallerista | `eliminarAsistencia()` | RF18 |
 | Tallerista | `modificarContenido()` | RF26 |
 | Administrador | `generarInformeCalificaciones()` | RF20 |
@@ -209,7 +217,7 @@ Cuatro reglas del modelo no pueden expresarse en la base de datos y deben implem
 | Administrador | `exportarInforme()` | RF13 |
 | Informe | `exportarPDF()`, `exportarExcel()` | RF13 |
 
-Estos elementos figuran en el modelo para reflejar el diseño completo del sistema, pero no se implementan en la primera versión. La única excepción parcial es modificarContenido() (RF26): la API ya admite la modificación (PATCH /contenidos/{id}), pero ninguna pantalla la ofrece.
+Estos elementos figuran en el modelo para reflejar el diseño completo del sistema, pero no se implementan en la primera versión. La única excepción parcial es `modificarContenido()` (RF26): la API ya admite la modificación (`PATCH /contenidos/{id}`), pero ninguna pantalla la ofrece.
 
 ---
 
@@ -219,7 +227,7 @@ Estos elementos figuran en el modelo para reflejar el diseño completo del siste
 
 | Entidad/Clase | RF de origen | NRF relacionados | HU de origen | Épica |
 |---|---|---|---|---|
-| `Usuario` *(abstracta)* | RF01, RF02, RF14 | NRF07, NRF08, NRF09 | HU01, HU02, HU20 | EP1, EP2, EP6 |
+| `Usuario` | RF01, RF02, RF14 | NRF07, NRF08, NRF09 | HU01, HU02, HU20 | EP1, EP2, EP6 |
 | `Administrador` | RF02, RF03, RF11, RF12, RF13, RF19, RF22, RF24 | NRF03, NRF07 | HU02, HU03, HU04, HU15, HU16, HU17, HU18, HU19 | EP2, EP5 |
 | `Tallerista` | RF04, RF05, RF06, RF09, RF10, RF16, RF17, RF22, RF25 | NRF05, NRF07 | HU05, HU06, HU07, HU08, HU11, HU12, HU13, HU14, HU19 | EP2, EP3, EP4, EP5 |
 | `Alumno` | RF02, RF07, RF08, RF19, RF23 | NRF08 | HU02, HU09, HU10, HU18 | EP2, EP4, EP5 |
@@ -232,7 +240,7 @@ Estos elementos figuran en el modelo para reflejar el diseño completo del siste
 | `Tarea` | RF06, RF07, RF08, RF09, RF10 | NRF11, NRF12 | HU08, HU09, HU10, HU11, HU12 | EP4 |
 | `Entrega` | RF08, RF09, RF10, RF17, RF23 | NRF05, NRF10 | HU10, HU11, HU12, HU14 | EP4 |
 | `Adjunto` | RF06, RF08 | NRF08, NRF10, NRF11, NRF12 | HU08, HU10 | EP4 |
-| `Informe` | RF11, RF12, RF13, RF19, RF22 | NRF03, NRF10 | HU15, HU16, HU17, HU18, HU19 | EP5 |
+| `Informe` | RF11, RF12, RF13 | NRF03, NRF10 | HU15, HU16, HU17 | EP5 |
 | `RegistroTrazabilidad` | — *(deriva de NRF10)* | NRF08, NRF10 | — | *(transversal)* |
 | `AsignacionTallerista` *(asociativa)* | RF03 | — | HU03 | EP2 |
 | `Inscripcion` *(asociativa)* | RF03 | — | HU03 | EP2 |
@@ -241,7 +249,7 @@ Estos elementos figuran en el modelo para reflejar el diseño completo del siste
 
 **Un mismo requerimiento puede figurar en dos clases.** Los requerimientos que describen una acción se asignan tanto a la clase que la ejecuta como a aquella sobre la que opera. RF11, por ejemplo, aparece en `Administrador` —donde reside el método `generarInformeAsistencia()`— y en `Informe`, que es el objeto producido. La duplicación es deliberada: refleja el criterio de asignación de métodos establecido en el Paso 3 de la derivación, según el cual quien inicia una acción y aquello sobre lo que actúa constituyen elementos distintos del modelo.
 
-**`RegistroTrazabilidad` es la única clase sin RF ni HU de origen.** Deriva exclusivamente de NRF10 y no corresponde a ninguna épica, ya que su registro se activa transversalmente en operaciones de todas ellas.
+**`RegistroTrazabilidad` es la única clase sin RF ni HU de origen.** Deriva exclusivamente de NRF10 y no corresponde a ninguna épica, ya que su registro debe activarse transversalmente en operaciones de todas ellas (en la primera versión, la API todavía no lo realiza).
 
 **`Usuario` abarca tres épicas** porque concentra elementos de origen diverso: la autenticación (EP1), su gestión como entidad administrada (EP2) y la edición del perfil propio (EP6).
 
@@ -252,6 +260,8 @@ Estos elementos figuran en el modelo para reflejar el diseño completo del siste
 **Las dos clases asociativas comparten trazabilidad** (RF03, HU03, EP2), dado que ambas derivan del mismo requerimiento de asignación.
 
 **Los cinco RF postergados por plazo** (RF15, RF18, RF20, RF21, RF26) no figuran en esta tabla, ya que no tienen historia de usuario asociada en el backlog de la primera versión. Los atributos y métodos que originan sí están presentes en el modelo, señalados como (v2). RF23, postergado al principio, se incluyó en la primera versión: figura en la tabla en `Alumno` y `Entrega`, pero sin historia de usuario propia, porque se incorporó al cierre (CC-17) y no formó parte del backlog. RF13, postergado después de iniciado el desarrollo, se mantiene en esta tabla porque tiene historias de usuario en el backlog; sus métodos de exportación figuran como (v2).
+
+**RF19, RF22 y RF24 se resuelven como consultas en pantalla.** En la primera versión, `generarListadoAlumnos()`, `generarInformeTalleristas()` y `consultarDatosSensibles()` se implementan en los paneles Alumnos y Talleristas del administrador, con sus listados y detalles, sin generar una instancia de `Informe` (CC-16). Por eso `Informe` solo se instancia para RF11 y RF12.
 
 ---
 
@@ -264,7 +274,6 @@ classDiagram
     direction TB
 
     class Usuario {
-        <<abstract>>
         +String cedula
         +String claveHash
         +String nombre
@@ -295,8 +304,8 @@ classDiagram
         +consultarDatosSensibles() List
         +generarInformeAsistencia(tallerId, desde, hasta) Informe
         +generarInformeTalleres() Informe
-        +generarListadoAlumnos() Informe
-        +generarInformeTalleristas() Informe
+        +generarListadoAlumnos() List
+        +generarInformeTalleristas() List
         +exportarInforme(informe, formato) File [v2]
         +generarInformeCalificaciones() Informe [v2]
         +generarInformeDetalladoAlumnos() Informe [v2]
@@ -324,13 +333,13 @@ classDiagram
         +String apellido
         +Estado estado
         +Date fechaIngreso
-        +Date fechaNacimiento [v2]
-        +String correo [v2]
-        +String telefono [v2]
-        +String direccion [v2]
-        +String referenteAdulto [v2]
-        +String centroReferencia [v2]
-        +String observaciones [v2]
+        +Date fechaNacimiento
+        +String correo
+        +String telefono
+        +String direccion
+        +String referenteAdulto
+        +String centroReferencia
+        +String observaciones
         +String foto [v2]
         +String biografia [v2]
         +visualizarMaterial(tallerId) List
@@ -349,7 +358,7 @@ classDiagram
         +String salon
         +Date fechaInicio
         +Date fechaFin
-        +Estado estado
+        +EstadoTaller estado
         +String observaciones
         +obtenerAlumnos() List
         +obtenerTalleristas() List
@@ -463,7 +472,7 @@ classDiagram
 
     Usuario "0..1" -- "0..1" Alumno : tiene cuenta
 
-    Taller "1" -- "0..*" AsignacionTallerista
+    Taller "1" -- "1..*" AsignacionTallerista
     Tallerista "1" -- "0..*" AsignacionTallerista
 
     Taller "1" -- "0..*" Inscripcion
@@ -494,13 +503,13 @@ classDiagram
 **Clases asociativas.** `AsignacionTallerista` e `Inscripcion` representan relaciones muchos a muchos con atributos propios. La notación empleada no dispone de un símbolo específico para clases asociativas, por lo que se representan como clases intermedias vinculadas a ambos extremos de la relación. Conceptualmente, la relación real es:
 
 - `Taller` **1..\*** ←→ **0..\*** `Tallerista`, con `AsignacionTallerista` como clase asociativa
-- `Taller` **0..\*** ←→ **0..\*** `Alumno`, con `Inscripcion` como clase asociativa
+- `Taller` **0..\*** ←→ **1..\*** `Tallerista`, con `AsignacionTallerista` como clase asociativa
 
-**Restricción de exclusividad de `Adjunto`.** El diagrama muestra dos composiciones hacia `Adjunto`, una desde `Contenido` y otra desde `Entrega`. En el modelo, ambas son excluyentes: un adjunto pertenece a un contenido **o** a una entrega, nunca a ambos ni a ninguno. Esta restricción no puede expresarse gráficamente y se documenta en el anexo.
+**Restricción de exclusividad de `Adjunto`.** El diagrama muestra dos composiciones hacia `Adjunto`, una desde `Contenido` y otra desde `Entrega`. En el modelo, ambas son excluyentes: un adjunto pertenece a un contenido **o** a una entrega, nunca a ambos ni a ninguno. Esta restricción no puede expresarse gráficamente: se implementa en la base de datos con la verificación `chk_adjuntos_origen` y se justifica en el anexo.
 
 **Elementos de fase 2.** Se señalan con el sufijo `[v2]` por limitaciones de la notación, que no permite aplicar estilos diferenciados a atributos o métodos individuales.
 
-**Enumeraciones.** Los tipos `Rol`, `Estado`, `EstadoAsistencia` y `EstadoEntrega` corresponden a conjuntos cerrados de valores documentados en el script de base de datos. No se representan como clases independientes por carecer de atributos y comportamiento propios.
+**Enumeraciones.** Los tipos `Rol`, `Estado`, `EstadoTaller`, `EstadoAsistencia` y `EstadoEntrega` corresponden a conjuntos cerrados de valores documentados en el script de base de datos. No se representan como clases independientes por carecer de atributos y comportamiento propios.
 
 ### Leyenda de símbolos
 
@@ -670,7 +679,7 @@ erDiagram
         date fecha_fin "NULL"
         datetime fecha_generacion
         json contenido "NULL"
-        varchar formato "PDF | Excel"
+        varchar formato "JSON en v1; PDF | Excel en v2"
         int generado_por FK
         varchar estado
     }

@@ -6,7 +6,7 @@
 
 **Proyecto:** TheNewfutures — Sistema de Gestión de Talleres en Convenio con INAU    
 **Fecha de elaboración:** 27 de octubre de 2026  
-**Última actualización:** 4 de noviembre de 2026  
+**Última actualización:** 5 de noviembre de 2026  
 
 **Qué es este documento.** Constituye la referencia técnica de la API REST (sigla en inglés de *Representational State Transfer*) del sistema. Describe las rutas disponibles, los niveles de acceso requeridos, el formato de las peticiones y respuestas, y las reglas de validación aplicadas.
 
@@ -77,7 +77,7 @@ Cada ruta declara en `routes.php` el nivel de acceso requerido. Antes de ejecuta
 
 Una ruta puede admitir varios roles; en ese caso, la tabla de la sección 4 los indica separados por una barra (por ejemplo, `admin \| tallerista`). Además del control por rol, los servicios verifican la pertenencia al taller: un tallerista solo accede a los talleres que tiene asignados y un alumno, solo a aquellos en los que está inscripto.
 
-> El detalle de los mecanismos de seguridad (hash de contraseñas, firma del token y limitaciones pendientes) se describe en `docs/05-Ciberseguridad/Mecanismos_Autenticacion_Criptografia_INAU.md`.
+> Las contraseñas se guardan con hash (`password_hash` con `PASSWORD_DEFAULT`, que en PHP 8.3 usa bcrypt) y se verifican con `password_verify`. El token se firma con la clave `SECRET_KEY` mediante el algoritmo HS256 (biblioteca `firebase/php-jwt`). Las limitaciones pendientes se describen en la sección 7.
 
 ---
 
@@ -125,7 +125,7 @@ Todas las respuestas se emiten en formato JSON mediante `core/Response.php`, con
 | `401` | No hay una sesión válida, o las credenciales son incorrectas | "Tenes que iniciar sesion." / "Correo o contraseña incorrectos." |
 | `403` | El usuario no tiene permiso para la operación | "No tenes permisos para hacer esto." |
 | `404` | La ruta o el recurso no existe | "No existe esa dirección, o no se puede usar con GET." |
-| `409` | Ya existe un registro con ese dato | "Ya existe un alumno con esa cédula." |
+| `409` | La operación choca con datos existentes o con el estado del recurso (dato repetido, alumno inactivo o no inscripto, taller finalizado) | "Ya existe un alumno con esa cédula." / "No se puede registrar asistencia en un taller finalizado." |
 | `422` | Los datos no superan la validación | "Los datos ingresados no son válidos." |
 | `429` | Demasiados pedidos en poco tiempo | "Demasiados intentos de inicio de sesión. Esperá unos minutos e intentá de nuevo." |
 | `500` | Error interno del servidor | "Ocurrio un error interno." / "Ocurrio un error interno con la base de datos." |
@@ -175,6 +175,8 @@ La API expone 55 rutas, agrupadas por recurso. La columna "Acceso" indica el niv
 | `POST` | `/talleristas` | `admin` | Crear un tallerista |
 | `PATCH` | `/talleristas/{id}` | `admin` | Modificar un tallerista |
 | `DELETE` | `/talleristas/{id}` | `admin` | Dar de baja un tallerista |
+
+La cédula y el correo no pueden repetirse: si ya existen, la API responde `409` ("Ya existe un usuario con esa cédula." o "Ya existe un usuario con ese correo.").
 
 ### 4.4 Talleres (6)
 
@@ -457,15 +459,17 @@ La API valida todos los datos recibidos, aunque el frontend ya los haya validado
 
 ## 7. Limitaciones conocidas
 
-| Limitación | Referencia |
-|---|---|
-| La exportación de reportes genera un archivo JSON, no PDF ni Excel (RF13, postergado) | `Testing-06.md`, sección 2.9 |
-| Los errores de validación se responden con `400` en unas rutas y con `422` en otras | Sección 3.1 de este documento |
-| El cierre de sesión (`POST /logout`) borra la cookie del navegador, pero no invalida en el servidor una copia del token | `Mecanismos_Autenticacion_Criptografia_INAU.md`, sección 9 |
-| No hay protección contra CSRF | `Mecanismos_Autenticacion_Criptografia_INAU.md`, sección 9 |
+| Limitación | Qué implica | Situación actual |
+|---|---|---|
+| La exportación de reportes genera un archivo JSON, no PDF ni Excel | El usuario no obtiene un documento listo para imprimir o compartir | RF13 postergado (`Testing-06.md`, sección 2.9) |
+| Los errores de validación se responden con `400` en unas rutas y con `422` en otras | Un cliente de la API tiene que contemplar los dos códigos para el mismo tipo de error | Ver la sección 3.1 |
+| El cierre de sesión (`POST /logout`) solo borra la cookie del navegador | La API no guarda una lista de tokens revocados: si alguien copió el token antes del cierre, sigue siendo válido hasta que vence (`TOKEN_LIFETIME`, una hora por defecto) | Cambiar la contraseña o desactivar al usuario sí invalida todos sus tokens, porque la API los compara con la base de datos en cada pedido (sección 2.1) |
+| No hay protección contra CSRF | Una página de otro sitio podría intentar que el navegador envíe un pedido con la cookie de sesión del usuario | La cookie usa `SameSite=Lax`, que bloquea parte de esos envíos, pero no es una defensa completa: faltan tokens anti-CSRF o la verificación del origen del pedido |
+| El servidor de prueba no usa HTTPS | La cookie viaja sin cifrar y no se marca como `Secure` (solo se marca cuando la API detecta HTTPS) | La configuración de HTTPS con Certbot está documentada en `Documento de Reconstruccion - Servidor.md`, pero no está aplicada |
+| La API no registra acciones en la tabla `trazabilidad` | No queda un registro de quién creó, modificó o eliminó cada dato, como pide NRF10 | La tabla existe en la base de datos, pero ninguna ruta escribe en ella |
 
 ---
 
 <br>
 
-**Documentos relacionados:** `backend/api-completa/README.md`, `Documento de Reconstruccion - Servidor.md`, `Mecanismos_Autenticacion_Criptografia_INAU.md`, `Hardening de Infraestructura y Contenedores.md`, `Testing-01.md` a `Testing-06.md`.
+**Documentos relacionados:** `backend/api-completa/README.md`, `Documento de Reconstruccion - Servidor.md`, `inau-infraestructura-docker.md`, `Testing-01.md` a `Testing-06.md`.

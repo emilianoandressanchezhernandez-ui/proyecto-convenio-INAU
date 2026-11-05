@@ -1,6 +1,10 @@
-# Sistema de Gestión de Talleres en Convenio con INAU — TheNewfutures
+# Entrevista de relevamiento
 
 <br>
+
+## Sistema de Gestión de Talleres en Convenio con INAU — TheNewfutures
+
+**Fecha:** segunda semana del proyecto, entre el 20/07/2026 y el 23/07/2026 (ver `Acta de Reuniones.md`, reuniones R-02 y R-03).
 
 ## Participantes de la entrevista
 
