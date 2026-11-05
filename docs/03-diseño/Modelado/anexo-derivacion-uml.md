@@ -78,7 +78,7 @@ Se aplicó el método de derivación en cinco pasos a partir de los requerimient
 
 ### 1.4 Decisiones de modelado
 
-**Usuario, Administrador y Tallerista se modelan mediante herencia.** RF01 exige distinguir tres roles con permisos diferenciados, pero los tres comparten los mismos datos de identificación y acceso. `Usuario` concentra esos atributos comunes como clase abstracta, y cada rol especializa el comportamiento. Solo `Tallerista` aporta un atributo propio (`especialidad`, requerido por RF22).
+**Usuario, Administrador y Tallerista se modelan mediante herencia.** RF01 exige distinguir tres roles con permisos diferenciados, pero los tres comparten los mismos datos de identificación y acceso. `Usuario` concentra esos atributos comunes; sus instancias directas son las cuentas de acceso de los alumnos, y `Administrador` y `Tallerista` especializan el comportamiento. Solo `Tallerista` aporta un atributo propio (`especialidad`, requerido por RF22).
 
 **Alumno no hereda de Usuario, se asocia a él.** El administrador registra al alumno como participante (RF02) antes de que este tenga cuenta de acceso, y RF07 y RF08 requieren que pueda ingresar al sistema. Por lo tanto, un alumno puede existir con o sin cuenta asociada: la relación correcta es una asociación opcional (0..1), no una herencia.
 
@@ -106,7 +106,7 @@ Por ese motivo `Informe` se incorpora como clase del modelo y forma parte de la 
 
 Es la única clase del modelo que no proviene de un requerimiento funcional, sino de NRF10: "el sistema debe registrar la trazabilidad de las acciones importantes realizadas por los usuarios".
 
-Se incorpora como clase porque la información debe persistirse y vincularse a un usuario. No obstante, y a diferencia de las restantes, **no participa de la lógica de negocio ni aporta métodos al dominio**: su registro corresponde a un mecanismo transversal de la capa de servicios, según se detalla en 3.16.
+Se incorpora como clase porque la información debe persistirse y vincularse a un usuario. No obstante, y a diferencia de las restantes, **no participa de la lógica de negocio ni aporta métodos al dominio**: su registro corresponde a un mecanismo transversal de la capa de servicios, según se detalla en 3.16. En la primera versión, la API todavía no registra acciones en ella (ver *Análisis del Modelo*, paso 8)..
 
 ---
 
@@ -121,7 +121,7 @@ Se incorpora como clase porque la información debe persistirse y vincularse a u
 
 <br>
 
-### 2.1 Usuario *(clase abstracta)*
+### 2.1 Usuario
 
 | Atributo | Origen | Justificación |
 |---|---|---|
@@ -326,7 +326,7 @@ Este criterio evita que las clases de rol concentren la totalidad del comportami
 
 <br>
 
-### 3.2 Usuario *(clase abstracta)*
+### 3.2 Usuario
 
 | Método | Verbo de origen | RF | Justificación |
 |---|---|---|---|
@@ -336,7 +336,7 @@ Este criterio evita que las clases de rol concentren la totalidad del comportami
 | `obtenerRol()` | "diferenciando el acceso según el rol" | RF01 | Necesario para determinar a qué panel se redirige al usuario tras el ingreso. |
 | `darDeBaja()` | "eliminar" | RF02 | Implementa la baja lógica modificando el estado, sin borrar el registro. |
 
-**Justificación de `autenticar()` en la clase abstracta:** aunque cada rol posee permisos distintos, el proceso de verificación de credenciales es idéntico para los tres. Diferenciarlo por rol duplicaría lógica innecesariamente; la distinción se produce después, en la redirección.
+**Justificación de `autenticar()` en la clase base:** aunque cada rol posee permisos distintos, el proceso de verificación de credenciales es idéntico para los tres. Diferenciarlo por rol duplicaría lógica innecesariamente; la distinción se produce después, en la redirección.
 
 <br>
 
@@ -510,7 +510,7 @@ Sin métodos propios. Hereda el comportamiento de `Contenido` sin especializarlo
 
 ### 3.16 RegistroTrazabilidad
 
-Sin métodos propios. NRF10 exige registrar las acciones relevantes ejecutadas por los usuarios, pero ese registro **no constituye una operación del dominio**: corresponde a un mecanismo transversal que se activa automáticamente al ejecutar operaciones de creación, modificación y eliminación en cualquier clase del modelo.
+Sin métodos propios. NRF10 exige registrar las acciones relevantes ejecutadas por los usuarios, pero ese registro **no constituye una operación del dominio**: corresponde a un mecanismo transversal que debe activarse automáticamente al ejecutar operaciones de creación, modificación y eliminación en cualquier clase del modelo.
 
 Incorporar un método de registro en cada clase dispersaría la lógica y contravendría el principio de responsabilidad única, por lo que su implementación corresponde a la capa de servicios. La clase existe únicamente para persistir la información resultante.
 
@@ -556,7 +556,7 @@ Incorporar un método de registro en cada clase dispersaría la lógica y contra
 | Relación | Multiplicidad | Frase de origen | Justificación de la cardinalidad |
 |---|---|---|---|
 | Usuario — Alumno | 0..1 ←→ 0..1 | RF01, RF02 | Del lado del alumno, **0..1** porque el administrador lo registra antes de crearle cuenta. Del lado del usuario, **0..1** porque administradores y talleristas no tienen ficha de alumno. Es la única asociación con ambos extremos opcionales. |
-| Taller — Tallerista | 1..\* ←→ 0..\* | RF03: "asignar... talleristas a los talleres" | Un taller no puede dictarse sin responsable, y el plural habilita más de uno. Un tallerista puede no tener talleres asignados tras su alta, o tener varios. |
+| Taller — Tallerista | 0..\* ←→ 1..\* | RF03: "asignar... talleristas a los talleres" | Un taller no puede dictarse sin responsable, y el plural habilita más de uno. Un tallerista puede no tener talleres asignados tras su alta, o tener varios. |
 | Taller — Alumno | 0..\* ←→ 0..\* | RF03, RF25 | Un taller admite **0..\*** alumnos porque al crearse no tiene inscriptos. Un alumno participa en **0..\*** talleres: la especificación admite más de uno. |
 | RegistroAsistencia — Alumno | 0..\* ←→ 1 | RF04 | Todo registro corresponde a **1** alumno, ya que el estado es individual. Un alumno acumula **0..\*** registros, uno por jornada. |
 | RegistroAsistencia — Usuario | 0..\* ←→ 1 | NRF10 | Todo registro identifica al usuario que lo cargó o modificó por última vez. Es **1** porque la responsabilidad sobre un registro no puede ser compartida ni quedar indeterminada. Un usuario acumula **0..\*** registros a lo largo de su actividad. |
@@ -663,7 +663,7 @@ Existen tres formas estándar de traducir una jerarquía de herencia. La elecci�
 
 | Clase UML | Tabla | Observación |
 |---|---|---|
-| `Usuario` *(abstracta)* | `usuarios` | Absorbe a `Administrador` y `Tallerista` mediante el discriminador `rol` |
+| `Usuario` | `usuarios` | Absorbe a `Administrador` y `Tallerista` mediante el discriminador `rol`; las filas con rol `alumno` son cuentas de alumnos |
 | `Administrador` | — | Sin tabla propia |
 | `Tallerista` | — | Sin tabla propia; aporta la columna `especialidad` |
 | `Alumno` | `alumnos` | Tabla propia, al no heredar de `Usuario` |
@@ -743,6 +743,14 @@ Cuatro reglas del modelo carecen de traducción directa y deben implementarse en
 **Justificación de por qué se aceptan estas limitaciones:** las cuatro derivan de decisiones de mapeo deliberadas —tabla única para las herencias, y separación entre la ficha del alumno y su cuenta de acceso— adoptadas por sus ventajas en las consultas y en el proceso de autenticación. Trasladar estas validaciones a la aplicación es el costo asumido a cambio.
 
 **Observación sobre la duplicación de datos personales:** se origina en la decisión de modelar al alumno como entidad administrada independiente de su cuenta, dado que el administrador puede registrarlo antes de otorgarle acceso (RF02) y el listado de alumnos debe funcionar en ambos casos (RF19). Para minimizar el riesgo de desincronización, se establece como regla del proyecto que ninguna operación modifique estos campos mediante instrucciones directas, sino exclusivamente a través de la función designada.
+
+**Reglas de multiplicidad controladas en la interfaz.** (misma tabla que en el modelo)
+
+| Regla | Dónde se controla |
+|---|---|
+| Todo taller tiene al menos un tallerista (`Taller` 0..\* ←→ 1..\* `Tallerista`) | Formulario de alta de taller del administrador. La API admite crear un taller sin tallerista y quitar el último asignado |
+| Todo taller tiene al menos un horario (`Taller` ◆— 1..\* `Horario`) | Formulario de alta de taller. La API admite un taller sin horarios |
+| Una jornada registra a todos los alumnos inscriptos (`estaCompleta()`) | Pantalla de asistencia del tallerista. La API admite guardar registros por separado |
 
 <br>
 

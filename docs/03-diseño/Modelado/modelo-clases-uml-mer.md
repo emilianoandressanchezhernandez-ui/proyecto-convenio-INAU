@@ -10,7 +10,7 @@ Este documento presenta el modelo de clases resultante y su traducción al model
 
 ## 1. Clases del modelo
 
-### 1.1 Usuario *(abstracta)*
+### 1.1 Usuario
 
 | Atributos | Métodos |
 |---|---|
@@ -116,7 +116,7 @@ Este documento presenta el modelo de clases resultante y su traducción al model
 | Usuario | Administrador, Tallerista | Generalización | — | — |
 | Contenido | Material, Tarea | Generalización | — | — |
 | Usuario | Alumno | Asociación | 0..1 ←→ 0..1 | — |
-| Taller | Tallerista | Asociación | 1..\* ←→ 0..\* | AsignacionTallerista |
+| Taller | Tallerista | Asociación | 0..\* ←→ 1..\* | AsignacionTallerista |
 | Taller | Alumno | Asociación | 0..\* ←→ 0..\* | Inscripcion |
 | Taller | Horario | Composición | 1 ◆— 1..\* | — |
 | Taller | Asistencia | Composición | 1 ◆— 0..\* | — |
@@ -159,7 +159,7 @@ Las dos jerarquías de herencia (`Usuario` y `Contenido`) se implementan mediant
 
 | Clase | Tabla | Observación |
 |---|---|---|
-| Usuario | `usuarios` | Absorbe a Administrador y Tallerista |
+| Usuario | `usuarios` | Absorbe a Administrador y Tallerista; sus instancias directas (rol = alumno) son las cuentas de acceso de los alumnos |
 | Administrador | — | `usuarios` con rol = admin |
 | Tallerista | — | `usuarios` con rol = tallerista; aporta `especialidad` |
 | Alumno | `alumnos` | — |
@@ -194,6 +194,15 @@ Cuatro reglas del modelo no pueden expresarse en la base de datos y deben implem
 
 **Regla de proyecto:** ninguna operación debe modificar los campos duplicados mediante instrucciones directas. Toda actualización se realiza a través de una única función que escriba en ambas tablas dentro de la misma transacción.
 
+**Reglas de multiplicidad controladas en la interfaz.** Tres multiplicidades mínimas del modelo tampoco pueden expresarse en la base de datos. En la primera versión las controla el frontend, no la API:
+
+| Regla | Dónde se controla |
+|---|---|
+| Todo taller tiene al menos un tallerista (`Taller` 0..\* ←→ 1..\* `Tallerista`) | Formulario de alta de taller del administrador. La API admite crear un taller sin tallerista y quitar el último asignado |
+| Todo taller tiene al menos un horario (`Taller` ◆— 1..\* `Horario`) | Formulario de alta de taller. La API admite un taller sin horarios |
+| Una jornada registra a todos los alumnos inscriptos (`estaCompleta()`) | Pantalla de asistencia del tallerista. La API admite guardar registros por separado |
+
+
 ---
 
 ## 6. Elementos correspondientes a la fase 2
@@ -218,7 +227,7 @@ Estos elementos figuran en el modelo para reflejar el diseño completo del siste
 
 | Entidad/Clase | RF de origen | NRF relacionados | HU de origen | Épica |
 |---|---|---|---|---|
-| `Usuario` *(abstracta)* | RF01, RF02, RF14 | NRF07, NRF08, NRF09 | HU01, HU02, HU20 | EP1, EP2, EP6 |
+| `Usuario` | RF01, RF02, RF14 | NRF07, NRF08, NRF09 | HU01, HU02, HU20 | EP1, EP2, EP6 |
 | `Administrador` | RF02, RF03, RF11, RF12, RF13, RF19, RF22, RF24 | NRF03, NRF07 | HU02, HU03, HU04, HU15, HU16, HU17, HU18, HU19 | EP2, EP5 |
 | `Tallerista` | RF04, RF05, RF06, RF09, RF10, RF16, RF17, RF22, RF25 | NRF05, NRF07 | HU05, HU06, HU07, HU08, HU11, HU12, HU13, HU14, HU19 | EP2, EP3, EP4, EP5 |
 | `Alumno` | RF02, RF07, RF08, RF19, RF23 | NRF08 | HU02, HU09, HU10, HU18 | EP2, EP4, EP5 |
@@ -265,7 +274,6 @@ classDiagram
     direction TB
 
     class Usuario {
-        <<abstract>>
         +String cedula
         +String claveHash
         +String nombre
@@ -464,7 +472,7 @@ classDiagram
 
     Usuario "0..1" -- "0..1" Alumno : tiene cuenta
 
-    Taller "1" -- "0..*" AsignacionTallerista
+    Taller "1" -- "1..*" AsignacionTallerista
     Tallerista "1" -- "0..*" AsignacionTallerista
 
     Taller "1" -- "0..*" Inscripcion
@@ -495,7 +503,7 @@ classDiagram
 **Clases asociativas.** `AsignacionTallerista` e `Inscripcion` representan relaciones muchos a muchos con atributos propios. La notación empleada no dispone de un símbolo específico para clases asociativas, por lo que se representan como clases intermedias vinculadas a ambos extremos de la relación. Conceptualmente, la relación real es:
 
 - `Taller` **1..\*** ←→ **0..\*** `Tallerista`, con `AsignacionTallerista` como clase asociativa
-- `Taller` **0..\*** ←→ **0..\*** `Alumno`, con `Inscripcion` como clase asociativa
+- `Taller` **0..\*** ←→ **1..\*** `Tallerista`, con `AsignacionTallerista` como clase asociativa
 
 **Restricción de exclusividad de `Adjunto`.** El diagrama muestra dos composiciones hacia `Adjunto`, una desde `Contenido` y otra desde `Entrega`. En el modelo, ambas son excluyentes: un adjunto pertenece a un contenido **o** a una entrega, nunca a ambos ni a ninguno. Esta restricción no puede expresarse gráficamente y se documenta en el anexo.
 
@@ -671,7 +679,7 @@ erDiagram
         date fecha_fin "NULL"
         datetime fecha_generacion
         json contenido "NULL"
-        varchar formato "PDF | Excel"
+        varchar formato "JSON en v1; PDF | Excel en v2"
         int generado_por FK
         varchar estado
     }

@@ -60,7 +60,7 @@ Los archivos que acompañan al contenido se almacenan como instancias de `Adjunt
 
 **Decisión que se pone a prueba:** la especialización entre `Material` y `Tarea` se justifica acá. Si fueran una sola clase, la fecha límite quedaría vacía en todos los materiales, y el modelo admitiría que un material recibiera entregas. La herencia expresa que comparten la base pero difieren en el comportamiento.
 
-El tallerista puede además retirar contenido que ya no corresponde mostrar mediante `eliminarMaterial()` (RF16). La operación se define en la clase base `Contenido` porque el procedimiento es idéntico para materiales y tareas, aunque el requerimiento solo contempla explícitamente el material.
+El tallerista puede además retirar contenido que ya no corresponde mostrar mediante `eliminarMaterial()` (RF16). La operación sobre los datos, `eliminar()`, se define en la clase base `Contenido` porque el procedimiento es idéntico para materiales y tareas, aunque el requerimiento solo contempla explícitamente el material.
 
 <br>
 
@@ -102,11 +102,13 @@ La multiplicidad **0..1** entre `Taller` e `Informe` también se justifica acá:
 
 ### Paso 8 — Auditoría transversal
 
-Las operaciones de creación, modificación y eliminación ejecutadas en los pasos anteriores generan instancias de `RegistroTrazabilidad` (NRF10), que registran la acción realizada, la entidad afectada, su identificador, el momento en que se produjo y, mediante su asociación con `Usuario`, la identidad de quien la ejecutó.
+Las operaciones de creación, modificación y eliminación ejecutadas en los pasos anteriores deben generar instancias de `RegistroTrazabilidad` (NRF10), que registran la acción realizada, la entidad afectada, su identificador, el momento en que se produjo y, mediante su asociación con `Usuario`, la identidad de quien la ejecutó.
 
 Este registro no se activa desde las clases del dominio sino desde la capa de servicios, según se justifica en la sección 3.16 del anexo. Por ese motivo `RegistroTrazabilidad` no aporta métodos al modelo: su función es exclusivamente persistir la información resultante.
 
 **Decisión que se pone a prueba:** la referencia genérica mediante entidad e identificador permite auditar operaciones sobre cualquier clase del modelo con una única estructura. La alternativa —una tabla de historial por cada entidad auditada— multiplicaría la estructura sin aportar capacidad adicional.
+
+>**Estado en la primera versión:** la tabla `trazabilidad` existe en la base de datos, pero la API todavía no registra acciones en ella. NRF10 se cumple solo en parte, mediante el usuario responsable de cada registro de asistencia (`usuario_registro`) y la fecha de carga de cada adjunto (`fechaSubida`).
 
 ---
 
@@ -125,7 +127,7 @@ Este registro no se activa desde las clases del dominio sino desde la capa de se
 | 7. Informes | Administrador, Informe, Asistencia, Taller, Alumno | RF11, RF12, RF13 (RF19 y RF22, como consultas en pantalla) |
 | 8. Auditoría | RegistroTrazabilidad, Usuario | NRF10 |
 
-incluidos los que no provienen de un requerimiento funcional: `RegistroTrazabilidad` y la asociación entre `RegistroAsistencia` y `Usuario`, derivados de NRF10; los métodos `validarFormato()` y `validarTamano()`, derivados de NRF11 y NRF12; y los métodos `estaCompleta()` y `generarNombreSeguro()`, señalados explícitamente como derivados de la operativa.
+Todos los elementos del modelo intervienen en al menos un paso del circuito, incluidos los que no provienen de un requerimiento funcional: `RegistroTrazabilidad` y la asociación entre `RegistroAsistencia` y `Usuario`, derivados de NRF10; los métodos `validarFormato()` y `validarTamano()`, derivados de NRF11 y NRF12; y los métodos `estaCompleta()` y `generarNombreSeguro()`, señalados explícitamente como derivados de la operativa.
 
 Los cinco requerimientos restantes del alcance de la primera versión se ejercitan de forma transversal: RF01 al inicio de cada paso mediante la autenticación, RF14 cuando cualquier usuario edita su perfil, RF23 cuando el alumno consulta la nota y la devolución registradas en el paso 6, y RF24 y RF25 como consultas del administrador y del tallerista sobre información ya registrada.
 
@@ -146,7 +148,7 @@ Al contrastar la entrevista con la lista de requerimientos funcionales se advirt
 | Capacidad ausente | Frase de la entrevista que la respalda | Elemento que la resuelve | Estado en v1 |
 |---|---|---|---|
 | Eliminación de material, calificaciones y asistencia por parte del tallerista | *"Puede eliminar material, notas y asistencia"* | RF16, RF17, RF18 → métodos `eliminarMaterial()`, `eliminarNota()` y `eliminarAsistencia()` | RF16 y RF17 incluidos; RF18 postergado |
-| Comunicación del tallerista con los alumnos | *"comunicarse con los alumnos"* | Formalizada como requerimiento | Excluida por complejidad de implementación |
+| Comunicación del tallerista con los alumnos | *"comunicarse con los alumnos"* | Registrada en el alcance excluido, sin RF propio | Excluida por complejidad de implementación |
 | Cuatro de los siete reportes solicitados | Sección de reportes: listas de alumnos, histórico de calificaciones, información de alumnos y de talleristas |RF19 a RF22 → métodos de `Administrador`; en la primera versión, RF19 y RF22 se resuelven como consultas en pantalla | RF19 y RF22 incluidos; RF20 y RF21 postergados |
 | Visualización de las notas por parte del alumno | *"puede ver... las notas que le dejó el tallerista asignado"* | RF23 → método `visualizarNotas()` | Incluido (postergado al principio) |
 | Consulta de datos sensibles | *"Se debe consultar: datos sensibles usados"* | RF24 → método `consultarDatosSensibles()` | Incluido |
@@ -182,7 +184,7 @@ Tres decisiones adoptadas en pasos tempranos se corrigieron al avanzar el análi
 
 **Observación metodológica:** las tres correcciones provienen de pasos posteriores al que había producido la decisión original. Esto confirma que el método de cinco pasos no opera de forma estrictamente secuencial: cada paso funciona como verificación de los anteriores, y el resultado final requiere revisar hacia atrás.
 
-> **Nota sobre el alcance del proyecto:** las postergaciones decididas por restricción de plazo, así como la exclusión de la comunicación entre tallerista y alumnos, no constituyen correcciones del modelo. Son decisiones de gestión del proyecto, documentadas en el documento de requerimientos, y su efecto sobre el modelo se limita al señalamiento **(v2)** de los elementos afectados.
+> **Nota sobre el alcance del proyecto:** las postergaciones decididas por restricción de plazo, así como la exclusión de la comunicación entre tallerista y alumnos, no constituyen correcciones del modelo. Son decisiones de gestión del proyecto, documentadas en `Doc.md` (sección 14) y en el Control de Cambios, y su efecto sobre el modelo se limita al señalamiento **(v2)** de los elementos afectados.
 
 ### 3.4 Síntesis
 
@@ -195,7 +197,7 @@ Tres decisiones adoptadas en pasos tempranos se corrigieron al avanzar el análi
 
 Ninguna de las trece correcciones provino de un cambio solicitado por el cliente: todas surgieron de contrastar la documentación del equipo consigo misma y con la implementación en curso. El modelo presentado las incorpora de forma directa, en lugar de documentar primero una versión incompleta y rectificarla después.
 
-Que las trece se detectaran antes de comenzar el desarrollo del backend es el resultado más relevante del análisis: cada una de ellas habría exigido rehacer código ya escrito si se hubiera descubierto durante la implementación.
+Que las trece se detectaran durante el modelado, con la base de datos y el backend en sus primeras etapas, es el resultado más relevante del análisis: cada una de ellas habría exigido rehacer código ya avanzado si se hubiera descubierto más tarde.
 
 <br>
 
@@ -210,7 +212,7 @@ No todo requerimiento no funcional se traduce en una clase o en una tabla. La ma
 | NRF | Cómo se atiende | Ámbito |
 |---|---|---|
 | **NRF01** — Diseño responsive | Bootstrap 5.3 y cuatro puntos de quiebre definidos en las hojas de estilo | Interfaz |
-| **NRF02** — Disponibilidad 24 horas | Contratación de hosting con la disponibilidad requerida | Despliegue |
+| **NRF02** — Disponibilidad 24 horas | Reinicio automático de los contenedores (`restart: unless-stopped`); la disponibilidad continua depende del alojamiento definitivo, todavía no contratado | Despliegue |
 | **NRF03** — Rapidez en operaciones habituales | Índices sobre las columnas de filtrado frecuente: `estado`, `rol`, `tipo` y `fecha` | Implementación física de la base |
 | **NRF04** — Navegación clara y consistente | Estructura de componentes común a los tres paneles, documentada en la guía de identidad visual | Interfaz |
 | **NRF05** — Validación en frontend y backend | Validaciones en JavaScript para la experiencia de uso, replicadas en PHP como control efectivo | Código de aplicación |
@@ -249,10 +251,10 @@ Es el único caso del modelo en que un requerimiento genera estructura de datos 
 
 El modelo de clases y el modelo entidad-relación presentados no constituyen un diseño genérico de sistema de gestión académica. Cada clase, atributo, método, relación y tabla fue derivado de una frase concreta de la entrevista, de un requerimiento numerado o de una historia de usuario, y esa derivación quedó documentada en el anexo correspondiente.
 
-La trazabilidad opera en ambos sentidos. Desde los requerimientos hacia el modelo, la tabla de la sección 7 del documento principal permite ubicar qué clases resuelven cada RF, NRF, historia de usuario y épica. Desde el modelo hacia los requerimientos, las justificaciones de los pasos 1 a 5 del anexo permiten identificar el origen de cualquier elemento, incluidos aquellos que no derivan de un requerimiento funcional sino de uno no funcional —detallados en la sección 4.2— y los dos únicos que no provienen de ningún requerimiento escrito: los métodos `estaCompleta()` y `generarNombreSeguro()`, señalados explícitamente en el anexo como derivados de la operativa y de las prácticas de seguridad respectivamente.
+La trazabilidad opera en ambos sentidos. Desde los requerimientos hacia el modelo, la tabla de la sección 7 del documento principal permite ubicar qué clases resuelven cada RF, NRF, historia de usuario y épica. Desde el modelo hacia los requerimientos, las justificaciones de los pasos 1 a 5 del anexo permiten identificar el origen de cualquier elemento, incluidos aquellos que no derivan de un requerimiento funcional sino de uno no funcional —detallados en la sección 4.2— y los únicos que no provienen de ningún requerimiento escrito: los métodos `estaCompleta()` y `generarNombreSeguro()`, derivados de la operativa y de las prácticas de seguridad respectivamente, y el atributo `comentarioAlumno` de `Entrega`, incorporado durante la implementación (CC-08).
 
 El análisis del circuito operativo verificó que las quince clases resuelven la operativa completa sin requerir estructuras adicionales, y mostró en qué punto concreto se justifica cada decisión de diseño. Varias de ellas —la separación de la asistencia en jornada y detalle, la especialización entre material y tarea, la fecha de inscripción— podían parecer sobreabundantes al momento de adoptarse; el recorrido del circuito identificó el paso en que cada una resulta necesaria.
 
-La aplicación del método permitió además detectar trece correcciones sobre la documentación previa: siete requerimientos que la entrevista contenía pero que la especificación no había recogido, tres contradicciones entre la especificación y la base de datos en construcción, y tres decisiones de modelado que resultaron insuficientes al avanzar el análisis. Ninguna de ellas provino de un cambio solicitado por el cliente. Todas se detectaron antes de comenzar el desarrollo del backend, lo que evitó tener que rehacer código ya escrito.
+La aplicación del método permitió además detectar trece correcciones sobre la documentación previa: siete requerimientos que la entrevista contenía pero que la especificación no había recogido, tres contradicciones entre la especificación y la base de datos en construcción, y tres decisiones de modelado que resultaron insuficientes al avanzar el análisis. Ninguna de ellas provino de un cambio solicitado por el cliente. Todas se detectaron en las primeras etapas de la implementación, lo que evitó tener que rehacer código ya avanzado.
 
 Ese resultado constituye el argumento central del trabajo: el método de derivación en cinco pasos no operó como un requisito formal de documentación, sino como un procedimiento de verificación que expuso omisiones y contradicciones que la lectura directa de la documentación no había revelado.
