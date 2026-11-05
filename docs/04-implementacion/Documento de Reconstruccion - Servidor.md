@@ -1,10 +1,15 @@
 # Despliegue en un servidor desde cero — TheNewfutures / INAU
 
+
 ## Guía de montaje del sitio en un servidor nuevo
+
+
+
+> **Qué es este documento.** Es la guía reproducible para montar el sitio en un **servidor recién creado, sin nada instalado**, hasta dejarlo accesible por internet con HTTPS. Usa el entorno Docker definido en `backend/api-completa/compose.yaml`; aquí no se redefine ese entorno, se documenta **cómo preparar el servidor y poner el sistema en producción**.
 
 ---
 
-> **Qué es este documento.** Es la guía reproducible para montar el sitio en un **servidor recién creado, sin nada instalado**, hasta dejarlo accesible por internet con HTTPS. Usa el entorno Docker definido en `backend/api-completa/compose.yaml`; aquí no se redefine ese entorno, se documenta **cómo preparar el servidor y poner el sistema en producción**.
+<br>
 
 ### Supuestos
 
@@ -17,6 +22,8 @@
 - Reemplazá los marcadores `<IP>`, `<tu-dominio>` y `<usuario>` por los valores reales.
 
 ---
+
+<br>
 
 ## Paso 1 — Entrar al servidor y crear un usuario de trabajo
 
@@ -35,6 +42,10 @@ usermod -aG sudo <usuario>
 
 Desde aquí se trabaja con ese usuario (`ssh <usuario>@<IP>`), no como root.
 
+---
+
+<br>
+
 ## Paso 2 — Actualizar el sistema y activar el firewall
 
 ```bash
@@ -50,7 +61,11 @@ sudo ufw allow 443
 sudo ufw enable
 ```
 
-> **Importante:** Docker escribe sus propias reglas de red y **no respeta UFW** para los puertos que publican los contenedores. El firewall por sí solo **no** impide que se acceda desde internet a la base (3308) o a la API (8002). Para cerrarlos hay que publicarlos solo en `127.0.0.1`, como se indica en el Paso 5.
+> **Importante:** Docker escribe sus propias reglas de red y **no respeta UFW** para los puertos que publican los contenedores. El firewall por sí solo **no** impide que se acceda desde internet a la base (3308) o a la API (8002). Por eso el `compose` los publica por defecto solo en `127.0.0.1` (ver el Paso 5).
+
+---
+
+<br>
 
 ## Paso 3 — Instalar Docker y Docker Compose
 
@@ -75,6 +90,10 @@ docker --version
 docker compose version
 ```
 
+---
+
+<br>
+
 ## Paso 4 — Traer el proyecto al servidor
 
 ```bash
@@ -84,6 +103,10 @@ cd proyecto-convenio-INAU
 ```
 
 > La versión con el backend completo está en la rama `cambios-frontend`. Una vez que se una a `main`, se puede clonar sin `-b cambios-frontend`.
+
+---
+
+<br>
 
 ## Paso 5 — Configurar las variables de entorno
 
@@ -110,14 +133,18 @@ FRONTEND_ORIGIN=https://<tu-dominio>
 DB_PASSWORD=<contraseña fuerte del usuario de la base>
 MYSQL_ROOT_PASSWORD=<contraseña fuerte de root>
 
-# Publicar la API y la base solo dentro del servidor (no hacia internet)
+# Valor por defecto: la API y la base solo se publican dentro del servidor. No cambiarlo.
 API_PORT=127.0.0.1:8002
 MYSQL_PORT=127.0.0.1:3308
 ```
 
-> **`SECRET_KEY` no puede quedar vacía.** Si se deja vacía, el `compose` usa una clave por defecto que está publicada en el repositorio, y cualquiera podría falsificar una sesión de administrador.
+> **`SECRET_KEY`, `DB_PASSWORD` y `MYSQL_ROOT_PASSWORD` son obligatorias.** Si alguna falta o queda vacía, `docker compose` no arranca y muestra "Debes configurar … en .env". Las contraseñas pueden generarse con `openssl rand -hex 16`.
 
 > **Antes de cargar datos reales:** quitar la línea `DROP DATABASE IF EXISTS` del script `DataBase/inau_talleres.sql`, para que una reinstalación no borre la base. Y no subir nunca el `.env` al repositorio.
+
+---
+
+<br>
 
 ## Paso 6 — Levantar la API y la base
 
@@ -130,7 +157,13 @@ docker compose ps
 
 Esto construye la imagen de la API, crea la base desde `DataBase/inau_talleres.sql` y deja la API escuchando en `127.0.0.1:8002`, accesible solo desde el propio servidor.
 
+> Los dos contenedores tienen `restart: unless-stopped`: si el servidor se reinicia, se vuelven a levantar solos, sin ejecutar `docker compose up -d`.
+
 > El script de la base se ejecuta **solo la primera vez**, cuando se crea el volumen de datos. Si más adelante cambia el esquema, volver a levantar el stack no lo aplica: hay que migrar la base a mano o recrearla.
+
+---
+
+<br>
 
 ## Paso 7 — Preparar el frontend
 
@@ -151,6 +184,10 @@ sudo mkdir -p /var/www/talleres
 sudo cp -r frontend/* /var/www/talleres/
 ```
 
+---
+
+<br>
+
 ## Paso 8 — Publicar con dominio y HTTPS (Nginx + Certbot)
 
 Instalar Nginx y Certbot:
@@ -167,6 +204,9 @@ server {
 
     # Tamaño máximo de subida (adjuntos de hasta 10 MB)
     client_max_body_size 12M;
+
+    # No mostrar la versión de Nginx en las respuestas
+    server_tokens off;
 
     # Frontend: archivos estáticos
     root /var/www/talleres;
@@ -204,6 +244,10 @@ sudo certbot --nginx -d <tu-dominio>
 
 > Como el frontend y la API quedan bajo el mismo dominio, el navegador envía la cookie de sesión en cada llamada a la API y no aparecen problemas de CORS. Por eso `FRONTEND_ORIGIN` debe ser exactamente `https://<tu-dominio>`.
 
+---
+
+<br>
+
 ## Paso 9 — Verificación
 
 | Qué | Cómo |
@@ -214,6 +258,12 @@ sudo certbot --nginx -d <tu-dominio>
 | Puertos cerrados hacia afuera | Desde otra máquina, `https://<tu-dominio>:8002` y el puerto `3308` no responden |
 | Sitio funcionando | Abrir `https://<tu-dominio>`, iniciar sesión con un usuario de prueba y navegar el panel |
 | HTTPS válido | El navegador muestra el candado sin advertencias |
+| Versiones ocultas | `curl -I https://<tu-dominio>/` muestra `Server: nginx` sin número de versión, y la API no envía `X-Powered-By` |
+| Reinicio automático | Después de `sudo reboot`, `docker compose ps` muestra `api` y `database` activos |
+
+---
+
+<br>
 
 ## Paso 10 — Operación y mantenimiento
 
@@ -232,6 +282,7 @@ Para actualizar el sitio con cambios nuevos del repositorio:
 
 ```bash
 cd ~/proyecto-convenio-INAU
+git checkout -- frontend   # descarta el reemplazo de URL anterior; si no, git pull falla
 git pull
 
 # API
@@ -242,7 +293,13 @@ grep -rl 'http://localhost:8002' frontend | xargs -r sed -i 's#http://localhost:
 sudo cp -r frontend/* /var/www/talleres/
 ```
 
+> Después de actualizar el frontend, recargar el navegador con Ctrl+Shift+R para no ver la versión guardada.
+
 > Actualizar el código no modifica la base de datos (ver la nota del Paso 6).
+
+---
+
+<br>
 
 ## Checklist de seguridad antes de usar con datos reales
 
@@ -253,6 +310,7 @@ sudo cp -r frontend/* /var/www/talleres/
 - [ ] El `.env` nunca se sube al repositorio.
 - [ ] `DROP DATABASE IF EXISTS` retirado del script de la base.
 - [ ] HTTPS activo y renovación automática de Certbot funcionando.
+- [ ] `server_tokens off` en Nginx; cabeceras sin versión (Paso 9).
 - [ ] Respaldo de la base programado.
 
 ---

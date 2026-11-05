@@ -2,7 +2,7 @@
 
 <br>
 
-> **Qué es este documento.** Registro de los requerimientos originales del proyecto, tal como se definieron después de la entrevista con el cliente. No refleja su estado actual, las postergaciones, ni el estado de cada requerimiento al cierre figuran en `Doc.md` y en `Control_de_Cambios.md`.
+> **Qué es este documento.** Registro de los requerimientos originales del proyecto, tal como se definieron después de la entrevista con el cliente. No refleja su estado actual: las postergaciones y el estado de cada requerimiento al cierre figuran en `Doc.md` y en `Control_de_Cambios.md`.
 
 <br>
 

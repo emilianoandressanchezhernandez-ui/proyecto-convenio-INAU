@@ -6,7 +6,7 @@
 
 **Proyecto:** TheNewfutures — Sistema de Gestión de Talleres en Convenio con INAU    
 **Fecha de elaboración:** 27 de octubre de 2026  
-**Última actualización:** 27 de octubre de 2026  
+**Última actualización:** 4 de noviembre de 2026  
 
 **Qué es este documento.** Constituye la referencia técnica de la API REST (sigla en inglés de *Representational State Transfer*) del sistema. Describe las rutas disponibles, los niveles de acceso requeridos, el formato de las peticiones y respuestas, y las reglas de validación aplicadas.
 
@@ -60,10 +60,12 @@ El usuario inicia sesión mediante `POST /login`, enviando su correo y su contra
 
 El token tiene una validez configurable mediante la variable de entorno `TOKEN_LIFETIME`, cuyo valor predeterminado es de 3600 segundos (una hora). La ruta `POST /logout` elimina la cookie del navegador; es pública para permitir eliminar incluso una cookie vencida o inválida.
 
+Después de cinco intentos fallidos para un mismo correo desde la misma IP, el inicio de sesión se bloquea durante cinco minutos (`429`). Además, cada IP puede hacer hasta 300 pedidos por minuto a la API. Cambiar la contraseña o desactivar a un usuario invalida sus sesiones abiertas: en cada pedido, la API comprueba en la base de datos que el usuario exista, esté activo y no haya cambiado su contraseña.
+
 
 ### 2.2 Niveles de acceso
 
-Cada ruta declara en `routes.php` el nivel de acceso requerido. Antes de ejecutarla, `core/AuthMiddleware.php` verifica el token y, cuando corresponde, el rol del usuario.
+Cada ruta declara en `routes.php` el nivel de acceso requerido. Antes de ejecutarla, `core/AuthMiddleware.php` verifica el token, consulta el usuario en la base de datos y comprueba su rol, tomado de la base y no del token.
 
 | Nivel | Quién puede usar la ruta | Respuesta si no se cumple |
 |---|---|---|
@@ -123,10 +125,14 @@ Todas las respuestas se emiten en formato JSON mediante `core/Response.php`, con
 | `401` | No hay una sesión válida, o las credenciales son incorrectas | "Tenes que iniciar sesion." / "Correo o contraseña incorrectos." |
 | `403` | El usuario no tiene permiso para la operación | "No tenes permisos para hacer esto." |
 | `404` | La ruta o el recurso no existe | "No existe esa dirección, o no se puede usar con GET." |
+| `409` | Ya existe un registro con ese dato | "Ya existe un alumno con esa cédula." |
 | `422` | Los datos no superan la validación | "Los datos ingresados no son válidos." |
-| `500` | Error interno del servidor | "Ocurrio un error interno." |
+| `429` | Demasiados pedidos en poco tiempo | "Demasiados intentos de inicio de sesión. Esperá unos minutos e intentá de nuevo." |
+| `500` | Error interno del servidor | "Ocurrio un error interno." / "Ocurrio un error interno con la base de datos." |
 
 Ante un error interno, el detalle técnico se registra en los registros del servidor y no se muestra al cliente.
+
+Las respuestas `429` incluyen el encabezado `Retry-After` y el campo `retry_after`, con los segundos que hay que esperar.
 
 > **Observación:** los errores de validación no utilizan un único código. Las rutas de alumnos, talleristas y adjuntos responden `422`, mientras que las de autenticación y perfil responden `400`.
 
@@ -245,6 +251,8 @@ La API expone 55 rutas, agrupadas por recurso. La columna "Acceso" indica el niv
 | `GET` | `/adjuntos/{id}/archivo` | `admin \| tallerista \| alumno` | Descargar un archivo adjunto |
 | `DELETE` | `/adjuntos/{id}` | `admin \| tallerista \| alumno` | Eliminar un adjunto; los permisos dependen de su origen |
 
+Las respuestas de adjuntos incluyen `id`, `contenido_id`, `entrega_id`, `nombre_original`, `tipo_mime`, `tamano_bytes` y `fecha_subida`. No incluyen la ruta ni el nombre interno del archivo en el servidor.
+
 ---
 
 <br>
@@ -278,6 +286,7 @@ Esta sección describe en detalle las rutas que representan los flujos centrales
 | `400` | Falta el correo o la contraseña | "Falta el correo." / "Falta la contraseña." |
 | `401` | Correo inexistente o contraseña incorrecta | "Correo o contraseña incorrectos." |
 | `403` | La cuenta está inactiva | — |
+| `429` | Cinco intentos fallidos en cinco minutos para el mismo correo | "Demasiados intentos de inicio de sesión. Esperá unos minutos e intentá de nuevo." |
 
 <br>
 
@@ -295,7 +304,7 @@ Esta sección describe en detalle las rutas que representan los flujos centrales
 }
 ```
 
-**Respuesta exitosa (`200`):** "Contraseña actualizada correctamente."
+**Respuesta exitosa (`200`):** "Contraseña actualizada correctamente." La respuesta envía una cookie `access_token` nueva: la sesión actual sigue activa y las demás sesiones del usuario se cierran.
 
 **Errores posibles** (verificados en `Testing-02.md`, casos CP-03, CP-04 y NF-01):
 
@@ -327,7 +336,7 @@ Esta sección describe en detalle las rutas que representan los flujos centrales
 }
 ```
 
-`nombre`, `apellido`, `cedula` y `fecha_nacimiento` son obligatorios; `correo` y `telefono` son opcionales. La cédula se acepta con o sin puntos y guion (`12345678` o `1.234.567-8`).
+`nombre`, `apellido`, `cedula` y `fecha_nacimiento` son obligatorios; `correo` y `telefono` son opcionales. La cédula se acepta con o sin puntos y guion (`12345678` o `1.234.567-8`). Se guarda con el formato X.XXX.XXX-X, y se detecta como repetida aunque se escriba en otro formato.
 
 **Respuesta exitosa (`201`):** "Alumno creado correctamente.", con el alumno creado en `datos`.
 
@@ -338,7 +347,7 @@ Esta sección describe en detalle las rutas que representan los flujos centrales
 | `422` | La cédula no tiene 8 dígitos o contiene letras | "La cédula debe contener exactamente 8 dígitos." |
 | `422` | El teléfono no tiene entre 8 y 15 dígitos o contiene letras | "El teléfono debe contener entre 8 y 15 dígitos y no puede incluir letras." |
 | `422` | Falta un campo obligatorio o la fecha no tiene formato válido | Mensaje del campo correspondiente (sección 6) |
-| `400` | Ya existe un alumno con la misma cédula | "Ya existe un alumno con esa cédula." |
+| `409` | Ya existe un alumno con la misma cédula | "Ya existe un alumno con esa cédula." |
 
 
 <br>
@@ -429,7 +438,7 @@ La API valida todos los datos recibidos, aunque el frontend ya los haya validado
 
 | Dato | Regla | Mensaje de error |
 |---|---|---|
-| Cédula | Exactamente 8 dígitos; admite puntos y guion | "La cédula debe contener exactamente 8 dígitos." |
+| Cédula | Exactamente 8 dígitos; admite puntos y guion. Se guarda con el formato X.XXX.XXX-X | "La cédula debe contener exactamente 8 dígitos." |
 | Teléfono | Entre 8 y 15 dígitos; admite espacios, `+`, `-` y paréntesis, pero no letras | "El teléfono debe contener entre 8 y 15 dígitos y no puede incluir letras." |
 | Correo electrónico | Formato de correo válido | "El correo electrónico no es válido." |
 | Fecha de nacimiento | Formato `YYYY-MM-DD` | "La fecha de nacimiento debe tener formato YYYY-MM-DD." |
@@ -450,14 +459,13 @@ La API valida todos los datos recibidos, aunque el frontend ya los haya validado
 
 | Limitación | Referencia |
 |---|---|
-| Los archivos subidos pueden descargarse sin sesión mediante una ruta directa, además de la ruta oficial `GET /adjuntos/{id}/archivo` | `Hardening de Infraestructura y Contenedores.md`, hallazgo H-02 |
-| La exportación de reportes genera un archivo JSON, no PDF ni Excel (RF13) | `Testing-01.md`, DEF-02 |
-| La comprobación de cédula repetida no normaliza el formato: `1.234.567-8` y `12345678` se aceptan como cédulas distintas | `Testing-02.md`, DEF-09 |
+| La exportación de reportes genera un archivo JSON, no PDF ni Excel (RF13, postergado) | `Testing-06.md`, sección 2.9 |
 | Los errores de validación se responden con `400` en unas rutas y con `422` en otras | Sección 3.1 de este documento |
-| El cambio de contraseña no invalida los tokens ya emitidos, y la limitación de intentos de inicio de sesión no está conectada | `Mecanismos_Autenticacion_Criptografia_INAU.md`, sección 9 |
+| El cierre de sesión (`POST /logout`) borra la cookie del navegador, pero no invalida en el servidor una copia del token | `Mecanismos_Autenticacion_Criptografia_INAU.md`, sección 9 |
+| No hay protección contra CSRF | `Mecanismos_Autenticacion_Criptografia_INAU.md`, sección 9 |
 
 ---
 
 <br>
 
-**Documentos relacionados:** `backend/api-completa/README.md`, `Documento de Reconstruccion - Servidor.md`, `Mecanismos_Autenticacion_Criptografia_INAU.md`, `Hardening de Infraestructura y Contenedores.md`, `Testing-01.md` y `Testing-02.md`.
+**Documentos relacionados:** `backend/api-completa/README.md`, `Documento de Reconstruccion - Servidor.md`, `Mecanismos_Autenticacion_Criptografia_INAU.md`, `Hardening de Infraestructura y Contenedores.md`, `Testing-01.md` a `Testing-06.md`.
