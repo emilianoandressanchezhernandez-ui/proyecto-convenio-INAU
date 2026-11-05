@@ -57,7 +57,7 @@ Se aplicó el método de derivación en cinco pasos a partir de los requerimient
 
 | # | Clase | Origen | Justificación |
 |---|---|---|---|
-| 1 | **Usuario** | RF01, RF02, RF14 | Tiene identidad propia (cédula), datos persistentes y es el sujeto de la autenticación. |
+| 1 | **Usuario** | RF01, RF02, RF14 | Tiene identidad propia (cédula), datos persistentes y es el sujeto de la autenticación, que se realiza con su correo. |
 | 2 | **Administrador** | RF01, RF02, RF24 | Rol con permisos globales sobre el sistema; comparte todos los atributos de Usuario. |
 | 3 | **Tallerista** | RF01, RF06, RF09, RF22 | Rol con permisos acotados a sus talleres; aporta un atributo propio (especialidad). |
 | 4 | **Alumno** | RF02, RF03, RF04, RF07, RF08, RF19 | Entidad administrada con identidad propia; participa en talleres, asistencias y entregas. |
@@ -124,10 +124,11 @@ Se incorpora como clase porque la información debe persistirse y vincularse a u
 
 | Atributo | Origen | Justificación |
 |---|---|---|
-| `cedula` | RF01, RF02 | Identificador de acceso al sistema y dato no modificable por el usuario. |
+| `cedula` | RF02 | Identificador personal del usuario, único y no modificable por el usuario. |
 | `claveHash` | RF01, RF14 | RF01 requiere contraseña y RF14 permite modificarla; se almacena cifrada conforme a NRF08. |
 | `nombre`, `apellido` | RF02, RF14 | Datos personales gestionados por el administrador y visibles en el perfil. |
-| `correo`, `telefono` | RF14 | Datos de contacto que el propio usuario puede modificar. |
+| `correo` | RF01, RF14 | Identificador de acceso al sistema (único por usuario) y dato de contacto que el propio usuario puede modificar. |
+| `telefono` | RF14 | Dato de contacto que el propio usuario puede modificar. |
 | `rol` | RF01 | Determina la redirección y los permisos tras el inicio de sesión. |
 | `estado` | RF02 | Permite la baja lógica, preservando el historial exigido por NRF10. |
 | `fechaRegistro`, `ultimoAcceso` | RF24 | Datos de auditoría para la supervisión del uso de la plataforma. |
@@ -329,7 +330,7 @@ Este criterio evita que las clases de rol concentren la totalidad del comportami
 
 | Método | Verbo de origen | RF | Justificación |
 |---|---|---|---|
-| `autenticar(cedula, clave)` | "iniciar sesión" | RF01 | RF01 exige validar credenciales. Se ubica en la clase abstracta porque los tres roles se autentican del mismo modo. |
+| `autenticar(correo, clave)` | "iniciar sesión" | RF01 | RF01 exige validar credenciales; el acceso se realiza con el correo, dato único por usuario (CC-07). Se ubica en la clase abstracta porque los tres roles se autentican del mismo modo. |
 | `modificarContrasena(nueva)` | "modificar contraseña" | RF14 | RF14 permite a cada usuario cambiar su clave. |
 | `modificarDatosPersonales(datos)` | "gestionar su perfil" | RF14 | Actualiza correo y teléfono. No incluye cédula, nombre ni apellido, que son de solo lectura para el usuario. |
 | `obtenerRol()` | "diferenciando el acceso según el rol" | RF01 | Necesario para determinar a qué panel se redirige al usuario tras el ingreso. |
