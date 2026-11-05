@@ -170,7 +170,7 @@ Las dos jerarquías de herencia (`Usuario` y `Contenido`) se implementan mediant
 | Contenido | `contenidos` | Absorbe a Material y Tarea |
 | Material | — | `contenidos` con tipo = Material |
 | Tarea | — | `contenidos` con tipo = Tarea; aporta `fecha_limite`. La consigna se almacena en `descripcion` |
-| Entrega | `entregas` | — |
+| Entrega | `entregas` | `comentarioCorreccion` se almacena en la columna `comentario` |
 | Adjunto | `adjuntos` | — |
 | Informe | `reportes` | — |
 | RegistroTrazabilidad | `trazabilidad` | — |
@@ -217,7 +217,7 @@ Cuatro reglas del modelo no pueden expresarse en la base de datos y deben implem
 | Administrador | `exportarInforme()` | RF13 |
 | Informe | `exportarPDF()`, `exportarExcel()` | RF13 |
 
-Estos elementos figuran en el modelo para reflejar el diseño completo del sistema, pero no se implementan en la primera versión. La única excepción parcial es modificarContenido() (RF26): la API ya admite la modificación (PATCH /contenidos/{id}), pero ninguna pantalla la ofrece.
+Estos elementos figuran en el modelo para reflejar el diseño completo del sistema, pero no se implementan en la primera versión. La única excepción parcial es `modificarContenido()` (RF26): la API ya admite la modificación (`PATCH /contenidos/{id}`), pero ninguna pantalla la ofrece.
 
 ---
 
@@ -249,7 +249,7 @@ Estos elementos figuran en el modelo para reflejar el diseño completo del siste
 
 **Un mismo requerimiento puede figurar en dos clases.** Los requerimientos que describen una acción se asignan tanto a la clase que la ejecuta como a aquella sobre la que opera. RF11, por ejemplo, aparece en `Administrador` —donde reside el método `generarInformeAsistencia()`— y en `Informe`, que es el objeto producido. La duplicación es deliberada: refleja el criterio de asignación de métodos establecido en el Paso 3 de la derivación, según el cual quien inicia una acción y aquello sobre lo que actúa constituyen elementos distintos del modelo.
 
-**`RegistroTrazabilidad` es la única clase sin RF ni HU de origen.** Deriva exclusivamente de NRF10 y no corresponde a ninguna épica, ya que su registro se activa transversalmente en operaciones de todas ellas.
+**`RegistroTrazabilidad` es la única clase sin RF ni HU de origen.** Deriva exclusivamente de NRF10 y no corresponde a ninguna épica, ya que su registro debe activarse transversalmente en operaciones de todas ellas (en la primera versión, la API todavía no lo realiza).
 
 **`Usuario` abarca tres épicas** porque concentra elementos de origen diverso: la autenticación (EP1), su gestión como entidad administrada (EP2) y la edición del perfil propio (EP6).
 
@@ -358,7 +358,7 @@ classDiagram
         +String salon
         +Date fechaInicio
         +Date fechaFin
-        +Estado estado
+        +EstadoTaller estado
         +String observaciones
         +obtenerAlumnos() List
         +obtenerTalleristas() List
@@ -505,11 +505,11 @@ classDiagram
 - `Taller` **1..\*** ←→ **0..\*** `Tallerista`, con `AsignacionTallerista` como clase asociativa
 - `Taller` **0..\*** ←→ **1..\*** `Tallerista`, con `AsignacionTallerista` como clase asociativa
 
-**Restricción de exclusividad de `Adjunto`.** El diagrama muestra dos composiciones hacia `Adjunto`, una desde `Contenido` y otra desde `Entrega`. En el modelo, ambas son excluyentes: un adjunto pertenece a un contenido **o** a una entrega, nunca a ambos ni a ninguno. Esta restricción no puede expresarse gráficamente y se documenta en el anexo.
+**Restricción de exclusividad de `Adjunto`.** El diagrama muestra dos composiciones hacia `Adjunto`, una desde `Contenido` y otra desde `Entrega`. En el modelo, ambas son excluyentes: un adjunto pertenece a un contenido **o** a una entrega, nunca a ambos ni a ninguno. Esta restricción no puede expresarse gráficamente: se implementa en la base de datos con la verificación `chk_adjuntos_origen` y se justifica en el anexo.
 
 **Elementos de fase 2.** Se señalan con el sufijo `[v2]` por limitaciones de la notación, que no permite aplicar estilos diferenciados a atributos o métodos individuales.
 
-**Enumeraciones.** Los tipos `Rol`, `Estado`, `EstadoAsistencia` y `EstadoEntrega` corresponden a conjuntos cerrados de valores documentados en el script de base de datos. No se representan como clases independientes por carecer de atributos y comportamiento propios.
+**Enumeraciones.** Los tipos `Rol`, `Estado`, `EstadoTaller`, `EstadoAsistencia` y `EstadoEntrega` corresponden a conjuntos cerrados de valores documentados en el script de base de datos. No se representan como clases independientes por carecer de atributos y comportamiento propios.
 
 ### Leyenda de símbolos
 
