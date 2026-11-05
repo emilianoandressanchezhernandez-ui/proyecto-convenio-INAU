@@ -128,7 +128,8 @@ class AlumnoRepository extends Repository
                 id,
                 cedula
             FROM alumnos
-            WHERE cedula = :cedula
+            WHERE REPLACE(REPLACE(cedula, '.', ''), '-', '') =
+                  REPLACE(REPLACE(:cedula, '.', ''), '-', '')
             LIMIT 1
         ";
 

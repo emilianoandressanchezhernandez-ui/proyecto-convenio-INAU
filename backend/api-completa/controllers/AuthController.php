@@ -20,6 +20,10 @@ class AuthController extends Controller
     /**
      * POST /login
      * Recibe: { "correo": "...", "clave": "..." }
+     *
+     * Límite de intentos: máximo 5 intentos cada 5 minutos
+     * por cada combinación de IP + correo. Si se supera, responde 429.
+     * Un login correcto borra los intentos acumulados.
      */
     public function login($id = null)
     {
@@ -33,7 +37,22 @@ class AuthController extends Controller
 
         $dto = new LoginDTO($data);
 
+        // Contar este intento. Si ya hubo 5 en los últimos 5 minutos
+        // para esta IP y este correo, RateLimiter responde 429 y corta.
+        $limiter = RateLimiter::check(
+            5,
+            300,
+            'login',
+            RateLimiter::clientIp() . '|' . $dto->getCorreo(),
+            'Demasiados intentos de inicio de sesión. Esperá unos minutos e intentá de nuevo.'
+        );
+
+        // Si la contraseña es incorrecta, el service responde 401 y corta;
+        // por eso la línea siguiente solo se ejecuta si el login fue correcto.
         $session = $this->service->login($dto);
+
+        // Login correcto: se borran los intentos acumulados.
+        $limiter->reset();
 
         Token::sendCookie($session['token']);
 
@@ -95,6 +114,9 @@ class AuthController extends Controller
     /**
      * PATCH /perfil/clave
      * Cambia la contraseña del usuario autenticado.
+     *
+     * Las demás sesiones del usuario se cierran; la actual recibe
+     * una cookie nueva para seguir abierta.
      */
     public function changePassword($id = null)
     {
@@ -111,11 +133,14 @@ class AuthController extends Controller
             return;
         }
 
-        $this->service->changePassword(
+        $token = $this->service->changePassword(
             (int) $this->user()['id'],
             $data['clave_actual'],
             $data['clave_nueva']
         );
+
+        // Mantener abierta la sesión de quien cambió la contraseña.
+        Token::sendCookie($token);
 
         Response::success(
             null,

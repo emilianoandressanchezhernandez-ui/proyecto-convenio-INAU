@@ -707,6 +707,10 @@ async function guardarNuevoMaterialAPI() {
         "nuevo-material-fecha-limite"
     )?.value ?? "";
 
+    const archivos = Array.from(
+        document.getElementById("nuevo-material-archivos")?.files ?? []
+    );
+
     const taller = talleresMaterial.find(
         item => Number(item.id) === tallerId
     );
@@ -747,6 +751,26 @@ async function guardarNuevoMaterialAPI() {
         return;
     }
 
+    // Revisar los archivos antes de crear el contenido.
+    for (const archivo of archivos) {
+        const nombre = archivo.name.toLowerCase();
+
+        if (![".pdf", ".jpg", ".jpeg"].some(ext => nombre.endsWith(ext))) {
+            mostrarAlertaNuevoMaterial(`"${archivo.name}" no es un PDF ni una imagen JPG.`);
+            return;
+        }
+
+        if (archivo.size === 0) {
+            mostrarAlertaNuevoMaterial(`"${archivo.name}" está vacío.`);
+            return;
+        }
+
+        if (archivo.size > 10 * 1024 * 1024) {
+            mostrarAlertaNuevoMaterial(`"${archivo.name}" supera los 10 MB.`);
+            return;
+        }
+    }
+
     const datos = {
         tipo: tipo,
         titulo: titulo,
@@ -767,11 +791,22 @@ async function guardarNuevoMaterialAPI() {
     }
 
     try {
-        await solicitarMaterialAPI(
+        const contenidoCreado = await solicitarMaterialAPI(
             `/talleres/${tallerId}/contenidos`,
             "POST",
             datos
         );
+
+        // Subir los archivos adjuntos al contenido recién creado.
+        const archivosFallidos = [];
+
+        for (const archivo of archivos) {
+            try {
+                await subirAdjuntoMaterialAPI(contenidoCreado.id, archivo);
+            } catch (errorArchivo) {
+                archivosFallidos.push(`${archivo.name}: ${errorArchivo.message}`);
+            }
+        }
 
         const modalElemento = document.getElementById(
             "modal-nuevo-material"
@@ -781,10 +816,18 @@ async function guardarNuevoMaterialAPI() {
             modalElemento
         ).hide();
 
-        mostrarAlertaMaterial(
-            "Contenido publicado correctamente en MySQL.",
-            "success"
-        );
+        if (archivosFallidos.length > 0) {
+            mostrarAlertaMaterial(
+                "El contenido se publicó, pero no se pudieron subir estos archivos: " +
+                archivosFallidos.join(" | "),
+                "warning"
+            );
+        } else {
+            mostrarAlertaMaterial(
+                "Contenido publicado correctamente en MySQL.",
+                "success"
+            );
+        }
 
         // Volver a consultar para mostrar
         // exactamente lo guardado en la API.
@@ -822,6 +865,37 @@ async function guardarNuevoMaterialAPI() {
             boton.textContent = "Guardar";
         }
     }
+}
+
+
+// Sube un archivo a un contenido ya creado (DEF-06).
+async function subirAdjuntoMaterialAPI(contenidoId, archivo) {
+    const formulario = new FormData();
+    formulario.append("archivo", archivo);
+
+    const respuesta = await fetch(
+        `${TALLERISTA_API_URL}/contenidos/${Number(contenidoId)}/adjuntos`,
+        {
+            method: "POST",
+            credentials: "include",
+            headers: { Accept: "application/json" },
+            body: formulario
+        }
+    );
+
+    const resultado = await respuesta.json().catch(() => ({}));
+
+    if (!respuesta.ok || resultado.ok === false) {
+        const errores = resultado.errores && typeof resultado.errores === "object"
+            ? Object.values(resultado.errores).join(" ")
+            : "";
+
+        throw new Error(
+            `${resultado.mensaje || "No se pudo subir el archivo."} ${errores}`.trim()
+        );
+    }
+
+    return resultado.datos;
 }
 
 

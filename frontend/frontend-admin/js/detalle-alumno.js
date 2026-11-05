@@ -136,6 +136,9 @@ function mostrarDatosAlumno(alumno) {
 
     colocarTexto("telefono", alumno.telefono || "—");
     colocarTexto("correo", alumno.correo || "—");
+    colocarTexto("direccion", alumno.direccion || "—");
+    colocarTexto("referente-adulto", alumno.referenteAdulto || "—");
+    colocarTexto("centro-referencia", alumno.centroReferencia || "—");
 
     colocarTexto(
         "fecha-registro",

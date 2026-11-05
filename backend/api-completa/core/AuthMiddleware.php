@@ -28,7 +28,7 @@ class AuthMiddleware
     /**
      * Ejecuta el control de acceso de la ruta.
      */
-    public static function handle(?string $requirement): void
+       public static function handle(?string $requirement): void
     {
         // Ruta publica.
         if ($requirement === null) {
@@ -45,6 +45,29 @@ class AuthMiddleware
                 401
             );
         }
+
+        // Comprobar contra la base que la sesión siga siendo válida:      
+        // el usuario existe, está activo y no cambió su contraseña.       
+        $actual = (new UserRepository())->findById((int) ($user['id'] ?? 0)); 
+                                                                           
+        if (                                                               
+            $actual === null ||                                            
+            !$actual->isActivo() ||                                       
+            !hash_equals(                                                 
+                $actual->getPasswordFingerprint(),                         
+                (string) ($user['kv'] ?? '')                               
+            )                                                              
+        ) {                                                                
+            Token::clearCookie();                                          
+                                                                           
+            Response::error(                                               
+                'Tu sesión ya no es válida. Iniciá sesión de nuevo.',      
+                401                                                        
+            );                                                             
+        }                                                                  
+                                                                           
+        // El rol se toma de la base, no del token.                        
+        $user['rol'] = $actual->getRole();                                 
 
         // Guardamos el usuario autenticado.
         self::$user = $user;

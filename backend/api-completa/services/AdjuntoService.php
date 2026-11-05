@@ -32,8 +32,9 @@ class AdjuntoService
             $user
         );
 
-        return $this->repository->findByEntrega(
-            $entregaId
+        return array_map(
+            fn($adjunto) => $this->ocultarDatosInternos($adjunto),
+            $this->repository->findByEntrega($entregaId)
         );
     }
 
@@ -109,8 +110,9 @@ class AdjuntoService
             $user
         );
 
-        return $this->repository->findByContenido(
-            $contenidoId
+        return array_map(
+            fn($adjunto) => $this->ocultarDatosInternos($adjunto),
+            $this->repository->findByContenido($contenidoId)
         );
     }
 
@@ -654,6 +656,18 @@ class AdjuntoService
             );
         }
 
+        return $this->ocultarDatosInternos($adjunto);
+    }
+    /**
+     * Quita los datos internos de almacenamiento antes de enviar
+     * un adjunto al cliente. El servidor los sigue usando para
+     * la descarga oficial (getFile), pero el navegador no los necesita.
+     */
+    private function ocultarDatosInternos(array $adjunto): array
+    {
+        unset($adjunto['ruta'], $adjunto['nombre_archivo']);
+
         return $adjunto;
     }
+
 }

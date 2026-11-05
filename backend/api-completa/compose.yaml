@@ -3,13 +3,14 @@ name: api-completa
 services:
   database:
     image: mysql:8.4
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: inau_talleres
       MYSQL_USER: utu_user
-      MYSQL_PASSWORD: ${DB_PASSWORD:-utu_password}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Debes configurar DB_PASSWORD en .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Debes configurar MYSQL_ROOT_PASSWORD en .env}
     ports:
-      - "${MYSQL_PORT:-3308}:3306"
+      - "${MYSQL_PORT:-127.0.0.1:3308}:3306"
     volumes:
       # Los datos sobreviven aunque se detengan o vuelvan a crear los containers.
       - mysql_data:/var/lib/mysql
@@ -27,6 +28,7 @@ services:
     build:
       context: .
       dockerfile: docker/php-apache/Dockerfile
+    restart: unless-stopped
     environment:
       APP_ENV: ${APP_ENV:-development}
       SECRET_KEY: ${SECRET_KEY:?Debes configurar SECRET_KEY en .env}
@@ -35,9 +37,9 @@ services:
       DB_HOST: database
       DB_NAME: inau_talleres
       DB_USER: utu_user
-      DB_PASSWORD: ${DB_PASSWORD:-utu_password}
+      DB_PASSWORD: ${DB_PASSWORD:?Debes configurar DB_PASSWORD en .env}
     ports:
-      - "${API_PORT:-8002}:80"
+      - "${API_PORT:-127.0.0.1:8002}:80"
     volumes:
       - uploads_data:/var/www/html/uploads
     depends_on:

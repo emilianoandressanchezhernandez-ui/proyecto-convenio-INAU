@@ -17,7 +17,7 @@ Las decisiones de stack (PHP como backend, frontend sin framework, login único)
 | MySQL en contenedor separado con volumen persistente (`mysql_data`) | NRF09 "garantizar la persistencia confiable de los datos en una base de datos relacional". Los datos sobreviven aunque se detengan o se vuelvan a crear los contenedores. |
 | Código de la API copiado dentro de la imagen | La API queda autocontenida: la imagen se construye desde `backend/api-completa/` e instala sus dependencias con Composer a partir de `composer.lock`, sin depender de la computadora de cada integrante. |
 | Archivos subidos en un volumen propio (`uploads_data`) | Los adjuntos de material y entregas persisten de forma independiente del contenedor de la API (NRF09). |
-| Variables configurables mediante `.env` | NRF08 "proteger los datos personales de los usuarios". El `compose` trae valores por defecto pensados solo para desarrollo, de modo que funciona sin `.env`; en producción esos valores (clave secreta y contraseñas) deben reemplazarse obligatoriamente. |
+| Variables configurables mediante `.env` | NRF08 "proteger los datos personales de los usuarios". `SECRET_KEY`, `DB_PASSWORD` y `MYSQL_ROOT_PASSWORD` no tienen valor por defecto: el `compose` no arranca sin un `.env` que las defina, lo que evita usar claves publicadas en el repositorio. |
 | Frontend separado de la API | NRF06 "arquitectura separada entre frontend y backend". El frontend es estático y se comunica con la API por HTTP; la API solo acepta solicitudes con credenciales desde el origen autorizado en `FRONTEND_ORIGIN` (CORS). |
 
 ---
@@ -29,7 +29,7 @@ La estructura completa del repositorio se documenta en `docs/Estructura del Repo
 ```
 backend/api-completa/
 ├── compose.yaml                 # orquestación de los servicios api y database
-├── .env.docker.example          # plantilla opcional de variables (se copia como .env)
+├── .env.docker.example          # plantilla de variables (se copia como .env; obligatorio)
 ├── DataBase/
 │   └── inau_talleres.sql        # esquema y datos de prueba, ejecutado al crear la base
 └── docker/php-apache/
@@ -53,8 +53,9 @@ El archivo completo está en `backend/api-completa/compose.yaml`. Define dos ser
 | Inicialización de la base | Monta `./DataBase/inau_talleres.sql` como `/docker-entrypoint-initdb.d/01-database.sql` | MySQL ejecuta el script automáticamente, pero **solo la primera vez que se crea el volumen**. |
 | `healthcheck` en `database` + `depends_on: service_healthy` en `api` | `mysqladmin ping` cada 5 s | La API no arranca hasta que MySQL está listo, evitando errores de conexión en el primer inicio. |
 | Servicio `api` | Se construye con `docker/php-apache/Dockerfile` | Contiene el código de la API y sus dependencias. |
-| Puerto de la API | `${API_PORT:-8002}:80` | La API queda disponible en `http://localhost:8002`. |
-| Puerto de MySQL | `${MYSQL_PORT:-3308}:3306` | Permite inspeccionar la base desde la computadora durante el desarrollo. **Queda expuesto en todas las interfaces**: en un servidor debe restringirse (ver sección 9). |
+| Reinicio automático | `restart: unless-stopped` en los dos servicios | Si un contenedor se detiene por un error o se reinicia el servidor, Docker lo vuelve a levantar solo (hallazgo H-04). |
+| Puerto de la API | `${API_PORT:-127.0.0.1:8002}:80` | La API queda disponible en `http://localhost:8002`, solo desde la propia computadora (hallazgo H-01). |
+| Puerto de MySQL | `${MYSQL_PORT:-127.0.0.1:3308}:3306` | Permite inspeccionar la base desde la propia computadora durante el desarrollo. Por defecto solo escucha en `127.0.0.1`, por lo que no queda accesible desde otras máquinas (H-01). |
 | Volumen `mysql_data` | Datos de MySQL | Persisten con `docker compose down`; solo se borran con `docker compose down -v` (NRF09). |
 | Volumen `uploads_data` | `/var/www/html/uploads` | Persistencia de los archivos adjuntos. |
 
@@ -62,19 +63,19 @@ El archivo completo está en `backend/api-completa/compose.yaml`. Define dos ser
 
 ## 4. Variables de entorno
 
-El `compose` funciona sin archivo `.env`, con valores por defecto de desarrollo. Para cambiarlos, se copia `.env.docker.example` como `.env` en la misma carpeta y se completan los valores:
+El `compose` necesita un archivo `.env`: se copia `.env.docker.example` como `.env` en la misma carpeta y se completan, como mínimo, las tres variables obligatorias:
 
 | Variable | Uso | Valor por defecto |
 |---|---|---|
-| `SECRET_KEY` | Clave con la que la API firma los tokens de sesión | Clave de demostración incluida en `compose.yaml` |
+| `SECRET_KEY` | Clave con la que la API firma los tokens de sesión | **Obligatoria**, sin valor por defecto |
 | `APP_ENV` | `development` o `production` | `development` |
 | `TOKEN_LIFETIME` | Duración del token, en segundos | `3600` |
 | `FRONTEND_ORIGIN` | Origen del frontend autorizado por CORS | `http://localhost:8000` |
-| `DB_PASSWORD` | Contraseña del usuario `utu_user` | `utu_password` |
-| `MYSQL_ROOT_PASSWORD` | Contraseña de root de MySQL | `root_password` |
-| `API_PORT` / `MYSQL_PORT` | Puertos publicados en la computadora | `8002` / `3308` |
+| `DB_PASSWORD` | Contraseña del usuario `utu_user` | **Obligatoria**, sin valor por defecto |
+| `MYSQL_ROOT_PASSWORD` | Contraseña de root de MySQL | **Obligatoria**, sin valor por defecto |
+| `API_PORT` / `MYSQL_PORT` | Puertos publicados en la computadora | `127.0.0.1:8002` / `127.0.0.1:3308` |
 
-> La `SECRET_KEY` por defecto está publicada en el repositorio, por lo que **solo sirve para desarrollo**. Fuera de la máquina local debe generarse una nueva (por ejemplo, con `php -r "echo bin2hex(random_bytes(32));"`).
+> La `SECRET_KEY` se genera, por ejemplo, con `php -r "echo bin2hex(random_bytes(32));"`, y las contraseñas, con `openssl rand -hex 16`. Si falta alguna de las tres variables obligatorias, `docker compose` se detiene con el mensaje "Debes configurar … en .env".
 
 El archivo `.env` no debe versionarse. El `.gitignore` de la raíz del repositorio lo excluye, junto con los patrones `.env.*`, salvo las plantillas `.env.example` y `.env.docker.example`.
 
@@ -91,6 +92,7 @@ El archivo está en `backend/api-completa/docker/php-apache/Dockerfile`. Sus dec
 | Módulo `rewrite` + `app.conf` con `AllowOverride All` | Permite que Apache envíe todas las rutas de la API a `index.php` mediante `.htaccess`. `app.conf` desactiva además el listado de carpetas (`Options -Indexes`). |
 | `uploads.ini` | NRF12: limita el tamaño de los archivos subidos (`upload_max_filesize = 10M`, `post_max_size = 12M`). El tipo de archivo se valida en la propia API (NRF11). |
 | `entrypoint.sh` | Crea la carpeta `uploads` y le asigna los permisos del usuario de Apache al iniciar el contenedor. |
+| Versiones ocultas | El `Dockerfile` cambia `ServerTokens` a `Prod` y `ServerSignature` a `Off` en `security.conf`, y define `expose_php = Off`, para que las respuestas no muestren las versiones de Apache ni de PHP (hallazgo H-05). |
 
 El manejo de errores no se configura en la imagen sino en la aplicación: según `APP_ENV`, y mediante el manejador de `index.php`, que registra el detalle en el log y responde al cliente con un mensaje genérico.
 
@@ -126,6 +128,8 @@ Accesos por defecto en desarrollo:
 | MySQL (cliente externo) | localhost:3308 |
 | Frontend (servido aparte) | http://localhost:8000 |
 
+> Con la configuración por defecto, la API y MySQL solo responden desde la misma computadora.
+
 ---
 
 ## 8. Inicialización de la base de datos
@@ -144,9 +148,9 @@ El esquema está definido en `backend/api-completa/DataBase/inau_talleres.sql` (
 
 Antes de conectar este entorno a datos reales de INAU deben verificarse:
 
-- `SECRET_KEY` nueva y contraseñas propias definidas en `.env`, reemplazando los valores por defecto del `compose`.
+- `SECRET_KEY` nueva y contraseñas propias definidas en `.env` (el `compose` no arranca sin ellas).
 - `APP_ENV=production`.
-- Puerto de MySQL no expuesto fuera del servidor.
+- `API_PORT` y `MYSQL_PORT` publicados solo en `127.0.0.1` (valor por defecto), verificado desde otra máquina.
 - `.env` fuera del control de versiones.
 - Contraseñas almacenadas mediante hash seguro.
 - Conexión bajo HTTPS.

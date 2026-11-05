@@ -124,6 +124,18 @@ class AlumnoValidator
         return preg_match('/^[0-9]{8}$/', $digitos) === 1;
     }
 
+    /**
+     * Lleva la cédula al formato único X.XXX.XXX-X.
+     * Se usa después de validar, así que siempre tiene 8 dígitos.
+     */
+    public static function normalizarCedula(string $cedula): string
+    {
+        $d = preg_replace('/\D/', '', $cedula);
+
+        return $d[0] . '.' . substr($d, 1, 3) . '.' .
+            substr($d, 4, 3) . '-' . $d[7];
+    }
+
     private static function telefonoValido(string $telefono): bool
     {
         // Permite números y separadores habituales.

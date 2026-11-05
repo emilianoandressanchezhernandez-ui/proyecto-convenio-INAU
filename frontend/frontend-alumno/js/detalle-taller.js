@@ -40,12 +40,29 @@ async function inicializarDetalleTaller() {
 
         configurarEnlacesDetalle(taller.id);
 
-        // Todavía no tenemos conectadas las asistencias reales.
-        // Evitamos presentar un porcentaje simulado como verdadero.
-        colocarTextoDetalle(
-            "asistencia-promedio",
-            "Pendiente de integrar"
-        );
+        // Porcentaje de asistencia del alumno en este taller.
+        // Se calcula igual que en Mi Asistencia: presentes / total.
+        try {
+            const asistencias = await consultarDetalleTallerAPI("/mis-asistencias");
+
+            const registrosTaller = Array.isArray(asistencias)
+                ? asistencias.filter(r => Number(r.taller_id) === idTaller)
+                : [];
+
+            const presentes = registrosTaller.filter(
+                r => normalizarDetalle(r.estado) === "presente"
+            ).length;
+
+            colocarTextoDetalle(
+                "asistencia-promedio",
+                registrosTaller.length > 0
+                    ? `${Math.round((presentes / registrosTaller.length) * 100)}%`
+                    : "Sin registros"
+            );
+        } catch (errorAsistencia) {
+            // Si falla, el resto del detalle se sigue mostrando.
+            colocarTextoDetalle("asistencia-promedio", "-");
+        }
 
         const enlaceAsistencia =
             document.getElementById("enlace-asistencia");
@@ -75,15 +92,15 @@ async function inicializarDetalleTaller() {
             fechaLimite: contenido.fecha_limite
         }));
 
-        // Consultar los adjuntos reales de cada material.
-        const materiales = contenidos.filter(
-            contenido => normalizarDetalle(contenido.tipo) === "material"
+        // Consultar los adjuntos reales de cada material y de cada tarea.
+        const contenidosConArchivos = contenidos.filter(
+            contenido => ["material", "tarea"].includes(normalizarDetalle(contenido.tipo))
         );
 
         const adjuntosPorMaterial = await Promise.all(
-            materiales.map(material =>
+            contenidosConArchivos.map(contenido =>
                 consultarDetalleTallerAPI(
-                    `/contenidos/${material.id}/adjuntos`
+                    `/contenidos/${contenido.id}/adjuntos`
                 )
             )
         );
@@ -108,13 +125,29 @@ async function inicializarDetalleTaller() {
             adjuntos
         );
 
-        // Mostrar las tareas reales. Las entregas se
-        // integrarán en el próximo paso.
+        // Consultar la entrega del alumno para cada tarea.
+        const tareasTaller = contenidos.filter(
+            contenido => normalizarDetalle(contenido.tipo) === "tarea"
+        );
+
+        const entregas = (await Promise.all(
+            tareasTaller.map(async tarea => {
+                const entrega = await consultarDetalleTallerAPI(
+                    `/contenidos/${tarea.id}/mi-entrega`
+                );
+
+                return entrega
+                    ? { ...entrega, contenidoId: Number(tarea.id) }
+                    : null;
+            })
+        )).filter(Boolean);
+
         renderizarTareasDetalle(
             idTaller,
             Number.NaN,
             contenidos,
-            []
+            entregas,
+            adjuntos
         );
 
         ocultarErrorDetalleTaller();
@@ -660,7 +693,7 @@ function renderizarMaterialesDetalle(tallerId, contenidos, adjuntos) {
 // TAREAS DEL TALLER
 // ==============================
 
-function renderizarTareasDetalle(tallerId, alumnoId, contenidos, entregas) {
+function renderizarTareasDetalle(tallerId, alumnoId, contenidos, entregas, adjuntos = []) {
     const contenedor =
         document.getElementById("contenedor-tareas-taller");
 
@@ -692,11 +725,12 @@ function renderizarTareasDetalle(tallerId, alumnoId, contenidos, entregas) {
         .forEach((tarea) => {
             const entrega = entregas.find(
                 (elemento) =>
-                    Number(elemento?.contenidoId) === Number(tarea.id) &&
-                    Number(elemento?.alumnoId) === alumnoId
+                    Number(elemento?.contenidoId) === Number(tarea.id)
             );
 
-            const estadoEntrega = entrega?.estado || "Sin consultar";
+            const estadoEntrega = entrega
+                ? (entrega.estado || "Entregada")
+                : "Pendiente";
 
             const tarjeta = document.createElement("article");
             tarjeta.className = "lista-item";
@@ -752,6 +786,29 @@ function renderizarTareasDetalle(tallerId, alumnoId, contenidos, entregas) {
 
             fechas.textContent = partesFecha.join(" · ") || "Fechas no disponibles";
             contenido.appendChild(fechas);
+
+            // Archivos de la consigna (DEF-16).
+            const archivosTarea = adjuntos.filter(
+                (adjunto) => Number(adjunto?.contenidoId) === Number(tarea.id)
+            );
+
+            if (archivosTarea.length > 0) {
+                const lineaArchivos = document.createElement("p");
+                lineaArchivos.className = "small mt-2 mb-0";
+
+                const iconoArchivos = document.createElement("i");
+                iconoArchivos.className = "bi bi-paperclip me-1";
+                iconoArchivos.setAttribute("aria-hidden", "true");
+
+                lineaArchivos.append(
+                    iconoArchivos,
+                    document.createTextNode(
+                        `Archivos de la consigna: ${archivosTarea.map(a => a.nombreOriginal || "Archivo").join(", ")}. Descargalos desde "Ver tarea".`
+                    )
+                );
+
+                contenido.appendChild(lineaArchivos);
+            }
 
             if (
                 entrega &&

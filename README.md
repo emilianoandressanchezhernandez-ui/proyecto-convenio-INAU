@@ -71,12 +71,17 @@ proyecto-convenio-INAU/
 │   │
 │   ├── 04-implementacion/
 │   │   ├── Documento de Reconstruccion - Servidor.md
+│   │   ├── Manual_de_Usuario.md          
 │   │   ├── PrimeraVista.md
 │   │   ├── api.md
 │   │   ├── inau-infraestructura-docker.md
 │   │   └── Testing/
 │   │       ├── Testing-01.md
-│   │       └── Testing-02.md
+│   │       ├── Testing-02.md
+│   │       ├── Testing-03.md             
+│   │       ├── Testing-04.md             
+│   │       ├── Testing-05.md             
+│   │       └── Testing-06.md            
 │   │
 │   ├── 05-Ciberseguridad/
 │   │   ├── Doc NMAP.md
@@ -191,15 +196,15 @@ proyecto-convenio-INAU/
 | `docs/02-analisis/` | Documento principal del proyecto, entrevista y requerimientos | 3 |
 | `docs/03-diseño/` | Identidad visual y justificación tecnológica | 2 |
 | `docs/03-diseño/Modelado/` | Modelo de clases y MER, anexo de derivación y análisis del modelo | 3 |
-| `docs/04-implementacion/` | Reconstrucción en servidor, estado inicial, infraestructura y documentación de la API | 4 |
-| `docs/04-implementacion/Testing/` | Registros de pruebas, uno por ejecución | 2 |
+| `docs/04-implementacion/` | Reconstrucción en servidor, estado inicial, infraestructura, documentación de la API y manual de usuario | 5 |
+| `docs/04-implementacion/Testing/` | Registros de pruebas, uno por ejecución | 6 |
 | `docs/05-Ciberseguridad/` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening de infraestructura y contenedores, escaneo con Nmap y plan de contingencia | 5 |
 | `docs/06-Emprendedurismo/` | Plan de negocios | 1 |
 | `frontend/` | Pantalla de acceso y scripts compartidos (`api.js`, `auth.js`) | 3 |
 | `frontend/frontend-admin/` | Panel del administrador: 11 páginas, 1 hoja de estilos, 15 scripts | 28 |
 | `frontend/frontend-tallerista/` | Panel del tallerista: 9 páginas, 1 hoja de estilos, 12 scripts | 23 |
 | `frontend/frontend-alumno/` | Panel del alumno: 7 páginas, 1 hoja de estilos, 10 scripts | 18 |
-| **Total** | | **178** |
+| **Total** | | **183** |
 
 
 <br>
@@ -220,8 +225,8 @@ proyecto-convenio-INAU/
 
 | Componente | Estado |
 | --- | --- |
-| Panel del administrador | Completo y conectado a la API |
-| Panel del tallerista | Completo y conectado a la API. Incluye la gestión de material y tareas y la corrección de entregas |
+| Panel del administrador | Completo y conectado a la API. La exportación de informes a PDF o Excel (RF13) quedó postergada: los informes se descargan en JSON |
+| Panel del tallerista | Completo y conectado a la API. Incluye la gestión de material y tareas y la corrección de entregas. Los informes se descargan en JSON (RF13 postergado) |
 | Panel del alumno | Completo y conectado a la API, incluida la asistencia |
 | Pantalla de acceso (`frontend/index.html`) | Acceso por correo y contraseña, autenticación contra la API y redirección por rol |
 | Base de datos | Script con las trece tablas y datos de prueba en `backend/api-completa/DataBase/inau_talleres.sql`, ejecutado en el entorno Docker |
@@ -238,6 +243,6 @@ La documentación se organiza en carpetas numeradas según la etapa del proyecto
 | `01-gestion` | Gestión del proyecto: charter, actas, declaración de uso de IA, control de cambios y revisión de coherencia |
 | `02-analisis` | Relevamiento, entrevista con el cliente, requerimientos, historias de usuario y planificación de sprints |
 | `03-diseño` | Modelo de clases, modelo entidad-relación, identidad visual y justificación tecnológica |
-| `04-implementacion` | Estado inicial del desarrollo, entorno de ejecución, reconstrucción y despliegue, API y pruebas |
+| `04-implementacion` | Estado inicial del desarrollo, entorno de ejecución, reconstrucción y despliegue, API, manual de usuario y pruebas |
 | `05-Ciberseguridad` | Identificación de amenazas, mecanismos de autenticación y criptografía, hardening, escaneo con Nmap y plan de contingencia |
 | `06-Emprendedurismo` | Plan de negocios del producto |

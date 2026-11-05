@@ -109,6 +109,20 @@ async function inicializarDetalleTarea() {
             taller
         );
 
+        // Archivos que el tallerista adjuntó a la consigna (DEF-16).
+        // Si la consulta falla, el resto de la tarea se sigue mostrando.
+        try {
+            const archivosConsigna = await consultarDetalleTareaAPI(
+                `/contenidos/${idTarea}/adjuntos`
+            );
+
+            mostrarArchivosConsignaDetalle(
+                Array.isArray(archivosConsigna) ? archivosConsigna : []
+            );
+        } catch (errorArchivos) {
+            console.error("Error al cargar los archivos de la consigna:", errorArchivos);
+        }
+
         mostrarEntregaExistenteDetalle(
             entregaDetalleActual,
             adjuntosAdaptados
@@ -282,6 +296,46 @@ function mostrarInformacionTareaDetalle(tarea, taller) {
 
     document.title = `INAU - ${tarea.titulo || "Detalle de Tarea"}`;
     actualizarBadgeEstadoTareaDetalle(entregaDetalleActual?.estado || "Pendiente");
+}
+
+// Muestra los archivos que el tallerista adjuntó a la tarea (DEF-16).
+function mostrarArchivosConsignaDetalle(archivos) {
+    const bloque = document.getElementById("bloque-archivos-tarea");
+    const lista = document.getElementById("lista-archivos-tarea");
+
+    if (!bloque || !lista) {
+        return;
+    }
+
+    lista.replaceChildren();
+    bloque.classList.toggle("d-none", archivos.length === 0);
+
+    archivos.forEach(archivo => {
+        const item = document.createElement("li");
+        item.className = "mb-2";
+
+        const boton = document.createElement("button");
+        boton.type = "button";
+        boton.className = "btn btn-sm btn-outline-primary";
+        boton.textContent = `Descargar ${archivo.nombre_original || "archivo"}`;
+
+        boton.addEventListener("click", async () => {
+            boton.disabled = true;
+
+            try {
+                await descargarArchivoEntregaDetalle(archivo);
+            } catch (error) {
+                mostrarErrorDetalleTarea(
+                    error.message || "No se pudo descargar el archivo."
+                );
+            } finally {
+                boton.disabled = false;
+            }
+        });
+
+        item.appendChild(boton);
+        lista.appendChild(item);
+    });
 }
 
 function actualizarBadgeEstadoTareaDetalle(estado) {

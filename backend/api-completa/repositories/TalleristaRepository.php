@@ -35,7 +35,8 @@ class TalleristaRepository extends Repository
     {
         $sql = "SELECT id, cedula
                 FROM usuarios
-                WHERE cedula = :cedula
+            WHERE REPLACE(REPLACE(cedula, '.', ''), '-', '') =
+                  REPLACE(REPLACE(:cedula, '.', ''), '-', '')
                 LIMIT 1";
 
         $query = $this->db->prepare($sql);

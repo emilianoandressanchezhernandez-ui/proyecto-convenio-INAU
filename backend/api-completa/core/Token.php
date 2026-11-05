@@ -16,6 +16,7 @@ class Token
             'rol' => $user->getRole(),
             'iat' => time(),
             'exp' => time() + TOKEN_LIFETIME,
+            'kv' => $user->getPasswordFingerprint(),
         ];
 
         return JWT::encode(
