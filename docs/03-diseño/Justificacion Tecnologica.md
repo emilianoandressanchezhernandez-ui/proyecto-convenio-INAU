@@ -27,7 +27,7 @@
 | **MySQL** | Base de datos | Establecido en la propuesta original. El modelo de datos requiere relaciones N:M, lo que justifica un motor relacional. Cumple NRF09. |
 | **PDO (pdo_mysql)** | Acceso a la base de datos | Consultas preparadas en todos los accesos, lo que previene la inyección SQL. Contribuye a NRF08. |
 | **Composer + firebase/php-jwt** | Autenticación | Gestión de dependencias y emisión de tokens JWT para la autenticación, sin implementar criptografía propia. |
-| **Symfony Rate Limiter** | Limitación de intentos y de pedidos | Restringe los intentos repetidos de inicio de sesión (cinco por correo cada cinco minutos) y limita los pedidos a la API a 300 por minuto por IP, como defensa ante ataques de fuerza bruta y uso abusivo. |
+| **Symfony Rate Limiter** | Limitación de intentos y de pedidos | Restringe los intentos repetidos de inicio de sesión (cinco por correo y por IP cada cinco minutos) y limita los pedidos a la API a 300 por minuto por IP, como defensa ante ataques de fuerza bruta y uso abusivo. |
 | **API REST** | Comunicación frontend-backend | Requisito explícito de la propuesta original ("organización del sistema bajo arquitectura de endpoints REST"). Permite mantener las capas desacopladas (NRF06). |
 | **Fetch API** | Consumo de la API desde el cliente | API nativa del navegador, sin necesidad de librerías externas, coherente con la decisión de dependencias mínimas. |
 | **Filesystem del servidor** | Almacenamiento de adjuntos | Establecido en la propuesta original. Los archivos se guardan en un volumen de Docker (`uploads_data`), sin depender de un servicio de almacenamiento externo. |

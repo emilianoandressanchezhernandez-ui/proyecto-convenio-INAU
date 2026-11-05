@@ -710,7 +710,7 @@ Al finalizar el sprint, el sistema permitirá:
 
 Sin Sprint Review: el cliente no estuvo presente durante el desarrollo (ver *Declaración sobre las instancias de Sprint Review*).
 
-#### Resultado del sprint: *En proceso.*
+#### Resultado del sprint: *Completado.*
 
 ---
 
