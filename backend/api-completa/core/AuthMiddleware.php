@@ -14,7 +14,6 @@ class AuthMiddleware
      * No activar hasta que los documentos esten
      * aprobados y el flujo de aceptacion funcione.
      */
-<<<<<<< HEAD
     private const TERMINOS_OBLIGATORIOS = true;
 
     public static function handle(
@@ -24,11 +23,9 @@ class AuthMiddleware
     ): void {
 
         // Las rutas publicas no requieren autenticacion.
-=======
        public static function handle(?string $requirement): void
     {
         // Ruta publica.
->>>>>>> 3142c238843e2b9b4cbdadd42dd71aeb70cf5de5
         if ($requirement === null) {
             return;
         }
@@ -43,8 +40,6 @@ class AuthMiddleware
             );
         }
 
-<<<<<<< HEAD
-=======
         // Comprobar contra la base que la sesión siga siendo válida:      
         // el usuario existe, está activo y no cambió su contraseña.       
         $actual = (new UserRepository())->findById((int) ($user['id'] ?? 0)); 
@@ -69,7 +64,6 @@ class AuthMiddleware
         $user['rol'] = $actual->getRole();                                 
 
         // Guardamos el usuario autenticado.
->>>>>>> 3142c238843e2b9b4cbdadd42dd71aeb70cf5de5
         self::$user = $user;
 
         // Primero comprobar los permisos por rol.
