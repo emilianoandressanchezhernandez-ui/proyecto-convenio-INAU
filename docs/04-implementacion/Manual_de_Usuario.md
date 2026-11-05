@@ -1,5 +1,7 @@
 # Manual de Usuario
 
+
+
 ## Sistema de Gestión de Talleres — INAU
 
 **Fecha:** 4 de noviembre de 2026

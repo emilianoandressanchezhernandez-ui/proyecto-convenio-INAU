@@ -108,7 +108,7 @@
 
 ### 2.9 DEF-02 — Exportación de informes (RF13)
 
-No se probó. El equipo decidió postergar la exportación a PDF y Excel, porque requiere cambios en el código y se prefirió no entregar una función mal integrada. Los botones de exportación siguen descargando JSON. La decisión se registra en `Control de Cambios.md`.
+No se probó. El equipo decidió postergar la exportación a PDF y Excel, porque requiere cambios en el código y se prefirió no entregar una función mal integrada. Los botones de exportación siguen descargando JSON. La decisión se registra en `Control_de_Cambios.md`.
 
 ### 2.10 Alumno vacío en la ventana Corregir (observación de `Testing-05.md`)
 
@@ -204,4 +204,4 @@ Los defectos DEF-11, DEF-14 y DEF-15, y los de la Revisión 4.7 y de Mecanismos 
 
 **Datos del servidor de prueba:** esta ronda no dejó registros nuevos. La tarea de prueba de CP-34 se eliminó y la nota de CP-14 se restauró a 9. La contraseña de Sofía se cambió después de la prueba. La de Carlos se cambió en `Testing-05.md` (CP-10) y debe restaurarse a su valor original. Los demás datos de prueba son los que lista `Testing-04.md`.
 
-**Documentos relacionados:** `Testing-01.md` a `Testing-05.md`, `requerimientos.md`, `Control de Cambios.md`, `api.md`, `Documento de Reconstruccion - Servidor.md`, `Hardening de Infraestructura y Contenedores.md`, `Doc NMAP.md` y `Revision_Coherencia_INAU.md`.
+**Documentos relacionados:** `Testing-01.md` a `Testing-05.md`, `requerimientos.md`, `Control_de_Cambios.md`, `api.md`, `Documento de Reconstruccion - Servidor.md`, `Hardening de Infraestructura y Contenedores.md`, `Doc NMAP.md` y `Revision_Coherencia_INAU.md`.

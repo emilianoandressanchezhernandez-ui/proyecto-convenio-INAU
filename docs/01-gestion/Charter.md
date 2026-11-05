@@ -71,6 +71,7 @@
 15. Consulta de datos sensibles utilizados en la plataforma por parte del administrador.
 16. Consulta del listado de alumnos inscritos en el taller por parte del tallerista.
 
+> **Nota:** este alcance corresponde a la definición inicial del proyecto. Las funciones postergadas durante el desarrollo y el estado final de cada requerimiento figuran en `Doc.md` (secciones 14 y 23).
 
 ---
 
