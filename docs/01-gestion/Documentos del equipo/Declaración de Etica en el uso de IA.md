@@ -4,7 +4,7 @@
 
 ### Nombre del proyecto: *TheNewfutures - Proyecto Sistema de Gestión de Talleres en Convenio con INAU*
 
-### Fecha: 04/08/26 — Última actualización: 28/10/26
+### Fecha: 04/08/26 — Última actualización: 05/11/26
 
 ---
 
@@ -60,6 +60,12 @@
 | IA-24 | Claude Opus 5.5 | `25/10/2026` - Escaneo con Nmap y documentos de Ciberseguridad | Se utilizó IA como guía para instalar Nmap y ejecutar los escaneos del servidor, para verificar los puertos desde otra computadora mediante la extensión Claude en Chrome, y para proponer la actualización de los documentos de Ciberseguridad (Doc NMAP, Identificación de amenazas, Hardening, Mecanismos y Plan de Contingencia). Las propuestas fueron revisadas y aprobadas por el subcoordinador, Gabriel Rendon. | Gabriel Rendon |
 | IA-25 | Claude Opus 5.5 | `26/10/2026` - Segunda prueba del sistema (Testing-02) | Se utilizó IA, mediante la extensión Claude en Chrome, para ejecutar la segunda ronda de pruebas del sistema en un servidor Ubuntu. El proceso fue supervisado y los resultados fueron verificados por el subcoordinador, Gabriel Rendon. | Gabriel Rendon |
 | IA-26 | Claude Opus 5.5 | `27/10 – 28/10/2026` - Revisión completa y preparación (Tercera entrega) | Se utilizó IA para revisar todos los documentos, verificar su coherencia con el código y con las pruebas, y proponer correcciones, que fueron revisadas y aprobadas por el subcoordinador antes de aplicarlas. Además, se utilizó para redactar el documento de la API (`api.md`) a partir del código fuente y la Revisión de Coherencia; su contenido fue revisado por el subcoordinador, Gabriel Rendon. | Gabriel Rendon |
+| IA-27 | Claude Opus 5.5 | `29/10 – 31/10/2026` - Pruebas de rendimiento y carga (Testing-03) y Manual de Usuario | Se utilizó IA para guiar las pruebas de tiempo de respuesta (mediante la extensión Claude en Chrome) y de carga (los comandos en el servidor los ejecutó el subcoordinador), y para redactar `Testing-03.md`. También se utilizó para redactar el Manual de Usuario a partir del recorrido de todas las pantallas. Los resultados y el texto fueron revisados por el subcoordinador, Gabriel Rendon. | Gabriel Rendon |
+| IA-28 | Claude Opus 5.5 | `01/11 – 02/11/2026` - Corrección de defectos de prioridad alta y pruebas (Testing-04 y Testing-05) | Se utilizó IA para proponer las correcciones de código del enlace al archivo entregado (DEF-15), del límite de intentos de inicio de sesión (DEF-11), del cierre de sesiones al cambiar la contraseña y de la filtración de errores de la base de datos (Revisión de Coherencia 4.7). También se usó para ejecutar las pruebas mediante la extensión Claude en Chrome y redactar `Testing-04.md` y `Testing-05.md`. Cada cambio fue revisado y aplicado por el subcoordinador y aprobados por el resto del equipo. | Gabriel Rendon |
+| IA-29 | Claude Opus 5.5 | `02/11 – 04/11/2026` - Corrección de defectos de prioridad media y hardening | Se utilizó IA para proponer las correcciones de código de DEF-06, DEF-07, DEF-09, DEF-10, DEF-12, DEF-13 y DEF-16, del nombre del alumno en la ventana de corrección y del detalle del alumno en el panel del administrador, y de los hallazgos de hardening H-01 a H-05 y las contraseñas obligatorias de MySQL. Los cambios se presentaron con su ubicación exacta en el código y fueron revisados y aplicados por el subcoordinador y aprobados por el resto del equipo. | Gabriel Rendon |
+| IA-31 | Claude Opus 5.5 | `04/11/2026` - Prueba completa del sistema (Testing-06) | Se utilizó IA, mediante la extensión Claude en Chrome, para ejecutar la prueba completa del sistema con los tres roles y verificar las correcciones, y para redactar `Testing-06.md` y unificar la estructura de `Testing-01.md` a `Testing-06.md`. Los inicios de sesión y los comandos del servidor los realizó el subcoordinador, que verificó los resultados. | Gabriel Rendon |
+| IA-32 | Claude Opus 5.5 | `04/11 – 05/11/2026` - Documentación de la entrega final | Se utilizó IA para revisar la coherencia de la documentación con el código y las pruebas, y para proponer en los documentos desactualizados. Cada cambio fue revisado y aprobado por el subcoordinador antes de aplicarlo. | Gabriel Rendon |
+| IA-33 | Claude Opus 5.5 | `04/11 - 05/11/2026` - Informe final de Ciberseguridad | Se utilizo IA para la redacción del informe y para su posterior revisión. Todo bajo la supervisión de Emiliano Sánchez(Líder) y Gabriel Rendon(Subcoordinador). | Emiliano Sánchez |
 
 ---
 
@@ -70,6 +76,6 @@
 
 | Integrante | Firma / fecha |
 | --- | --- |
-| Emiliano Sánchez – Líder/Scrum Master. | Emiliano Sánchez - 04/08/26 (actualizada el 28/10/26) |
-| Gabriel Rendon – Subcoordinador. | Gabriel Rendon - 04/08/26 (actualizada el 28/10/26) |
-| Thiago Ferragut – Desarrollador Frontend/Backend. | Thiago Ferragut - 04/08/26 (actualizada el 28/10/26) |
+| Emiliano Sánchez – Líder/Scrum Master. | Emiliano Sánchez - 04/08/26 (actualizada el 05/11/26) |
+| Gabriel Rendon – Subcoordinador. | Gabriel Rendon - 04/08/26 (actualizada el 05/11/26) |
+| Thiago Ferragut – Desarrollador Frontend/Backend. | Thiago Ferragut - 04/08/26 (actualizada el 05/11/26) |

@@ -32,7 +32,7 @@ Este documento presenta el modelo de clases resultante y su traducción al model
 
 | Atributos | Métodos |
 |---|---|
-| `cedula`, `nombre`, `apellido`, `estado`, `fechaIngreso`, `fechaNacimiento` **(v2)**, `correo` **(v2)**, `telefono` **(v2)**, `direccion` **(v2)**, `referenteAdulto` **(v2)**, `centroReferencia` **(v2)**, `observaciones` **(v2)**, `foto` **(v2)**, `biografia` **(v2)** | `visualizarMaterial()`, `visualizarTareas()`, `entregarTarea()`, `visualizarNotas()` **(v2)**, `eliminarDatoPerfil()` **(v2)** |
+| `cedula`, `nombre`, `apellido`, `estado`, `fechaIngreso`, `fechaNacimiento` **(v2)**, `correo` **(v2)**, `telefono` **(v2)**, `direccion` **(v2)**, `referenteAdulto` **(v2)**, `centroReferencia` **(v2)**, `observaciones` **(v2)**, `foto` **(v2)**, `biografia` **(v2)** | `visualizarMaterial()`, `visualizarTareas()`, `entregarTarea()`, `visualizarNotas()`, `eliminarDatoPerfil()` **(v2)** |
 
 ### 1.5 Taller
 
@@ -222,7 +222,7 @@ Estos elementos figuran en el modelo para reflejar el diseño completo del siste
 | `Usuario` *(abstracta)* | RF01, RF02, RF14 | NRF07, NRF08, NRF09 | HU01, HU02, HU20 | EP1, EP2, EP6 |
 | `Administrador` | RF02, RF03, RF11, RF12, RF13, RF19, RF22, RF24 | NRF03, NRF07 | HU02, HU03, HU04, HU15, HU16, HU17, HU18, HU19 | EP2, EP5 |
 | `Tallerista` | RF04, RF05, RF06, RF09, RF10, RF16, RF17, RF22, RF25 | NRF05, NRF07 | HU05, HU06, HU07, HU08, HU11, HU12, HU13, HU14, HU19 | EP2, EP3, EP4, EP5 |
-| `Alumno` | RF02, RF07, RF08, RF19 | NRF08 | HU02, HU09, HU10, HU18 | EP2, EP4, EP5 |
+| `Alumno` | RF02, RF07, RF08, RF19, RF23 | NRF08 | HU02, HU09, HU10, HU18 | EP2, EP4, EP5 |
 | `Taller` | RF02, RF03, RF12 | NRF09 | HU02, HU03, HU16 | EP2, EP5 |
 | `Horario` | RF02 | — | HU02 | EP2 |
 | `Asistencia` *(jornada)* | RF04, RF05, RF11 | NRF05, NRF10 | HU06, HU07, HU15 | EP3, EP5 |
@@ -230,7 +230,7 @@ Estos elementos figuran en el modelo para reflejar el diseño completo del siste
 | `Contenido` *(abstracta)* | RF06, RF07, RF16 | NRF05 | HU08, HU09, HU13 | EP4 |
 | `Material` | RF06, RF07, RF16 | NRF11, NRF12 | HU08, HU09, HU13 | EP4 |
 | `Tarea` | RF06, RF07, RF08, RF09, RF10 | NRF11, NRF12 | HU08, HU09, HU10, HU11, HU12 | EP4 |
-| `Entrega` | RF08, RF09, RF10, RF17 | NRF05, NRF10 | HU10, HU11, HU12, HU14 | EP4 |
+| `Entrega` | RF08, RF09, RF10, RF17, RF23 | NRF05, NRF10 | HU10, HU11, HU12, HU14 | EP4 |
 | `Adjunto` | RF06, RF08 | NRF08, NRF10, NRF11, NRF12 | HU08, HU10 | EP4 |
 | `Informe` | RF11, RF12, RF13, RF19, RF22 | NRF03, NRF10 | HU15, HU16, HU17, HU18, HU19 | EP5 |
 | `RegistroTrazabilidad` | — *(deriva de NRF10)* | NRF08, NRF10 | — | *(transversal)* |
@@ -251,7 +251,7 @@ Estos elementos figuran en el modelo para reflejar el diseño completo del siste
 
 **Las dos clases asociativas comparten trazabilidad** (RF03, HU03, EP2), dado que ambas derivan del mismo requerimiento de asignación.
 
-**Los cinco RF postergados por plazo** (RF15, RF18, RF20, RF21, RF26) no figuran en esta tabla, ya que no tienen historia de usuario asociada en el backlog de la primera versión. Los atributos y métodos que originan sí están presentes en el modelo, señalados como (v2). RF23, postergado al principio, se incluyó en la primera versión sin una historia de usuario propia. RF13, postergado después de iniciado el desarrollo, se mantiene en esta tabla porque tiene historias de usuario en el backlog; sus métodos de exportación figuran como (v2).
+**Los cinco RF postergados por plazo** (RF15, RF18, RF20, RF21, RF26) no figuran en esta tabla, ya que no tienen historia de usuario asociada en el backlog de la primera versión. Los atributos y métodos que originan sí están presentes en el modelo, señalados como (v2). RF23, postergado al principio, se incluyó en la primera versión: figura en la tabla en `Alumno` y `Entrega`, pero sin historia de usuario propia, porque se incorporó al cierre (CC-17) y no formó parte del backlog. RF13, postergado después de iniciado el desarrollo, se mantiene en esta tabla porque tiene historias de usuario en el backlog; sus métodos de exportación figuran como (v2).
 
 ---
 
@@ -275,7 +275,7 @@ classDiagram
         +Estado estado
         +Date fechaRegistro
         +DateTime ultimoAcceso
-        +autenticar(cedula, clave) bool
+        +autenticar(correo, clave) bool
         +modificarContrasena(nueva) void
         +modificarDatosPersonales(datos) void
         +obtenerRol() Rol

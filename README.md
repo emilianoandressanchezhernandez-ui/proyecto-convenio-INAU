@@ -71,17 +71,17 @@ proyecto-convenio-INAU/
 │   │
 │   ├── 04-implementacion/
 │   │   ├── Documento de Reconstruccion - Servidor.md
-│   │   ├── Manual_de_Usuario.md          
+│   │   ├── Manual_de_Usuario.md
 │   │   ├── PrimeraVista.md
 │   │   ├── api.md
 │   │   ├── inau-infraestructura-docker.md
 │   │   └── Testing/
 │   │       ├── Testing-01.md
 │   │       ├── Testing-02.md
-│   │       ├── Testing-03.md             
-│   │       ├── Testing-04.md             
-│   │       ├── Testing-05.md             
-│   │       └── Testing-06.md            
+│   │       ├── Testing-03.md
+│   │       ├── Testing-04.md
+│   │       ├── Testing-05.md
+│   │       └── Testing-06.md
 │   │
 │   ├── 05-Ciberseguridad/
 │   │   ├── Doc NMAP.md
@@ -225,12 +225,12 @@ proyecto-convenio-INAU/
 
 | Componente | Estado |
 | --- | --- |
-| Panel del administrador | Completo y conectado a la API. La exportación de informes a PDF o Excel (RF13) quedó postergada: los informes se descargan en JSON |
-| Panel del tallerista | Completo y conectado a la API. Incluye la gestión de material y tareas y la corrección de entregas. Los informes se descargan en JSON (RF13 postergado) |
-| Panel del alumno | Completo y conectado a la API, incluida la asistencia |
+| Panel del administrador | Completo y conectado a la API. La exportación de informes a PDF o Excel (RF13) quedó postergada, los informes se descargan en JSON |
+| Panel del tallerista | Completo y conectado a la API. Incluye la gestión de material y tareas con archivos adjuntos, la corrección de entregas, la eliminación de notas y el cambio de contraseña. Los informes se descargan en JSON (RF13 postergado) |
+| Panel del alumno | Completo y conectado a la API, incluidos la asistencia, el estado de las tareas, las notas y los archivos de la consigna. Permite cambiar la contraseña |
 | Pantalla de acceso (`frontend/index.html`) | Acceso por correo y contraseña, autenticación contra la API y redirección por rol |
 | Base de datos | Script con las trece tablas y datos de prueba en `backend/api-completa/DataBase/inau_talleres.sql`, ejecutado en el entorno Docker |
-| Backend | Implementado: API REST con 55 rutas, organizada en capas, con autenticación JWT y control de acceso por rol |
+| Backend | Implementado: API REST con 55 rutas, organizada en capas, con autenticación JWT, control de acceso por rol y límite de intentos de inicio de sesión |
 
 <br>
 
