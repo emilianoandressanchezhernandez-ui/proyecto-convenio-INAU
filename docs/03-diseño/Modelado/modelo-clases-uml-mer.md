@@ -201,7 +201,6 @@ Cuatro reglas del modelo no pueden expresarse en la base de datos y deben implem
 | Clase | Elementos (v2) | RF de origen |
 |---|---|---|
 | Alumno | `foto`, `biografia`, `eliminarDatoPerfil()` | RF15 |
-| Alumno | `fechaNacimiento`, `correo`, `telefono`, `direccion`, `referenteAdulto`, `centroReferencia`, `observaciones` | RF21 |
 | Tallerista | `eliminarAsistencia()` | RF18 |
 | Tallerista | `modificarContenido()` | RF26 |
 | Administrador | `generarInformeCalificaciones()` | RF20 |
@@ -232,7 +231,7 @@ Estos elementos figuran en el modelo para reflejar el diseño completo del siste
 | `Tarea` | RF06, RF07, RF08, RF09, RF10 | NRF11, NRF12 | HU08, HU09, HU10, HU11, HU12 | EP4 |
 | `Entrega` | RF08, RF09, RF10, RF17, RF23 | NRF05, NRF10 | HU10, HU11, HU12, HU14 | EP4 |
 | `Adjunto` | RF06, RF08 | NRF08, NRF10, NRF11, NRF12 | HU08, HU10 | EP4 |
-| `Informe` | RF11, RF12, RF13, RF19, RF22 | NRF03, NRF10 | HU15, HU16, HU17, HU18, HU19 | EP5 |
+| `Informe` | RF11, RF12, RF13 | NRF03, NRF10 | HU15, HU16, HU17 | EP5 |
 | `RegistroTrazabilidad` | — *(deriva de NRF10)* | NRF08, NRF10 | — | *(transversal)* |
 | `AsignacionTallerista` *(asociativa)* | RF03 | — | HU03 | EP2 |
 | `Inscripcion` *(asociativa)* | RF03 | — | HU03 | EP2 |
@@ -252,6 +251,8 @@ Estos elementos figuran en el modelo para reflejar el diseño completo del siste
 **Las dos clases asociativas comparten trazabilidad** (RF03, HU03, EP2), dado que ambas derivan del mismo requerimiento de asignación.
 
 **Los cinco RF postergados por plazo** (RF15, RF18, RF20, RF21, RF26) no figuran en esta tabla, ya que no tienen historia de usuario asociada en el backlog de la primera versión. Los atributos y métodos que originan sí están presentes en el modelo, señalados como (v2). RF23, postergado al principio, se incluyó en la primera versión: figura en la tabla en `Alumno` y `Entrega`, pero sin historia de usuario propia, porque se incorporó al cierre (CC-17) y no formó parte del backlog. RF13, postergado después de iniciado el desarrollo, se mantiene en esta tabla porque tiene historias de usuario en el backlog; sus métodos de exportación figuran como (v2).
+
+**RF19, RF22 y RF24 se resuelven como consultas en pantalla.** En la primera versión, `generarListadoAlumnos()`, `generarInformeTalleristas()` y `consultarDatosSensibles()` se implementan en los paneles Alumnos y Talleristas del administrador, con sus listados y detalles, sin generar una instancia de `Informe` (CC-16). Por eso `Informe` solo se instancia para RF11 y RF12.
 
 ---
 
@@ -295,8 +296,8 @@ classDiagram
         +consultarDatosSensibles() List
         +generarInformeAsistencia(tallerId, desde, hasta) Informe
         +generarInformeTalleres() Informe
-        +generarListadoAlumnos() Informe
-        +generarInformeTalleristas() Informe
+        +generarListadoAlumnos() List
+        +generarInformeTalleristas() List
         +exportarInforme(informe, formato) File [v2]
         +generarInformeCalificaciones() Informe [v2]
         +generarInformeDetalladoAlumnos() Informe [v2]
@@ -324,7 +325,7 @@ classDiagram
         +String apellido
         +Estado estado
         +Date fechaIngreso
-        +Date fechaNacimiento [v2]
+        +Date fechaNacimiento
         +String correo [v2]
         +String telefono [v2]
         +String direccion [v2]

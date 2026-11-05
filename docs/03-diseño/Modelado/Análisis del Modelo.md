@@ -90,7 +90,7 @@ El estado de la entrega refleja en qué punto del proceso se encuentra: pendient
 
 ### Paso 7 — Generación de informes (EP5)
 
-El administrador solicita informes mediante los métodos correspondientes (RF11, RF12, RF19, RF22), que producen instancias de `Informe`. El informe de asistencia por taller recorre las jornadas del período solicitado y sus registros, aplicando `Asistencia.contarPresentes()` sobre cada una.
+El administrador solicita informes mediante los métodos correspondientes (RF11, RF12), que producen instancias de `Informe`. El listado de alumnos (RF19) y el de talleristas (RF22) se consultan directamente en sus paneles. El informe de asistencia por taller recorre las jornadas del período solicitado y sus registros, aplicando `Asistencia.contarPresentes()` sobre cada una.
 
 Una vez generado, el informe puede exportarse con `exportarPDF()` o `exportarExcel()` (RF13). La exportación quedó postergada: ambos métodos figuran como (v2) y, en la primera versión, el informe se descarga en JSON. Cada informe registra qué usuario lo generó, conforme a NRF10.
 
@@ -122,7 +122,7 @@ Este registro no se activa desde las clases del dominio sino desde la capa de se
 | 4. Publicación de contenidos | Tallerista, Contenido, Material, Tarea, Adjunto | RF06, RF16 |
 | 5. Consulta y entrega | Alumno, Contenido, Tarea, Entrega, Adjunto | RF07, RF08 |
 | 6. Corrección y calificación | Tallerista, Tarea, Entrega | RF09, RF10, RF17 |
-| 7. Informes | Administrador, Informe, Asistencia, Taller, Alumno | RF11, RF12, RF13, RF19, RF22 |
+| 7. Informes | Administrador, Informe, Asistencia, Taller, Alumno | RF11, RF12, RF13 (RF19 y RF22, como consultas en pantalla) |
 | 8. Auditoría | RegistroTrazabilidad, Usuario | NRF10 |
 
 incluidos los que no provienen de un requerimiento funcional: `RegistroTrazabilidad` y la asociación entre `RegistroAsistencia` y `Usuario`, derivados de NRF10; los métodos `validarFormato()` y `validarTamano()`, derivados de NRF11 y NRF12; y los métodos `estaCompleta()` y `generarNombreSeguro()`, señalados explícitamente como derivados de la operativa.

@@ -70,7 +70,7 @@ Se aplicó el método de derivación en cinco pasos a partir de los requerimient
 | 11 | **Tarea** | RF06, RF07, RF08, RF09, RF10 | Contenido que exige una entrega del alumno y admite calificación. |
 | 12 | **Entrega** | RF08, RF09, RF10, RF17 | Vincula a un alumno con una tarea y almacena su corrección y nota. |
 | 13 | **Adjunto** | RF06, RF08 | Archivo asociado a un contenido o a una entrega; requiere persistir ruta y metadatos. |
-| 14 | **Informe** | RF11, RF12, RF13, RF19, RF22 | Resultado consolidado de una consulta, exportable en distintos formatos. Ver 1.5. |
+| 14 | **Informe** | RF11, RF12, RF13 | Resultado consolidado de una consulta, exportable en distintos formatos. Ver 1.5. |
 | 15 | **RegistroTrazabilidad** | NRF10 | Registro de una acción relevante ejecutada por un usuario. Ver 1.6. |
 
 <br>
@@ -95,7 +95,7 @@ Se aplicó el método de derivación en cinco pasos a partir de los requerimient
 
 ### 1.5 Observación sobre la clase Informe
 
-Los requerimientos RF11, RF12, RF19 y RF22 establecen la generación de informes, y RF13 exige poder exportarlos en formato PDF o Excel. Esta última operación requiere que el informe exista como objeto con identidad propia: para exportarlo es necesario haberlo generado previamente, con sus datos consolidados, su tipo y su formato de salida.
+Los requerimientos RF11 y RF12 establecen la generación de informes, y RF13 exige poder exportarlos en formato PDF o Excel. Esta última operación requiere que el informe exista como objeto con identidad propia: para exportarlo es necesario haberlo generado previamente, con sus datos consolidados, su tipo y su formato de salida.(RF19 y RF22 se resuelven como consultas en pantalla; ver 3.2).
 
 Por ese motivo `Informe` se incorpora como clase del modelo y forma parte de la primera versión. Su persistencia habilita además el historial de informes emitidos, funcionalidad prevista para etapas posteriores, aunque ningún requerimiento de la primera versión exige conservarlos.
 
@@ -157,11 +157,11 @@ Sin atributos propios. Se distingue de las demás especializaciones únicamente 
 | `nombre`, `apellido` | RF02, RF19 | Datos mínimos requeridos por el listado de alumnos. |
 | `estado` | RF02 | Baja lógica del participante. |
 | `fechaIngreso` | RF02 | Fecha de alta del alumno como participante del programa. Se completa en el momento del registro, por lo que forma parte de la primera versión, a diferencia del resto de los datos de la ficha detallada. |
-| `fechaNacimiento` **(v2)** | RF21 | Dato de la ficha detallada; permite además verificar edades en un contexto de menores. |
-| `correo`, `telefono`, `direccion` **(v2)** | RF21 | Datos de contacto de la ficha detallada. |
-| `referenteAdulto` **(v2)** | RF21 | Contacto adulto responsable, propio del contexto socioeducativo. |
-| `centroReferencia` **(v2)** | RF21 | Centro o programa al que pertenece el alumno. |
-| `observaciones` **(v2)** | RF21 | Campo libre de la ficha. |
+| `fechaNacimiento` | RF02, RF24 | Dato registrado en el alta; permite además verificar edades en un contexto de menores. |
+| `correo`, `telefono`, `direccion` | RF02, RF24 | Datos de contacto registrados por el administrador y consultables en el detalle del alumno. |
+| `referenteAdulto` | RF02, RF24 | Contacto adulto responsable, propio del contexto socioeducativo. |
+| `centroReferencia` | RF02, RF24 | Centro o programa al que pertenece el alumno. |
+| `observaciones` | RF02 | Campo libre de la ficha. |
 | `foto` **(v2)** | RF15 | RF15 permite al alumno eliminar su foto de perfil. |
 | `biografia` **(v2)** | RF15 | Ídem anterior. |
 
@@ -270,7 +270,7 @@ Sin atributos propios. Se distingue de la tarea por no requerir devolución ni a
 | Atributo | Origen | Justificación |
 |---|---|---|
 | `nombre` | RF11, RF12 | Identifica el informe generado. |
-| `tipo` | RF11, RF12, RF19, RF22 | Distingue entre informe de asistencia, de talleres, listado de alumnos e información de talleristas. |
+| `tipo` | RF11, RF12 | Distingue entre informe de asistencia e informe general de talleres. |
 | `fechaInicio`, `fechaFin` | RF11 | Delimitan el rango temporal del informe de asistencia. |
 | `fechaGeneracion` | RF13 | Momento de emisión del informe. |
 | `formato` | RF13 | RF13 contempla exportación en PDF o Excel. |
@@ -295,7 +295,6 @@ Sin atributos propios. Se distingue de la tarea por no requerir devolución ni a
 | Clase | Atributos (v2) | RF de origen |
 |---|---|---|
 | Alumno | `foto`, `biografia` | RF15 |
-| Alumno | `fechaNacimiento`, `correo`, `telefono`, `direccion`, `referenteAdulto`, `centroReferencia`, `observaciones` | RF21 |
 
 Los restantes requerimientos excluidos (RF18, RF20 y RF26) no aportan atributos nuevos: operan sobre datos ya presentes en el modelo. Tampoco RF23, incluido finalmente en la primera versión: únicamente requiere que el alumno pueda consultar el atributo nota de Entrega, incorporado por RF10.
 
@@ -353,10 +352,10 @@ Este criterio evita que las clases de rol concentren la totalidad del comportami
 | `eliminarTaller(id)` | "eliminar" | RF02 | Ídem. |
 | `asignarAlumnoATaller(alumnoId, tallerId)` | "asignar alumnos" | RF03 | RF03 atribuye la asignación exclusivamente al administrador. |
 | `asignarTalleristaATaller(talleristaId, tallerId)` | "asignar... talleristas" | RF03 | Ídem. |
-| `consultarDatosSensibles()` | "consultar los datos sensibles" | RF24 | RF24 restringe esta consulta al administrador. |
+| `consultarDatosSensibles()` | ... | RF24 | RF24 restringe esta consulta al administrador. Se implementa con el detalle de alumnos y talleristas del panel del administrador (CC-16). |
 | `generarInformeAsistencia(tallerId, desde, hasta)` | "generar informes de asistencia" | RF11 | La generación de informes corresponde al administrador según las historias de usuario asociadas. |
-| `generarInformeTalleres()` | "generar informes de talleres" | RF12 | Ídem. |
-| `generarListadoAlumnos()` | "generar un listado de alumnos" | RF19 | Ídem. |
+| `generarInformeTalleres()` | "generar informes de talleres" | RF22 | Ídem, con el listado y el detalle del panel Talleristas. |
+| `generarListadoAlumnos()` | "generar un listado de alumnos" | RF19 | Corresponde al administrador. Se implementa como el listado con búsqueda del panel Alumnos, sin generar un `Informe` (CC-16). |
 | `generarInformeTalleristas()` | "generar un informe... de los talleristas" | RF22 | Ídem. |
 | `exportarInforme(informe, formato)` **(v2)** | "exportar los informes" | RF13 | RF13 contempla dos formatos, por lo que el formato se recibe como parámetro. Postergado en la primera versión. |
 | `generarInformeCalificaciones()` **(v2)** | "histórico de calificaciones" | RF20 | Excluido de la primera versión. |
@@ -561,8 +560,8 @@ Incorporar un método de registro en cada clase dispersaría la lógica y contra
 | RegistroAsistencia — Alumno | 0..\* ←→ 1 | RF04 | Todo registro corresponde a **1** alumno, ya que el estado es individual. Un alumno acumula **0..\*** registros, uno por jornada. |
 | RegistroAsistencia — Usuario | 0..\* ←→ 1 | NRF10 | Todo registro identifica al usuario que lo cargó o modificó por última vez. Es **1** porque la responsabilidad sobre un registro no puede ser compartida ni quedar indeterminada. Un usuario acumula **0..\*** registros a lo largo de su actividad. |
 | Alumno — Entrega | 1 ←→ 0..\* | RF08 | Toda entrega pertenece a **1** alumno: no existen entregas anónimas ni grupales. Un alumno realiza **0..\*** entregas, una por tarea completada. |
-| Usuario — Informe | 1 ←→ 0..\* | RF11-RF13, RF19, RF22 | Todo informe registra quién lo generó, conforme a NRF10. |
-| Taller — Informe | 0..1 ←→ 0..\* | RF11: "informes de asistencia por taller" | **0..1** porque no todos los informes refieren a un taller: el listado de alumnos (RF19) y el de talleristas (RF22) son de alcance global. |
+| Usuario — Informe | 1 ←→ 0..\* | RF11-RF13 | Todo informe registra quién lo generó, conforme a NRF10. |
+| Taller — Informe | 0..1 ←→ 0..\* | RF11: "informes de asistencia por taller" **0..1** porque no todos los informes refieren a un taller: el informe general (RF12) es de alcance global. |
 | Usuario — RegistroTrazabilidad | 1 ←→ 0..\* | NRF10 | Toda acción registrada corresponde al usuario que la ejecutó. |
 
 <br>
