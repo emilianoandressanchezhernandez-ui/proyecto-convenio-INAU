@@ -32,7 +32,7 @@ Este documento presenta el modelo de clases resultante y su traducción al model
 
 | Atributos | Métodos |
 |---|---|
-| `cedula`, `nombre`, `apellido`, `estado`, `fechaIngreso`, `fechaNacimiento` **(v2)**, `correo` **(v2)**, `telefono` **(v2)**, `direccion` **(v2)**, `referenteAdulto` **(v2)**, `centroReferencia` **(v2)**, `observaciones` **(v2)**, `foto` **(v2)**, `biografia` **(v2)** | `visualizarMaterial()`, `visualizarTareas()`, `entregarTarea()`, `visualizarNotas()`, `eliminarDatoPerfil()` **(v2)** |
+| `cedula`, `nombre`, `apellido`, `estado`, `fechaIngreso`, `fechaNacimiento`, `correo`, `telefono`, `direccion`, `referenteAdulto`, `centroReferencia`, `observaciones`, `foto` **(v2)**, `biografia` **(v2)** | `visualizarMaterial()`, `visualizarTareas()`, `entregarTarea()`, `visualizarNotas()`, `eliminarDatoPerfil()` **(v2)** |
 
 ### 1.5 Taller
 
@@ -334,12 +334,12 @@ classDiagram
         +Estado estado
         +Date fechaIngreso
         +Date fechaNacimiento
-        +String correo [v2]
-        +String telefono [v2]
-        +String direccion [v2]
-        +String referenteAdulto [v2]
-        +String centroReferencia [v2]
-        +String observaciones [v2]
+        +String correo
+        +String telefono
+        +String direccion
+        +String referenteAdulto
+        +String centroReferencia
+        +String observaciones
         +String foto [v2]
         +String biografia [v2]
         +visualizarMaterial(tallerId) List
