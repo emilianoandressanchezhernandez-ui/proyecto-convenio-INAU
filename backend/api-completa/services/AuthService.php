@@ -189,12 +189,20 @@ class AuthService
      *
      * Verifica la contraseña actual y almacena únicamente
      * el hash de la nueva contraseña.
+     *
+     * Devuelve un token nuevo: al cambiar la contraseña, las sesiones
+     * anteriores dejan de ser válidas (AuthMiddleware compara la huella
+     * de la contraseña), y así la sesión de quien hizo el cambio sigue
+     * abierta.
+     *
+     * Response::error() termina el programa, por eso no hace falta
+     * "return" después de cada error.
      */
     public function changePassword(
         int $usuarioId,
         string $claveActual,
         string $claveNueva
-    ): void {
+    ): string {
         // Obtener el usuario desde MySQL.
         $user = $this->repository->findById($usuarioId);
 
@@ -203,7 +211,6 @@ class AuthService
                 'El usuario ya no existe.',
                 404
             );
-            return;
         }
 
         // Verificar la contraseña actual.
@@ -212,7 +219,6 @@ class AuthService
                 'La contraseña actual es incorrecta.',
                 400
             );
-            return;
         }
 
         // Comprobar que la nueva contraseña sea diferente.
@@ -221,7 +227,6 @@ class AuthService
                 'La nueva contraseña debe ser diferente de la actual.',
                 400
             );
-            return;
         }
 
         // Generar un hash seguro.
@@ -241,7 +246,11 @@ class AuthService
                 'No se pudo cambiar la contraseña.',
                 500
             );
-            return;
         }
+
+        // Token nuevo con la huella de la nueva contraseña.
+        return Token::create(
+            $this->repository->findById($usuarioId)
+        );
     }
 }

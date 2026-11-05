@@ -35,7 +35,12 @@ class TalleristaService
             );
         }
 
-        $cedula = trim($data['cedula']);
+        // Guardar y comparar siempre en el mismo formato.
+        $cedula = TalleristaValidator::normalizarCedula(
+            trim($data['cedula'])
+        );
+
+        $data['cedula'] = $cedula;
         $correo = trim($data['correo']);
 
         if ($this->repository->findByCedula($cedula)) {

@@ -92,7 +92,7 @@ El estado de la entrega refleja en qué punto del proceso se encuentra: pendient
 
 El administrador solicita informes mediante los métodos correspondientes (RF11, RF12, RF19, RF22), que producen instancias de `Informe`. El informe de asistencia por taller recorre las jornadas del período solicitado y sus registros, aplicando `Asistencia.contarPresentes()` sobre cada una.
 
-Una vez generado, el informe puede exportarse con `exportarPDF()` o `exportarExcel()` (RF13). Cada informe registra qué usuario lo generó, conforme a NRF10.
+Una vez generado, el informe puede exportarse con `exportarPDF()` o `exportarExcel()` (RF13). La exportación quedó postergada: ambos métodos figuran como (v2) y, en la primera versión, el informe se descarga en JSON. Cada informe registra qué usuario lo generó, conforme a NRF10.
 
 **Decisión que se pone a prueba:** el atributo `fechaInscripcion` de la clase `Inscripcion` resulta indispensable en este paso. Un informe de asistencia por rango de fechas debe considerar únicamente las jornadas posteriores a la incorporación de cada alumno al taller; sin ese dato, un alumno inscripto a mitad del período figuraría como ausente en todas las jornadas previas a su ingreso, distorsionando el resultado.
 
@@ -148,10 +148,10 @@ Al contrastar la entrevista con la lista de requerimientos funcionales se advirt
 | Eliminación de material, calificaciones y asistencia por parte del tallerista | *"Puede eliminar material, notas y asistencia"* | RF16, RF17, RF18 → métodos `eliminarMaterial()`, `eliminarNota()` y `eliminarAsistencia()` | RF16 y RF17 incluidos; RF18 postergado |
 | Comunicación del tallerista con los alumnos | *"comunicarse con los alumnos"* | Formalizada como requerimiento | Excluida por complejidad de implementación |
 | Cuatro de los siete reportes solicitados | Sección de reportes: listas de alumnos, histórico de calificaciones, información de alumnos y de talleristas | RF19 a RF22 → métodos de generación en `Administrador` | RF19 y RF22 incluidos; RF20 y RF21 postergados |
-| Visualización de las notas por parte del alumno | *"puede ver... las notas que le dejó el tallerista asignado"* | RF23 → método `visualizarNotas()` | Postergado |
+| Visualización de las notas por parte del alumno | *"puede ver... las notas que le dejó el tallerista asignado"* | RF23 → método `visualizarNotas()` | Incluido (postergado al principio) |
 | Consulta de datos sensibles | *"Se debe consultar: datos sensibles usados"* | RF24 → método `consultarDatosSensibles()` | Incluido |
 | Consulta del listado de alumnos por el tallerista | *"quién está en su taller"* | RF25 → método `consultarAlumnosDeTaller()` | Incluido |
-| Modificación de material ya publicado | *"Ajuste de materiales de su taller"* | RF26 → método `modificarContenido()` | Postergado |
+| Modificación de material ya publicado | *"Ajuste de materiales de su taller"* | RF26 → método `modificarContenido()` | Postergado en la interfaz; disponible en la API |
 
 **Observación metodológica:** estas ausencias no se detectaron al redactar los requerimientos sino al aplicar el Paso 3 de la derivación, que exige localizar el verbo de origen de cada método. Al recorrer la entrevista buscando verbos de acción aparecieron los que ningún requerimiento había recogido. La derivación funcionó, en este sentido, como una verificación de completitud sobre la documentación previa.
 

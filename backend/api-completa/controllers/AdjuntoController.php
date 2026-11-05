@@ -209,6 +209,12 @@ class AdjuntoController extends Controller
     private function handleException(
         Exception $e
     ): void {
+        // Error de base de datos: lo maneja index.php
+        // (guarda el detalle en el log y responde un mensaje genérico).
+        if ($e instanceof PDOException) {
+            throw $e;
+        }
+
         $message = strtolower(
             $e->getMessage()
         );

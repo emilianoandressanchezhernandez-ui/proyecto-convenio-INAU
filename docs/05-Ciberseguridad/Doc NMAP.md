@@ -5,13 +5,17 @@
 **Rama:** Ciberseguridad  
 **Fecha:** 22 de octubre de 2026
 
-**Última actualización:** 24 de octubre de 2026 (ejecución del escaneo sobre el servidor de prueba; resultados en la sección 10)
+**Última actualización:** 3 de noviembre de 2026 (escaneo del servidor de prueba en la sección 10; corrección del valor por defecto en el repositorio en la sección 10.6)
+
+<br>
 
 ## 1. Objetivo
 
 Este documento establece cómo utilizar Nmap para comprobar qué puertos y servicios de red son accesibles en el entorno de ejecución de TheNewfutures/INAU. El propósito es contrastar la exposición de red con la arquitectura que aparece en los archivos Docker y en la documentación de despliegue.
 
 Nmap se utiliza aquí como herramienta de reconocimiento defensivo. Un escaneo identifica puertos accesibles y puede intentar reconocer el servicio que responde; por sí solo no demuestra que exista una vulnerabilidad ni reemplaza las pruebas de la aplicación.
+
+<br>
 
 ## 2. Alcance y autorización
 
@@ -22,19 +26,23 @@ Las comprobaciones descritas se deben ejecutar únicamente sobre:
 
 No se deben ejecutar escaneos contra direcciones públicas, redes de terceros o equipos ajenos al proyecto sin autorización expresa. Las secciones 4 a 9 describen el procedimiento reproducible; los resultados obtenidos al aplicarlo sobre el servidor de prueba del equipo se registran en la sección 10.
 
+<br>
+
 ## 3. Componentes del proyecto que se comprobarán
 
 La configuración ejecutable de contenedores se encuentra en `backend/api-completa/compose.yaml`.
 
 | Componente | Evidencia en el repositorio | Puerto publicado por defecto | Uso dentro del proyecto |
 |---|---|---:|---|
-| API PHP y Apache | `backend/api-completa/compose.yaml` y `docker/php-apache/Dockerfile` | TCP 8002 en el host, redirigido al puerto 80 del contenedor | Recibe las solicitudes HTTP de la aplicación y las entrega a la API. |
-| MySQL | Servicio `database` en `backend/api-completa/compose.yaml` | TCP 3308 en el host, redirigido al puerto 3306 del contenedor | Almacena los datos del sistema. |
+| API PHP y Apache | `backend/api-completa/compose.yaml` y `docker/php-apache/Dockerfile` | TCP 8002, solo en la interfaz local del host (127.0.0.1), redirigido al puerto 80 del contenedor | Recibe las solicitudes HTTP de la aplicación y las entrega a la API. |
+| MySQL | Servicio `database` en `backend/api-completa/compose.yaml` | TCP 3308, solo en la interfaz local del host (127.0.0.1), redirigido al puerto 3306 del contenedor | Almacena los datos del sistema. |
 | Proxy web HTTPS previsto para el despliegue | `docs/04-implementacion/Documento de Reconstruccion - Servidor.md` | TCP 80 y 443; SSH utiliza TCP 22 | La guía de despliegue propone Nginx y Certbot delante del servicio de la API. |
 
 Los puertos 8002 y 3308 son los valores por defecto definidos en el `compose.yaml` actual. Si se cambian `API_PORT` o `MYSQL_PORT` en el archivo `.env`, el escaneo debe utilizar los puertos configurados realmente.
 
-**Distinción importante:** el archivo Compose actual publica los puertos 8002 y 3308 en el host sin limitar explícitamente la dirección de escucha a `127.0.0.1`. La guía de despliegue, por su parte, plantea que desde Internet solo se habiliten SSH y HTTP/HTTPS y que MySQL no quede expuesto al exterior. Nmap permite comprobar la exposición que resulta en una máquina concreta; no se debe asumir que la configuración final cumple ese objetivo sin medirla.
+**Distinción importante:** desde el 2 de noviembre de 2026, el archivo Compose limita por defecto los puertos 8002 y 3308 a la dirección local (`127.0.0.1`). Hasta esa fecha los publicaba en todas las interfaces, que es la configuración que muestran las ejecuciones de la sección 10. La guía de despliegue, por su parte, plantea que desde Internet solo se habiliten SSH y HTTP/HTTPS y que MySQL no quede expuesto al exterior. Nmap permite comprobar la exposición que resulta en una máquina concreta; no se debe asumir que la configuración final cumple ese objetivo sin medirla.
+
+<br>
 
 ## 4. Preparación del escaneo local
 
@@ -62,6 +70,8 @@ docker compose ps
 
 Esta comprobación permite saber si los servicios `api` y `database` están levantados antes de interpretar los resultados. Un puerto cerrado cuando el contenedor está detenido no equivale a una comprobación de seguridad de un servicio en funcionamiento.
 
+<br>
+
 ## 5. Escaneo de puertos locales del proyecto
 
 Con los contenedores en ejecución y los puertos por defecto, ejecutar:
@@ -81,6 +91,8 @@ nmap -Pn -sT -sV -p 8002,3308 -oN nmap-local.txt 127.0.0.1
 
 El archivo `nmap-local.txt` será la evidencia de esa ejecución. Su contenido debe reflejar el resultado observado; no se debe completar anticipadamente con estados supuestos.
 
+<br>
+
 ## 6. Escaneo del servidor autorizado
 
 Cuando el proyecto esté desplegado en un servidor y exista autorización para comprobarlo, ejecutar el siguiente comando sustituyendo `<IP_AUTORIZADA>` por la dirección real del servidor:
@@ -93,6 +105,8 @@ La selección de puertos corresponde a los servicios tratados en la documentaci�
 
 No se debe ejecutar este comando con el marcador literal `<IP_AUTORIZADA>`. Primero debe asignarse el servidor correcto y confirmar que el escaneo está autorizado.
 
+<br>
+
 ## 7. Cómo interpretar la salida
 
 | Estado informado por Nmap | Interpretación operativa | Acción para el proyecto |
@@ -101,6 +115,8 @@ No se debe ejecutar este comando con el marcador literal `<IP_AUTORIZADA>`. Prim
 | `closed` | El host responde, pero no hay una aplicación aceptando conexiones en ese puerto en el momento de la prueba. | Confirmar si el servicio debía estar levantado. No es por sí solo una vulnerabilidad. |
 | `filtered` | Nmap no puede determinar con certeza si el puerto está abierto porque un filtro de red impide obtener una respuesta concluyente. | Revisar reglas de firewall y repetir la prueba desde el punto de red apropiado, si está autorizado. |
 | Servicio o versión identificados | Nmap detectó características compatibles con un servicio concreto. | Registrar el dato como identificación probable del servicio, no como prueba de una vulnerabilidad. |
+
+<br>
 
 ## 8. Matriz de comprobación de exposición
 
@@ -111,8 +127,10 @@ Esta matriz define el resultado que debe verificarse. Los resultados observados 
 | 22/TCP | SSH | Depende de si el equipo ofrece SSH; no es un puerto exigido por el Compose local. | Debe quedar accesible para la administración autorizada del servidor. |
 | 80/TCP | HTTP / redirección web | Depende de los servicios que se ejecuten en el equipo. | Se habilita en la guía para servir o redirigir el acceso web. |
 | 443/TCP | HTTPS | Depende de si existe un proxy HTTPS local. | Debe quedar accesible si se sigue el procedimiento documentado con Nginx y Certbot. |
-| 8002/TCP | API PHP/Apache publicada por Docker | Se espera que responda cuando el contenedor de API está activo y se usan los valores por defecto. | Debe evaluarse si puede limitarse a la interfaz local detrás de Nginx; no debería darse por hecho que debe quedar accesible directamente desde Internet. |
+| 8002/TCP | API PHP/Apache publicada por Docker | Se espera que responda cuando el contenedor de API está activo y se usan los valores por defecto. | No debe quedar accesible directamente: la API se publica a través de Nginx. El valor por defecto de `compose.yaml` la limita a la interfaz local. |
 | 3308/TCP | MySQL publicado por Docker | Se puede utilizar para conexiones desde el host de desarrollo si el mapeo por defecto está activo. | No debería quedar accesible desde Internet; la guía del servidor indica que el puerto de la base de datos no se abre al exterior. |
+
+<br>
 
 ## 9. Registro de evidencia y cierre
 
@@ -128,6 +146,8 @@ Por cada ejecución, registrar:
 8. Resultado de una nueva comprobación después de los cambios.
 
 El documento debe actualizarse con los resultados observados únicamente después de ejecutar la prueba. No se debe escribir que el sistema está seguro porque el escaneo no haya mostrado puertos inesperados: Nmap solo comprueba la superficie de red definida en el comando.
+
+<br>
 
 ## 10. Resultados de la ejecución en el servidor de prueba
 
@@ -208,7 +228,7 @@ La corrección no afectó el funcionamiento del sitio, y la API y MySQL ya no so
 
 | Hallazgo | Explicación | Acción |
 |---|---|---|
-| La API y MySQL quedaban publicados en todas las interfaces | Con los valores por defecto, `compose.yaml` publica 8002 y 3308 en `0.0.0.0`. Docker crea sus propias reglas de red y no respeta `ufw`, por lo que el firewall no los bloqueaba, tal como advierte la guía de despliegue | Corregido en el servidor de prueba limitando ambos puertos a `127.0.0.1` en el `.env` (escenario PC-08 del Plan de Contingencia) |
+| La API y MySQL quedaban publicados en todas las interfaces | Con los valores por defecto, `compose.yaml` publica 8002 y 3308 en `0.0.0.0`. Docker crea sus propias reglas de red y no respeta `ufw`, por lo que el firewall no los bloqueaba, tal como advierte la guía de despliegue | Corregido en el servidor de prueba limitando ambos puertos a `127.0.0.1` en el `.env` (escenario PC-08 del Plan de Contingencia). Desde el 2 de noviembre de 2026, también es el valor por defecto del repositorio (sección 10.6) |
 | Nmap identificó las versiones exactas de los servicios | Se informan OpenSSH 9.6p1, nginx 1.24.0, Apache 2.4.69 y MySQL 8.4.13. No es una vulnerabilidad por sí misma, pero facilita a un atacante buscar fallas conocidas de esas versiones | Mantener los servicios actualizados; evaluar ocultar la versión en las cabeceras de Nginx y Apache |
 | Los contenedores no se reinician solos | Tras reiniciar el servidor, la API y MySQL quedaron detenidos hasta ejecutar `docker compose up -d` | Evaluar una política de reinicio en `compose.yaml` |
 | La dirección del servidor cambió al reiniciarse | La red asigna la IP de forma dinámica; el primer escaneo apuntó a una dirección que ya no correspondía al servidor | Fijar la dirección (reserva en el router) y registrar siempre la IP y el estado de `docker compose ps` antes de interpretar un escaneo (sección 9) |
@@ -216,8 +236,19 @@ La corrección no afectó el funcionamiento del sitio, y la API y MySQL ya no so
 ### 10.5 Alcance y limitaciones de estos resultados
 
 - Los escaneos con Nmap se ejecutaron desde el propio servidor hacia su dirección de red. La exposición desde otra computadora de la red, después de la corrección, se comprobó con el navegador y no con Nmap; no se registró un escaneo con Nmap desde otra computadora antes de la corrección.
-- La corrección se aplicó en el `.env` del servidor de prueba. El `compose.yaml` del repositorio sigue publicando los puertos 8002 y 3308 en todas las interfaces cuando no se definen `API_PORT` y `MYSQL_PORT`.
+- La corrección se aplicó primero en el `.env` del servidor de prueba. El 2 de noviembre de 2026 se llevó al repositorio (sección 10.6).
 - El escaneo no prueba que los servicios sean seguros: solo describe la superficie de red de los puertos incluidos en el comando.
+
+### 10.6 Corrección en el repositorio (2 de noviembre de 2026)
+
+| Elemento | Detalle |
+|---|---|
+| Cambio | En el commit `fbc9612`, el valor por defecto de los puertos pasó a `127.0.0.1:8002` y `127.0.0.1:3308` en `compose.yaml`, y los mismos valores se escribieron en las plantillas `.env.example` y `.env.docker.example`. Las plantillas también debían cambiar: un valor escrito en el `.env` reemplaza al valor por defecto de `compose.yaml`, por lo que copiar una plantilla con `API_PORT=8002` volvía a publicar el puerto en todas las interfaces |
+| Verificación del código | Se revisaron los tres archivos del commit: los seis valores quedaron limitados a `127.0.0.1` |
+| Verificación desde otra computadora | Desde una computadora con Windows de la misma red, con el navegador Chrome (ejecución asistida por IA con la extensión Claude en Chrome), sobre el servidor en `192.168.1.5`: el sitio a través de Nginx (puerto 80) respondió en 23 ms; los puertos 8002 y 3308 no respondieron en 6 segundos, igual que un puerto cerrado usado como control (9999) |
+| Alcance | El servidor de prueba ya tenía estos valores en su `.env` desde el 24/10, por lo que la verificación desde otra computadora confirma que sigue protegido, pero no prueba por sí sola el valor por defecto del repositorio, que se verificó en el código. No se repitió el escaneo con Nmap. La corrección se registra también en `Hardening de Infraestructura y Contenedores.md` (H-01) y en `Testing/Testing-06.md` |
+
+<br>
 
 ## 11. Fuentes dentro del proyecto
 

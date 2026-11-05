@@ -18,6 +18,10 @@ class TallerController extends Controller
                 $talleres,
                 'Talleres obtenidos correctamente.'
             );
+        } catch (PDOException $e) {
+            // Error de base de datos: lo maneja index.php
+            // (guarda el detalle en el log y responde un mensaje genérico).
+            throw $e;
         } catch (Exception $e) {
             Response::error(
                 'No se pudieron obtener los talleres.',
@@ -46,6 +50,10 @@ class TallerController extends Controller
                 $talleres,
                 'Talleres del usuario obtenidos correctamente.'
             );
+        } catch (PDOException $e) {
+            // Error de base de datos: lo maneja index.php
+            // (guarda el detalle en el log y responde un mensaje genérico).
+            throw $e;
         } catch (Exception $e) {
             Response::error(
                 $e->getMessage(),
@@ -127,6 +135,10 @@ class TallerController extends Controller
                 $taller,
                 'Taller obtenido correctamente.'
             );
+        } catch (PDOException $e) {
+            // Error de base de datos: lo maneja index.php
+            // (guarda el detalle en el log y responde un mensaje genérico).
+            throw $e;
         } catch (Exception $e) {
 
             Response::error(
@@ -150,6 +162,10 @@ class TallerController extends Controller
                 'Taller creado correctamente.',
                 201
             );
+        } catch (PDOException $e) {
+            // Error de base de datos: lo maneja index.php
+            // (guarda el detalle en el log y responde un mensaje genérico).
+            throw $e;
         } catch (InvalidArgumentException $e) {
             $errores = json_decode($e->getMessage(), true);
 
@@ -179,6 +195,10 @@ class TallerController extends Controller
                 $taller,
                 'Taller actualizado correctamente.'
             );
+        } catch (PDOException $e) {
+            // Error de base de datos: lo maneja index.php
+            // (guarda el detalle en el log y responde un mensaje genérico).
+            throw $e;
         } catch (InvalidArgumentException $e) {
             $errores = json_decode($e->getMessage(), true);
 
@@ -210,6 +230,10 @@ class TallerController extends Controller
                 null,
                 'Taller finalizado correctamente.'
             );
+        } catch (PDOException $e) {
+            // Error de base de datos: lo maneja index.php
+            // (guarda el detalle en el log y responde un mensaje genérico).
+            throw $e;
         } catch (Exception $e) {
             $status = $e->getMessage() === 'Taller no encontrado.'
                 ? 404
