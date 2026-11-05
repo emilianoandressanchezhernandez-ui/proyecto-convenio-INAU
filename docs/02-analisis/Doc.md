@@ -797,7 +797,7 @@ Estado verificado en las pruebas del sistema, de `docs/04-implementacion/Testing
 | No todo entra en la primera versión | Seis funciones se postergaron para respetar el plazo de doce semanas. |
 | El modelado revela requerimientos faltantes | Al derivar el modelo de clases se detectaron requerimientos presentes en la entrevista que la especificación no había recogido. |
 | El cierre no significa que el producto no pueda evolucionar | El sistema queda operativo y se identifican mejoras futuras. |
-| Actuar a tiempo ante el incumplimiento de tareas | Durante el proyecto, dos integrantes (Maximiliano Leal e Ignacio Viera) dejaron de cumplir las tareas asignadas y fueron retirados del equipo, que continuó con tres integrantes (ver Control de Cambios, CC-03). La decisión debió tomarse antes, porque la demora afectó la distribución del trabajo y el cronograma. |
+| Actuar a tiempo ante el incumplimiento de tareas | Durante el proyecto, dos integrantes (Maximiliano Leal e Ignacio Viera) dejaron de cumplir las tareas asignadas y fueron retirados del equipo, que continuó con tres integrantes. La decisión debió tomarse antes, porque la demora afectó la distribución del trabajo y el cronograma. |
 
 ---
 
