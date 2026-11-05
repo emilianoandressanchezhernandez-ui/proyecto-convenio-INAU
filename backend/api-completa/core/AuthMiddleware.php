@@ -1,44 +1,35 @@
 <?php
 
 /**
- * CLASE AUTHMIDDLEWARE
- * ==================================================================
- * Se ejecuta antes del controller y controla si una ruta requiere:
- *
- * - null                 -> ruta publica
- * - auth                 -> cualquier usuario autenticado
- * - admin                -> solo administrador
- * - tallerista           -> solo tallerista
- * - alumno               -> solo alumno
- * - admin|tallerista     -> cualquiera de esos roles
- *
- * El requisito se define directamente en routes.php.
+ * Controla la autenticacion, los permisos por rol
+ * y, cuando se habilite, la aceptacion de terminos.
  */
-
 class AuthMiddleware
 {
-    /**
-     * Usuario obtenido del token.
-     *
-     * Se guarda para que los controllers puedan acceder al usuario
-     * autenticado sin tener que volver a leer el token.
-     */
     private static ?array $user = null;
 
     /**
-     * Ejecuta el control de acceso de la ruta.
+     * MODO DE PREPARACION.
+     *
+     * No activar hasta que los documentos esten
+     * aprobados y el flujo de aceptacion funcione.
      */
-    public static function handle(?string $requirement): void
-    {
-        // Ruta publica.
+    private const TERMINOS_OBLIGATORIOS = true;
+
+    public static function handle(
+        ?string $requirement,
+        ?string $method = null,
+        ?string $path = null
+    ): void {
+
+        // Las rutas publicas no requieren autenticacion.
         if ($requirement === null) {
             return;
         }
 
-        // Busca y valida el JWT guardado en la cookie.
+        // Validar la sesion mediante el JWT.
         $user = Token::read();
 
-        // No hay sesion valida.
         if ($user === null) {
             Response::error(
                 'Tenes que iniciar sesion.',
@@ -46,24 +37,85 @@ class AuthMiddleware
             );
         }
 
-        // Guardamos el usuario autenticado.
         self::$user = $user;
 
-        // "auth" permite entrar a cualquier usuario autenticado.
-        if ($requirement === 'auth') {
+        // Primero comprobar los permisos por rol.
+        if ($requirement !== 'auth') {
+            $allowedRoles = explode('|', $requirement);
+
+            if (!in_array(
+                $user['rol'] ?? null,
+                $allowedRoles,
+                true
+            )) {
+                Response::error(
+                    'No tenes permisos para hacer esto.',
+                    403
+                );
+            }
+        }
+
+        // Preparado para comprobar la aceptacion.
+        // Por ahora no bloquea ningun endpoint.
+        if (self::TERMINOS_OBLIGATORIOS) {
+            self::verificarAceptacionTerminos(
+                $user,
+                $method,
+                $path
+            );
+        }
+    }
+
+    /**
+     * Comprueba que el usuario haya aceptado
+     * la version vigente de los terminos.
+     */
+    private static function verificarAceptacionTerminos(
+        array $user,
+        ?string $method,
+        ?string $path
+    ): void {
+
+        // Rutas que deben seguir disponibles
+        // aunque el usuario todavia no haya aceptado.
+        $rutasPermitidas = [
+            'GET /perfil',
+            'GET /terminos/estado',
+            'POST /terminos/aceptar',
+            'POST /logout'
+        ];
+
+        $rutaActual = $method . ' ' . $path;
+
+        if (in_array($rutaActual, $rutasPermitidas, true)) {
             return;
         }
 
-        // Permite declarar uno o varios roles:
-        // 'admin'
-        // 'tallerista'
-        // 'alumno'
-        // 'admin|tallerista'
-        $allowedRoles = explode('|', $requirement);
+        // No permitir pasar si el token no tiene
+        // un identificador de usuario valido.
+        $usuarioId = filter_var(
+            $user['id'] ?? null,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
 
-        if (!in_array($user['rol'], $allowedRoles, true)) {
+        if ($usuarioId === false) {
             Response::error(
-                'No tenes permisos para hacer esto.',
+                'No se pudo verificar la identidad del usuario.',
+                401
+            );
+        }
+
+        $repository = new TerminosRepository();
+
+        $aceptado = $repository->haAceptado(
+            (int) $usuarioId,
+            TerminosService::VERSION_ACTUAL
+        );
+
+        if (!$aceptado) {
+            Response::error(
+                'Debes aceptar los terminos vigentes para continuar.',
                 403
             );
         }

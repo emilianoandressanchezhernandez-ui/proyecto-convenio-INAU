@@ -373,3 +373,23 @@ INSERT INTO trazabilidad (usuario_id, accion, entidad, entidad_id, fecha, detall
 (3, 'crear',  'contenido', 2, '2026-08-03 09:30:00', '{"titulo": "Primera página web", "tipo": "Tarea"}'),
 (3, 'editar', 'entrega',   1, '2026-08-16 08:12:00', '{"campo": "nota", "valor_anterior": null, "valor_nuevo": 9}'),
 (1, 'crear',  'alumno',    3, '2026-08-20 11:05:00', '{"nombre": "Valentina Gómez"}');
+
+
+-- ============================================================
+-- ACEPTACIONES DE TÉRMINOS Y CONDICIONES
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS aceptaciones_terminos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    version_terminos VARCHAR(30) NOT NULL,
+    fecha_aceptacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT uq_aceptacion_usuario_version
+        UNIQUE (usuario_id, version_terminos),
+
+    CONSTRAINT fk_aceptacion_usuario
+        FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(id)
+        ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

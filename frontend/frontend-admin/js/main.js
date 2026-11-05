@@ -21,6 +21,9 @@ async function inicializarAplicacion() {
 
         if (!usuario) return;
 
+        const terminosAceptados = await verificarTerminosAdministrador();
+        if (!terminosAceptados) return;
+
         // Usuario autenticado obtenido de la API.
         window.USUARIO_AUTENTICADO = usuario;
 
@@ -130,6 +133,48 @@ async function verificarSesionAdministrador() {
     return usuario;
 }
 
+async function verificarTerminosAdministrador() {
+    const response = await fetch(
+        `${ADMIN_API_URL}/terminos/estado`,
+        {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                Accept: "application/json"
+            },
+            cache: "no-store"
+        }
+    );
+
+    if (response.status === 401) {
+        redirigirAlLogin();
+        return false;
+    }
+
+    if (!response.ok) {
+        throw new Error(
+            `No se pudo comprobar la aceptación (HTTP ${response.status}).`
+        );
+    }
+
+    const resultado = await response.json();
+
+    if (
+        !resultado.ok ||
+        typeof resultado.datos?.aceptado !== "boolean"
+    ) {
+        throw new Error(
+            "La API devolvió un estado de aceptación inválido."
+        );
+    }
+
+    if (!resultado.datos.aceptado) {
+        window.location.replace("../../aceptar-terminos.html");
+        return false;
+    }
+
+    return true;
+}
 
 function redirigirAlLogin() {
     window.location.replace(ADMIN_LOGIN_URL);

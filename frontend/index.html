@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,15 +35,42 @@
                                 <label for="correo" class="form-label">
                                     Correo electrónico
                                 </label>
-                                <input type="email" class="form-control" id="correo" placeholder="usuario@ejemplo.com" autocomplete="username" required>
+                                <input type="email" class="form-control" id="correo" placeholder="usuario@ejemplo.com"
+                                    autocomplete="username" required>
                             </div>
                             <div class="mb-4">
                                 <label for="password" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control" id="password" autocomplete="current-password" required>
+                                <input type="password" class="form-control" id="password"
+                                    autocomplete="current-password" required>
                             </div>
                             <button type="submit" id="btn-login" class="btn btn-primary w-100">
                                 Ingresar
                             </button>
+
+                            <div class="text-center mt-4">
+                                <p class="small text-muted mb-2">
+                                    Al utilizar esta plataforma, se aplican las
+                                    condiciones de uso y las disposiciones de privacidad
+                                    correspondientes.
+                                </p>
+
+                                <div class="d-flex flex-wrap justify-content-center gap-2">
+                                    <a href="terminos.html" class="small text-decoration-none" target="_blank"
+                                        rel="noopener noreferrer">
+                                        <i class="bi bi-file-text me-1"></i>
+                                        Términos y Condiciones
+                                    </a>
+
+                                    <span class="text-muted">|</span>
+
+                                    <a href="privacidad.html" class="small text-decoration-none" target="_blank"
+                                        rel="noopener noreferrer">
+                                        <i class="bi bi-shield-lock me-1"></i>
+                                        Política de Privacidad
+                                    </a>
+                                </div>
+                            </div>
+
                         </form>
                     </div>
                 </div>
@@ -54,4 +82,5 @@
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
 </body>
+
 </html>

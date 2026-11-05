@@ -125,7 +125,11 @@ class Router
                  * Antes de ejecutar el controller, se comprueban
                  * autenticación y permisos.
                  */
-                AuthMiddleware::handle($route['middleware']);
+                AuthMiddleware::handle(
+                    $route['middleware'],
+                    $method,
+                    $path
+                );
 
                 /**
                  * El nombre del controller y del método están guardados

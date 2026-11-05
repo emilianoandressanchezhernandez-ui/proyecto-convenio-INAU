@@ -110,6 +110,8 @@ require_once __DIR__ . '/validators/EntregaValidator.php';
 require_once __DIR__ . '/validators/AdjuntoValidator.php';
 
 
+
+
 // ------------------------------------------------------------------
 // DTOs: transportan datos ya validados y normalizados.
 // ------------------------------------------------------------------
@@ -129,6 +131,7 @@ require_once __DIR__ . '/dtos/ContenidoDTO.php';
 
 require_once __DIR__ . '/repositories/Repository.php';
 require_once __DIR__ . '/repositories/UserRepository.php';
+require_once __DIR__ . '/repositories/TerminosRepository.php';
 require_once __DIR__ . '/repositories/AlumnoRepository.php';
 require_once __DIR__ . '/repositories/TalleristaRepository.php';
 require_once __DIR__ . '/repositories/TallerRepository.php';
@@ -152,6 +155,7 @@ require_once __DIR__ . '/services/TalleristaService.php';
 require_once __DIR__ . '/services/TallerService.php';
 require_once __DIR__ . '/services/AsignacionService.php';
 require_once __DIR__ . '/services/AsistenciaService.php';
+require_once __DIR__ . '/services/TerminosService.php';
 
 // NUEVO: servicio de reportes.
 require_once __DIR__ . '/services/ReporteService.php';
@@ -171,6 +175,7 @@ require_once __DIR__ . '/controllers/AlumnoController.php';
 require_once __DIR__ . '/controllers/TalleristaController.php';
 require_once __DIR__ . '/controllers/TallerController.php';
 require_once __DIR__ . '/controllers/AsignacionController.php';
+require_once __DIR__ . '/controllers/TerminosController.php';
 require_once __DIR__ . '/controllers/AsistenciaController.php';
 
 // NUEVO: controlador de reportes.

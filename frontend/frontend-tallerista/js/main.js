@@ -18,6 +18,10 @@ async function inicializarAplicacion() {
         const usuario = await verificarSesionTallerista();
         if (!usuario) return;
 
+        // Comprobar la aceptación antes de mostrar el dashboard.
+        const puedeContinuar = await verificarTerminosTallerista();
+        if (!puedeContinuar) return;
+
         window.USUARIO_AUTENTICADO = usuario;
 
         // Compatibilidad transitoria con los datos simulados.
@@ -131,6 +135,54 @@ function mostrarErrorDeSesion() {
 
     mensaje.append(titulo, detalle, reintentar);
     document.body.append(mensaje);
+}
+
+
+/**
+ * Comprueba si el tallerista aceptó los términos vigentes.
+ *
+ * Se ejecuta después de verificar la sesión y antes
+ * de mostrar o inicializar cualquier página.
+ */
+async function verificarTerminosTallerista() {
+    const response = await fetch(
+        `${TALLERISTA_API_URL}/terminos/estado`,
+        {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                Accept: "application/json"
+            },
+            cache: "no-store"
+        }
+    );
+
+    if (response.status === 401) {
+        redirigirAlLogin();
+        return false;
+    }
+
+    if (!response.ok) {
+        throw new Error(
+            `No se pudo comprobar la aceptación (HTTP ${response.status}).`
+        );
+    }
+
+    const resultado = await response.json();
+
+    if (!resultado.ok ||
+        typeof resultado.datos?.aceptado !== "boolean") {
+        throw new Error(
+            "La API devolvió un estado de aceptación inválido."
+        );
+    }
+
+    if (!resultado.datos.aceptado) {
+        window.location.replace("../../aceptar-terminos.html");
+        return false;
+    }
+
+    return true;
 }
 
 

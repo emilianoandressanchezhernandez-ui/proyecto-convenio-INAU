@@ -46,6 +46,41 @@
 $router = new Router();
 
 
+/**
+ * ================================================================
+ * TERMINOS Y CONDICIONES
+ * ================================================================
+ */
+
+// Consultar la version vigente.
+// No requiere iniciar sesion.
+$router->add(
+    'GET',
+    '/terminos',
+    'TerminosController',
+    'index'
+);
+
+// Comprobar si el usuario acepto la version vigente.
+$router->add(
+    'GET',
+    '/terminos/estado',
+    'TerminosController',
+    'estado',
+    'auth'
+);
+
+// Registrar la aceptacion del usuario autenticado.
+$router->add(
+    'POST',
+    '/terminos/aceptar',
+    'TerminosController',
+    'aceptar',
+    'auth'
+);
+
+
+
 // ---- Entrar al sistema -------------------------------------------
 
 // No existe autoregistro público.

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Aceptación de términos - INAU</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            min-height: 100vh;
+            background: #f4f6f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #263238;
+        }
+
+        .aceptacion-card {
+            max-width: 650px;
+            width: 100%;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .documento-enlace {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #263238;
+            transition: background-color .2s;
+        }
+
+        .documento-enlace:hover {
+            background-color: #f4f6f9;
+        }
+
+        .documento-enlace i {
+            font-size: 1.5rem;
+            color: #0d6efd;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container py-5">
+
+        <div class="card aceptacion-card mx-auto">
+            <div class="card-body p-4 p-md-5">
+
+                <div class="text-center mb-4">
+
+                    <i class="bi bi-shield-check text-primary fs-1"></i>
+
+                    <h1 class="h3 fw-bold mt-3">
+                        Términos y Condiciones
+                    </h1>
+
+                    <p class="text-muted">
+                        Sistema de Gestión de Talleres - INAU
+                    </p>
+
+                    <span class="badge bg-primary">
+                        Versión 1.0
+                    </span>
+
+                </div>
+
+                <div class="alert alert-info small">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Entorno de demostración académica.</strong>
+                    Estás utilizando la versión del Sistema
+                    de Gestión de Talleres INAU.
+
+                    Los Términos y Condiciones y la Política de Privacidad
+                    corresponden a la versión 1.0 de demostración.
+
+                    La aceptación quedará registrada en la base de datos
+                    de este entorno de pruebas.
+                </div>
+
+                <p>
+                    Antes de utilizar la plataforma, es importante
+                    conocer las condiciones de uso y la información
+                    relativa al tratamiento de datos personales.
+                </p>
+
+                <p class="fw-semibold mb-3">
+                    Documentos disponibles para lectura:
+                </p>
+
+                <div class="d-grid gap-3 mb-4">
+
+                    <a href="terminos.html" class="documento-enlace" target="_blank" rel="noopener noreferrer">
+                        <i class="bi bi-file-earmark-text"></i>
+
+                        <div>
+                            <strong>Términos y Condiciones</strong>
+                            <div class="small text-muted">
+                                Leer las condiciones de uso del sistema
+                            </div>
+                        </div>
+
+                        <i class="bi bi-box-arrow-up-right ms-auto fs-6"></i>
+                    </a>
+
+                    <a href="privacidad.html" class="documento-enlace" target="_blank" rel="noopener noreferrer">
+                        <i class="bi bi-shield-lock"></i>
+
+                        <div>
+                            <strong>Política de Privacidad</strong>
+                            <div class="small text-muted">
+                                Consultar el tratamiento de datos personales
+                            </div>
+                        </div>
+
+                        <i class="bi bi-box-arrow-up-right ms-auto fs-6"></i>
+                    </a>
+
+                </div>
+
+                <hr>
+
+                <form id="form-aceptacion">
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="acepta-terminos" disabled>
+
+                        <label class="form-check-label" for="acepta-terminos">
+                            He leído y acepto los Términos y
+                            Condiciones de Uso de la plataforma,
+                            versión 1.0.
+                        </label>
+                    </div>
+
+                    <button type="submit" id="btn-aceptar" class="btn btn-primary w-100 py-2" disabled>
+                        <i class="bi bi-check-circle me-1"></i>
+                        Aceptar y continuar
+                    </button>
+
+                </form>
+
+                <p class="text-center text-muted small mt-3 mb-0">
+                    Al confirmar, el sistema registrará tu usuario,
+                    la versión aceptada y la fecha de aceptación.
+                </p>
+
+                <div class="text-center mt-4">
+                    <button type="button" id="btn-cerrar-sesion" class="btn btn-outline-secondary">
+                        <i class="bi bi-box-arrow-right me-1"></i>
+                        Cerrar sesión
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+
+    <script src="js/api.js"></script>
+    <script src="js/aceptar-terminos.js"></script>
+
+</body>
+
+</html>
